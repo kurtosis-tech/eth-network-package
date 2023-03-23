@@ -1,6 +1,6 @@
-TODO REPLACE WITH REPO NAME
+Ethereum Network Package
 ===========================
-TODO replace with repo description
+This is a Kurtosis Starlark Package that will spin up a network of ethereum EL and CL nodes.
 
 TODO COMPLETE AND DELETE
 ------------------------
