@@ -2,17 +2,6 @@ Ethereum Network Package
 ===========================
 This is a Kurtosis Starlark Package that will spin up a network of ethereum EL and CL nodes.
 
-TODO COMPLETE AND DELETE
-------------------------
-CONFIGURE GENERAL REPO SETTINGS
-1. [ ] Check "Always suggest updating pull request branches"
-1. [ ] Check "Automatically delete head branches"
-1. [ ] Give kurtosisbot Read access to the repo (so it can do releases)
-1. [ ] Give the "Engineers" team Admin access to the repo
-1. [ ] Check "Allow auto merge"
-1. [ ] Uncheck "Allow merge commits" and "Allow rebase merging"
-1. [ ] Change the default for "Allow squashing and merging" to "Defualt to pull request title and description"
-
 SET UP KURTOSIS BRANCH PROTECTION
 1. [ ] Under "Branches", create a new branch protection rule
 1. [ ] Set the rule name to `main`
