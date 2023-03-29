@@ -1,5 +1,5 @@
 participant_network = import_module("github.com/kurtosis-tech/eth-network-package/src/participant_network/participant_network.star")
-parse_input = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
+input_parser = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
 
 static_files = import_module("github.com/kurtosis-tech/eth-network-package/src/static_files/static_files.star")
 genesis_constants = import_module("github.com/kurtosis-tech/eth-network-package/src/participant_network/prelaunch_data_generator/genesis_constants/genesis_constants.star")
