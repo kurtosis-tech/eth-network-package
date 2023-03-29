@@ -122,7 +122,6 @@ def parse_input(input_args):
 			capella_fork_epoch=result["network_params"]["capella_fork_epoch"],
 			genesis_delay=result["network_params"]["genesis_delay"]
 		),
-		launch_additional_services=result["launch_additional_services"],
 		wait_for_finalization=result["wait_for_finalization"],
 		wait_for_verifications=result["wait_for_verifications"],
 		verifications_epoch_limit=result["verifications_epoch_limit"],

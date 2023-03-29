@@ -1,5 +1,5 @@
 shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/shared_utils/shared_utils.star")
-parse_input = import_module("github.com/kurtosis-tech/eth-network-package/package_io/parse_input.star")
+parse_input = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
 cl_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_client_context.star")
 cl_node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_metrics_info.star")
 cl_node_health_checker = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_health_checker.star")

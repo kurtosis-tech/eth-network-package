@@ -2,7 +2,7 @@ cl_validator_keystores = import_module("github.com/kurtosis-tech/eth-network-pac
 el_genesis_data_generator = import_module("github.com/kurtosis-tech/eth-network-package/src/prelaunch_data_generator/el_genesis/el_genesis_data_generator.star")
 cl_genesis_data_generator = import_module("github.com/kurtosis-tech/eth-network-package/src/prelaunch_data_generator/cl_genesis/cl_genesis_data_generator.star")
 
-static_files = import_module("github.com/kurtosis-tech/eth-network-package/src/static_files/static_files.star")
+static_files = import_module("github.com/kurtosis-tech/eth-network-package/static_files/static_files.star")
 
 geth = import_module("github.com/kurtosis-tech/eth-network-package/src/el/geth/geth_launcher.star")
 besu = import_module("github.com/kurtosis-tech/eth-network-package/src/el/besu/besu_launcher.star")

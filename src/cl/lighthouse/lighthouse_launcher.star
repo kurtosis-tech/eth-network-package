@@ -1,10 +1,10 @@
 shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/shared_utils/shared_utils.star")
-parse_input = import_module("github.com/kurtosis-tech/eth-network-package/package_io/parse_input.star")
+parse_input = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
 cl_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_client_context.star")
 cl_node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_metrics_info.star")
 cl_node_health_checker = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_health_checker.star")
 
-package_io = import_module("github.com/kurtosis-tech/eth-network-package/src/package_io/constants.star")
+package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
 
 LIGHTHOUSE_BINARY_COMMAND = "lighthouse"
 
@@ -88,7 +88,6 @@ def launch(
 		image,
 		bootnode_context,
 		el_client_context,
-		mev_boost_context,
 		log_level,
 		extra_beacon_params,
 	)

@@ -1,5 +1,5 @@
 shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/shared_utils/shared_utils.star")
-parse_input = import_module("github.com/kurtosis-tech/eth-network-package/package_io/parse_input.star")
+parse_input = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
 cl_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_client_context.star")
 cl_node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_metrics_info.star")
 cl_node_health_checker = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_health_checker.star")
@@ -68,7 +68,6 @@ def launch(
 	global_log_level,
 	bootnode_context,
 	el_client_context,
-	eth-network-package_context,
 	node_keystore_files,
 	extra_beacon_params,
 	extra_validator_params):
@@ -77,7 +76,7 @@ def launch(
 
 	extra_params = [param for param in extra_beacon_params] + [param for param in extra_validator_params]
 
-	config = get_config(launcher.cl_genesis_data, image, bootnode_context, el_client_context, eth-network-package_context, log_level, node_keystore_files, extra_params)
+	config = get_config(launcher.cl_genesis_data, image, bootnode_context, el_client_context, log_level, node_keystore_files, extra_params)
 
 	nimbus_service = plan.add_service(service_name, config)
 
@@ -114,7 +113,6 @@ def get_config(
 	image,
 	boot_cl_client_ctx,
 	el_client_ctx,
-	eth-network-package_context,
 	log_level,
 	node_keystore_files,
 	extra_params):
