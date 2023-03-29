@@ -1,11 +1,10 @@
-shared_utils = import_module("github.com/kurtosis-tech/eth2-package/src/shared_utils/shared_utils.star")
-parse_input = import_module("github.com/kurtosis-tech/eth2-package/src/package_io/parse_input.star")
-cl_client_context = import_module("github.com/kurtosis-tech/eth2-package/src/participant_network/cl/cl_client_context.star")
-cl_node_metrics = import_module("github.com/kurtosis-tech/eth2-package/src/participant_network/cl/cl_node_metrics_info.star")
-mev_boost_context_module = import_module("github.com/kurtosis-tech/eth2-package/src/participant_network/mev_boost/mev_boost_context.star")
-cl_node_health_checker = import_module("github.com/kurtosis-tech/eth2-package/src/participant_network/cl/cl_node_health_checker.star")
+shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/shared_utils/shared_utils.star")
+parse_input = import_module("github.com/kurtosis-tech/eth-network-package/package_io/parse_input.star")
+cl_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_client_context.star")
+cl_node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_metrics_info.star")
+cl_node_health_checker = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_health_checker.star")
 
-package_io = import_module("github.com/kurtosis-tech/eth2-package/src/package_io/constants.star")
+package_io = import_module("github.com/kurtosis-tech/eth-network-package/src/package_io/constants.star")
 
 CONSENSUS_DATA_DIRPATH_ON_SERVICE_CONTAINER      = "/consensus-data"
 GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER   = "/genesis"
@@ -58,7 +57,6 @@ def launch(
 	global_log_level,
 	bootnode_context,
 	el_client_context,
-	mev_boost_context,
 	node_keystore_files,
 	extra_beacon_params,
 	extra_validator_params):
@@ -74,7 +72,6 @@ def launch(
 		image,
 		bootnode_context,
 		el_client_context,
-		mev_boost_context,
 		log_level,
 		extra_beacon_params,
 	)
@@ -96,7 +93,6 @@ def launch(
 		log_level,
 		beacon_http_url,
 		node_keystore_files,
-		mev_boost_context,
 		extra_validator_params,
 	)
 
@@ -134,7 +130,6 @@ def get_beacon_config(
 	image,
 	boot_cl_client_ctx,
 	el_client_ctx,
-	mev_boost_context,
 	log_level,
 	extra_params):
 
@@ -184,12 +179,6 @@ def get_beacon_config(
 
 	if boot_cl_client_ctx != None :
 		cmd.append("--bootnodes="+boot_cl_client_ctx.enr)
-	
-
-	if mev_boost_context != None:
-		cmd.append("--builder")
-		cmd.append("--builder.urls '{0}'".format(mev_boost_context_module.mev_boost_endpoint(mev_boost_context)))
-	
 
 	if len(extra_params) > 0:
 		# this is a repeated<proto type>, we convert it into Starlark
@@ -213,7 +202,6 @@ def get_validator_config(
 	log_level,
 	beacon_client_http_url,
 	node_keystore_files,
-	mev_boost_context,
 	extra_params):
 
 	root_dirpath = shared_utils.path_join(CONSENSUS_DATA_DIRPATH_ON_SERVICE_CONTAINER, service_name)
@@ -237,11 +225,6 @@ def get_validator_config(
 		# ^^^^^^^^^^^^^^^^^^^ PROMETHEUS CONFIG ^^^^^^^^^^^^^^^^^^^^^
 	]
 
-	if mev_boost_context != None:
-		cmd.append("--builder")
-		# TODO(old) required to work? - from old module
-		# cmdArgs = append(cmdArgs, "--defaultFeeRecipient <your ethereum address>")
-	
 	if len(extra_params) > 0:
 		# this is a repeated<proto type>, we convert it into Starlark
 		cmd.extend([param for param in extra_params])

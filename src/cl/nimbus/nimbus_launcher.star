@@ -1,10 +1,10 @@
-shared_utils = import_module("github.com/kurtosis-tech/eth2-package/src/shared_utils/shared_utils.star")
-parse_input = import_module("github.com/kurtosis-tech/eth2-package/src/package_io/parse_input.star")
-cl_client_context = import_module("github.com/kurtosis-tech/eth2-package/src/participant_network/cl/cl_client_context.star")
-cl_node_metrics = import_module("github.com/kurtosis-tech/eth2-package/src/participant_network/cl/cl_node_metrics_info.star")
-cl_node_health_checker = import_module("github.com/kurtosis-tech/eth2-package/src/participant_network/cl/cl_node_health_checker.star")
+shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/shared_utils/shared_utils.star")
+parse_input = import_module("github.com/kurtosis-tech/eth-network-package/package_io/parse_input.star")
+cl_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_client_context.star")
+cl_node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_metrics_info.star")
+cl_node_health_checker = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_health_checker.star")
 
-package_io = import_module("github.com/kurtosis-tech/eth2-package/src/package_io/constants.star")
+package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
 
 GENESIS_DATA_MOUNTPOINT_ON_CLIENT = "/genesis-data"
 
@@ -68,7 +68,7 @@ def launch(
 	global_log_level,
 	bootnode_context,
 	el_client_context,
-	mev_boost_context,
+	eth-network-package_context,
 	node_keystore_files,
 	extra_beacon_params,
 	extra_validator_params):
@@ -77,7 +77,7 @@ def launch(
 
 	extra_params = [param for param in extra_beacon_params] + [param for param in extra_validator_params]
 
-	config = get_config(launcher.cl_genesis_data, image, bootnode_context, el_client_context, mev_boost_context, log_level, node_keystore_files, extra_params)
+	config = get_config(launcher.cl_genesis_data, image, bootnode_context, el_client_context, eth-network-package_context, log_level, node_keystore_files, extra_params)
 
 	nimbus_service = plan.add_service(service_name, config)
 
@@ -114,7 +114,7 @@ def get_config(
 	image,
 	boot_cl_client_ctx,
 	el_client_ctx,
-	mev_boost_context,
+	eth-network-package_context,
 	log_level,
 	node_keystore_files,
 	extra_params):
@@ -192,11 +192,6 @@ def get_config(
 		cmd.append("--subscribe-all-subnets")
 	else:
 		cmd.append("--bootstrap-node="+boot_cl_client_ctx.enr)
-
-	if mev_boost_context != None:
-		# TODO(old) add `mev-boost` support once the feature lands on `stable` - from eth2-merge-kurtosis-module
-		pass
-
 
 	if len(extra_params) > 0:
 		cmd.extend([param for param in extra_params])

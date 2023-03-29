@@ -1,8 +1,8 @@
-shared_utils = import_module("github.com/kurtosis-tech/eth2-package/src/shared_utils/shared_utils.star")
-parse_input = import_module("github.com/kurtosis-tech/eth2-package/src/package_io/parse_input.star")
-el_client_context = import_module("github.com/kurtosis-tech/eth2-package/src/participant_network/el/el_client_context.star")
-el_admin_node_info = import_module("github.com/kurtosis-tech/eth2-package/src/participant_network/el/el_admin_node_info.star")
-package_io = import_module("github.com/kurtosis-tech/eth2-package/src/package_io/constants.star")
+shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/shared_utils/shared_utils.star")
+parse_input = import_module("github.com/kurtosis-tech/eth-network-package/package_io/parse_input.star")
+el_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/el/el_client_context.star")
+el_admin_node_info = import_module("github.com/kurtosis-tech/eth-network-package/src/el/el_admin_node_info.star")
+package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
 
 # The dirpath of the execution data directory on the client container
 EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/opt/besu/execution-data"

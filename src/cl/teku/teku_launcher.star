@@ -1,11 +1,10 @@
-shared_utils = import_module("github.com/kurtosis-tech/eth2-package/src/shared_utils/shared_utils.star")
-parse_input = import_module("github.com/kurtosis-tech/eth2-package/src/package_io/parse_input.star")
-cl_client_context = import_module("github.com/kurtosis-tech/eth2-package/src/participant_network/cl/cl_client_context.star")
-cl_node_metrics = import_module("github.com/kurtosis-tech/eth2-package/src/participant_network/cl/cl_node_metrics_info.star")
-cl_node_health_checker = import_module("github.com/kurtosis-tech/eth2-package/src/participant_network/cl/cl_node_health_checker.star")
-mev_boost_context_module = import_module("github.com/kurtosis-tech/eth2-package/src/participant_network/mev_boost/mev_boost_context.star")
+shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/shared_utils/shared_utils.star")
+parse_input = import_module("github.com/kurtosis-tech/eth-network-package/package_io/parse_input.star")
+cl_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_client_context.star")
+cl_node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_metrics_info.star")
+cl_node_health_checker = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_health_checker.star")
 
-package_io = import_module("github.com/kurtosis-tech/eth2-package/src/package_io/constants.star")
+package_io = import_module("github.com/kurtosis-tech/eth-network-package/src/package_io/constants.star")
 
 TEKU_BINARY_FILEPATH_IN_IMAGE = "/opt/teku/bin/teku"
 
@@ -75,7 +74,6 @@ def launch(
 	global_log_level,
 	bootnode_context,
 	el_client_context,
-	mev_boost_context,
 	node_keystore_files,
 	extra_beacon_params,
 	extra_validator_params):
@@ -84,7 +82,7 @@ def launch(
 
 	extra_params = [param for param in extra_beacon_params] + [param for param in extra_validator_params]
 	
-	config = get_config(launcher.cl_genesis_data, image, bootnode_context, el_client_context, mev_boost_context, log_level, node_keystore_files, extra_params)
+	config = get_config(launcher.cl_genesis_data, image, bootnode_context, el_client_context, log_level, node_keystore_files, extra_params)
 
 	teku_service = plan.add_service(service_name, config)
 
@@ -121,7 +119,6 @@ def get_config(
 	image,
 	boot_cl_client_ctx,
 	el_client_ctx,
-	mev_boost_context,
 	log_level,
 	node_keystore_files,
 	extra_params):
@@ -193,11 +190,6 @@ def get_config(
 
 	if boot_cl_client_ctx != None:
 		cmd.append("--p2p-discovery-bootnodes="+boot_cl_client_ctx.enr)
-
-	if mev_boost_context != None:
-		cmd.append("--validators-builder-registration-default-enabled=true")
-		cmd.append("--builder-endpoint='{0}'".format(mev_boost_context_module.mev_boost_endpoint(mev_boost_context)))
-
 
 	if len(extra_params) > 0:
 		# we do the list comprehension as the default extra_params is a proto repeated string
