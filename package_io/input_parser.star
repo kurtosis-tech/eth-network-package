@@ -20,20 +20,18 @@ ATTR_TO_BE_SKIPPED_AT_ROOT = ("network_params", "participants")
 
 def parse_input(input_args):
 	result = default_input_args()
-	for attr in dir(input_args):
-		value = getattr(input_args, attr)
+	for attr in input_args:
+		value = input_args[attr]
 		# if its insterted we use the value inserted
-		if attr not in ATTR_TO_BE_SKIPPED_AT_ROOT and hasattr(input_args, attr):
+		if attr not in ATTR_TO_BE_SKIPPED_AT_ROOT and attr in input_args:
 			result[attr] = value
 		elif attr == "network_params":
-			for sub_attr in dir(input_args.network_params):
-				sub_value = getattr(input_args.network_params, sub_attr)
-				# if its inserted we use the value inserted
-				if hasattr(input_args.network_params, sub_attr):
-					result["network_params"][sub_attr] = sub_value
+			for sub_attr in input_args["network_params"]:
+				sub_value = input_args["network_params"][sub_attr]
+				result["network_params"][sub_attr] = sub_value
 		elif attr == "participants":
 			participants = []
-			for participant in input_args.participants:
+			for participant in input_args["participants"]:
 				new_participant = default_participant()
 				for sub_attr, sub_value in participant.items():
 					# if the value is set in input we set it in participant
@@ -48,7 +46,6 @@ def parse_input(input_args):
 
 		if index == 0 and el_client_type in (BESU_NODE_NAME, NETHERMIND_NODE_NAME):
 			fail("besu/nethermind cant be the first participant")
-
 		el_image = participant["el_client_image"]
 		if el_image == "":
 			default_image = DEFAULT_EL_IMAGES.get(el_client_type, "")
