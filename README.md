@@ -1,26 +1,81 @@
 Ethereum Network Package
 ===========================
-This is a Kurtosis Starlark Package that will spin up a network of ethereum EL and CL nodes.
+This is a Kurtosis Starlark Package that spins up an ethereum network.
 
-SET UP KURTOSIS BRANCH PROTECTION
-1. [ ] Under "Branches", create a new branch protection rule
-1. [ ] Set the rule name to `main`
-1. [ ] Check "Require pull request reviews before merging"
-1. [ ] Check "Require approvals" (leaving it at 1)
-1. [ ] Check "Require status checks to pass before merging" and select all useful status checks
-1. [ ] Check "Require conversation resolution before merging" (NOTE: this is important as people sometimes forget comments)
-1. [ ] Check "Do not allow bypassing these settings"
-1. [ ] Select "Create" at the bottom
+### Run 
 
-SET UP CIRCLECI
-1. [ ] Visit [the CircleCI projects page](https://app.circleci.com/projects/project-dashboard/github/kurtosis-tech/) and select "Set Up Project"
-1. [ ] **VERY IMPORTANT:** Open the CircleCI project settings, go to Advanced, and set the following values:
-    * [ ] `Pass secrets to builds from forked pull requests` = `false`
-        * **HUGE WARNING:** This is VERY VERY IMPORTANT to be set to `false`!!! If it's `true`, somebody could fork our repo, add an `echo "${GITHUB_TOKEN}"` in their fork, our CI would happily run it and print the value, and they'd get to impersonate us and do all sorts of nasty things like delete repos!!!!!
-    * [ ] `Only build pull requests` = `true`
-        * If this is set to `false` (the default), CircleCI will build _every_ commit, which will quickly exhaust our CircleCI credits and mean we can't build CI
-    * [ ] `Auto-cancel redundant builds` = `true`
-        * If this is set to `false` (the default), CircleCI will waste credits unnecessarily (which is probably why it defaults to `false` - because they want you using more credits :P)
-    * [ ] `Build forked pull requests` = `true` If your repository is going to be public, enable this otherwise CI checks don't run on PRs created through forks.
-    * [ ] `Free and Open Source` = `true` If your repository is public, enable this. This gets you free builds!
-1. [ ] If you need any additional secrets (Docker, Kurtosis user, etc.), find the ones you need [from the list](https://app.circleci.com/settings/organization/github/kurtosis-tech/contexts?return-to=https%3A%2F%2Fapp.circleci.com%2Fpipelines%2Fgithub%2Fkurtosis-tech) add them to the `context` section of the project's CircleCI `config.yml` using Circle)
+This assumes you have [Kurtosis CLI](https://docs.kurtosis.com/cli/) installed.
+
+Simply run 
+```bash
+kurtosis run github.com/kurtosis-tech/eth-network-package
+```
+
+### Configuring the Network
+
+By default, this package spins up a single node with a [`geth`](https://github.com/kurtosis-tech/eth-network-package/blob/main/src/el/geth/geth_launcher.star) EL client and [`lighthouse`](https://github.com/kurtosis-tech/eth-network-package/blob/main/src/cl/lighthouse/lighthouse_launcher.star) CL client (more info on [node architecture](https://ethereum.org/en/developers/docs/nodes-and-clients/node-architecture/)) and comes with [five prefunded keys](https://github.com/kurtosis-tech/eth-network-package/blob/main/src/prelaunch_data_generator/genesis_constants/genesis_constants.star) for testing, but
+these and other parameters are configurable through a json file. 
+
+For example, this `eth-network-params.json` adds a second node, running a different EL/CL client configuration.
+```json
+{
+	"participants":[{
+        "el_client_type":         "geth",
+        "el_client_image":        "",
+        "el_client_log_level":    "",
+        "cl_client_type":         "lighthouse",
+        "cl_client_image":        "",
+        "cl_client_log_level":    "",
+        "beacon_extra_params":    [],
+        "el_extra_params":        [],
+        "validator_extra_params": [],
+        "builder_network_params": null
+	},{
+        "el_client_type":         "besu",
+        "el_client_image":        "",
+        "el_client_log_level":    "",
+        "cl_client_type":         "nimbus",
+        "cl_client_image":        "",
+        "cl_client_log_level":    "",
+        "beacon_extra_params":    [],
+        "el_extra_params":        [],
+        "validator_extra_params": [],
+        "builder_network_params": null
+	}],
+	"network_params":{
+		"preregistered_validator_keys_mnemonic": "giant issue aisle success illegal bike spike question tent bar rely arctic volcano long crawl hungry vocal artwork sniff fantasy very lucky have athlete",
+		"num_validator_keys_per_node": 64,
+		"network_id": "3151908",
+		"deposit_contract_address": "0x4242424242424242424242424242424242424242",
+		"seconds_per_slot": 12,
+		"slots_per_epoch": 32,
+		"genesis_delay": 120,
+		"capella_fork_epoch": 5
+	},
+	"wait_for_finalization": false,
+	"wait_for_verifications": false,
+	"verifications_epoch_limit": 5,
+	"global_client_log_level": "info"
+}
+```
+To run the package with your desired configuration, simply run
+```bash
+kurtosis run github.com/kurtosis-tech/eth-network-package "$(cat ~/eth-network-params.json)"
+```
+
+### Using this in your own package
+
+Kurtosis Packages can be used within other Kurtosis Packages through composition. Assuming you want to spin up an ethereum network and your own service
+together, you just need to do the following
+
+```py
+eth_network_module = import_module("github.com/kurtosis-tech/eth-network-package/main.star")
+
+# main.star of your Ethereum Network + Service package
+def run(plan, args):
+    plan.print("Spinning up the Ethereum Network")
+    # this will spin up the network and return the output of the Ethereum Network package
+    # any args parsed to your package would get passed down to the Ethereum Network package
+    eth_network_run_output = eth_network_module.run(plan, args)
+```
+
