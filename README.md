@@ -1,8 +1,6 @@
 Ethereum Network Package
 ===========================
 
-![Run of the Ethereum Network Package](/run.gif)
-
 This is a Kurtosis Starlark Package that spins up an ethereum network.
 
 ### Run 
