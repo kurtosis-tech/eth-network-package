@@ -8,6 +8,16 @@ executors:
     machine:
       image: ubuntu-2004:202201-02
 
+parameters:
+  # To enable/disabled the check_latest_version workflow execution which will be triggered by this scheduled pipeline: https://app.circleci.com/settings/project/github/kurtosis-tech/eth-network-package/triggers
+  should-enable-check-latest-version-workflow:
+    type: boolean
+    default: false
+  # To enable/disabled the check_code workflow execution which will be triggered by the PR's checkers
+  should-enable-build-workflow:
+    type: boolean
+    default: true
+
 # NOTE: Because CircleCI jobs run on separate machines from each other, we duplicate steps (like checkout) between jobs. This is because doing the "correct" DRY
 #  refactoring of, "one job for checkout, one job for build Docker image, etc." would require a) persisting files between jobs and b) persisting Docker images between
 #  jobs. Both are annoying (saving/loading workspaces require re-downloading the workspace over the network, and there doesn't seem to be a good way to do Docker
