@@ -10,7 +10,7 @@ DEFAULT_CL_IMAGES = {
 	"teku":       "consensys/teku:latest",
 	"nimbus":     "statusim/nimbus-eth2:multiarch-latest",
 	"prysm":    "gcr.io/prysmaticlabs/prysm/beacon-chain:latest,gcr.io/prysmaticlabs/prysm/validator:latest",
-	"lodestar": "chainsafe/lodestar:next",	
+	"lodestar": "chainsafe/lodestar:next",
 }
 
 BESU_NODE_NAME = "besu"
