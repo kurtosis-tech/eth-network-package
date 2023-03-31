@@ -1,5 +1,5 @@
 shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/shared_utils/shared_utils.star")
-parse_input = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
+input_parser = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
 el_admin_node_info = import_module("github.com/kurtosis-tech/eth-network-package/src/el/el_admin_node_info.star")
 el_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/el/el_client_context.star")
 
@@ -52,7 +52,7 @@ def launch(
 	existing_el_clients,
 	extra_params):
 
-	log_level = parse_input.get_client_log_level_or_default(participant_log_level, global_log_level, ERIGON_LOG_LEVELS)
+	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, ERIGON_LOG_LEVELS)
 
 	config = get_config(launcher.network_id, launcher.el_genesis_data,
                                     image, existing_el_clients, log_level, extra_params)
