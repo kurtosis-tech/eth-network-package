@@ -31,7 +31,7 @@ For example, this `eth-network-params.json` adds a second node, running a differ
         "validator_extra_params": [],
         "builder_network_params": null
 	},{
-        "el_client_type":         "besu",
+        "el_client_type":         "erigon",
         "el_client_image":        "",
         "el_client_log_level":    "",
         "cl_client_type":         "nimbus",
