@@ -46,7 +46,6 @@ def parse_input(input_args):
 
 		if index == 0 and el_client_type in (BESU_NODE_NAME, NETHERMIND_NODE_NAME):
 			fail("besu/nethermind cant be the first participant")
-		
 		el_image = participant["el_client_image"]
 		if el_image == "":
 			default_image = DEFAULT_EL_IMAGES.get(el_client_type, "")
@@ -141,7 +140,6 @@ def default_input_args():
 	return {
 		"participants":                participants,
 		"network_params":              network_params,
-		"launch_additional_services" : True,
 		"wait_for_finalization":       False,
 		"wait_for_verifications":      False,
 		"verifications_epoch_limit":   5,
