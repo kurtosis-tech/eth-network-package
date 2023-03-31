@@ -76,20 +76,6 @@ workflows:
     when: << pipeline.parameters.should-enable-build-workflow >>
     jobs:
       # -- PR check jobs ------------------------------------------
-      - kurtosis-docs-checker/check-docs:
-          should-check-changelog: false
-          markdown-link-check-config-json: |
-            {
-                "ignorePatterns": [
-                    {
-                        "pattern": "https://github.com/kurtosis-tech/eth-network-package"
-                    }
-                ]
-            }
-          filters:
-            branches:
-              ignore:
-                - main
       - run_starlark:
           context:
             # This pulls in KurtosisBot's Github token, so that we can read from our private repos
