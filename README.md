@@ -1,5 +1,8 @@
 Ethereum Network Package
 ===========================
+
+![Run of the Ethereum Network Package](/run.gif)
+
 This is a Kurtosis Starlark Package that spins up an ethereum network.
 
 ### Run 
@@ -31,7 +34,11 @@ For example, this `eth-network-params.json` adds a second node, running a differ
         "validator_extra_params": [],
         "builder_network_params": null
 	},{
+<<<<<<< HEAD
         "el_client_type":         "besu",
+=======
+        "el_client_type":         "erigon",
+>>>>>>> 571c0b01ee0ed69a0cbe6f97e3eb4f63328bb1a3
         "el_client_image":        "",
         "el_client_log_level":    "",
         "cl_client_type":         "nimbus",

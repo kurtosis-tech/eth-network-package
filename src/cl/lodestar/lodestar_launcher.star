@@ -1,5 +1,5 @@
 shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/shared_utils/shared_utils.star")
-parse_input = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
+input_parser = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
 cl_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_client_context.star")
 cl_node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_metrics_info.star")
 cl_node_health_checker = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_health_checker.star")
@@ -64,7 +64,7 @@ def launch(
 	beacon_node_service_name = "{0}-{1}".format(service_name, BEACON_SUFFIX_SERVICE_NAME)
 	validator_node_service_name = "{0}-{1}".format(service_name, VALIDATOR_SUFFIX_SERVICE_NAME)
 
-	log_level = parse_input.get_client_log_level_or_default(participant_log_level, global_log_level, LODESTAR_LOG_LEVELS)
+	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, LODESTAR_LOG_LEVELS)
 
 	# Launch Beacon node
 	beacon_config = get_beacon_config(
