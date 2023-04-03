@@ -61,7 +61,7 @@ For example, this `eth-network-params.json` adds a second node, running a differ
 	"global_client_log_level": "info"
 }
 ```
-To run the package with your desired configuration (as specified in your `eth-network-params.json` file, simply run:
+To run the package with your desired configuration (as specified in your `eth-network-params.json` file), simply run:
 ```bash
 kurtosis run github.com/kurtosis-tech/eth-network-package "$(cat ~/eth-network-params.json)"
 ```
