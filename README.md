@@ -17,7 +17,7 @@ kurtosis run github.com/kurtosis-tech/eth-network-package
 ### Configuring the Network
 
 By default, this package spins up a single node with a [`geth`](https://github.com/kurtosis-tech/eth-network-package/blob/main/src/el/geth/geth_launcher.star) EL client and [`lighthouse`](https://github.com/kurtosis-tech/eth-network-package/blob/main/src/cl/lighthouse/lighthouse_launcher.star) CL client and comes with [five prefunded keys](https://github.com/kurtosis-tech/eth-network-package/blob/main/src/prelaunch_data_generator/genesis_constants/genesis_constants.star) for testing, but
-these and other parameters are configurable through a json file. Read more about the [node architecture here](https://ethereum.org/en/developers/docs/nodes-and-clients/node-architecture/)
+these and other parameters are configurable through a json file Read more about the [node architecture here](https://ethereum.org/en/developers/docs/nodes-and-clients/node-architecture/).
 
 For example, this `eth-network-params.json` adds a second node, running a different EL/CL client configuration.
 ```json
