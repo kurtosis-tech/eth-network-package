@@ -22,7 +22,7 @@ these and other parameters are configurable through a json file Read more about 
 For example, this `eth-network-params.json` adds a second node, running a different EL/CL client configuration.
 ```json
 {
-  // each participant struct correponds to a node in the network
+  "//note": "each participant struct in particpants corresponds to a node in the network",
   "participants":[{
     "el_client_type":         "geth",
     "el_client_image":        "",
