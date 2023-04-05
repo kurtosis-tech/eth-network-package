@@ -52,13 +52,9 @@ For example, this `eth-network-params.json` adds a second node, running a differ
     "network_id": "3151908",
     "deposit_contract_address": "0x4242424242424242424242424242424242424242",
     "seconds_per_slot": 12,
-    "slots_per_epoch": 32,
     "genesis_delay": 120,
     "capella_fork_epoch": 5
   },
-  "wait_for_finalization": false,
-  "wait_for_verifications": false,
-  "verifications_epoch_limit": 5,
   "global_client_log_level": "info"
 }
 ```
