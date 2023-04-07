@@ -29,20 +29,17 @@ these and other parameters are configurable through a json file Read more about 
     "participants": [
         {
             //  The type of EL client that should be started
-            //  Valid values are "geth", "nethermind", "erigon" and "besu"
+            //  Valid values are "geth" 
             "el_client_type": "geth",
 
             //  The Docker image that should be used for the EL client; leave blank to use the default for the client type
             //  Defaults by client:
-            //  - geth: ethereum/client-go:latest
-            //  - erigon: thorax/erigon:devel
-            //  - nethermind: nethermind/nethermind:latest
-            //  - besu: hyperledger/besu:develop            
+            //  - geth: ethereum/client-go:latest   
             "el_client_image": "",
 
             //  The log level string that this participant's EL client should log at
             //  If this is emptystring then the global `logLevel` parameter's value will be translated into a string appropriate for the client (e.g. if
-            //   global `logLevel` = `info` then Geth would receive `3`, Besu would receive `INFO`, etc.)
+            //   global `logLevel` = `info` then Geth would receive `3`)
             //  If this is not emptystring, then this value will override the global `logLevel` setting to allow for fine-grained control
             //   over a specific participant's logging
             "el_client_log_level": "",
@@ -51,15 +48,13 @@ these and other parameters are configurable through a json file Read more about 
             "el_extra_params": [],
 
             //  The type of CL client that should be started
-            //  Valid values are "nimbus", "lighthouse", "lodestar", "teku", and "prysm"
+            //  Valid values are "lighthouse", "lodestar", "teku"
             "cl_client_type": "lighthouse",
 
             //  The Docker image that should be used for the EL client; leave blank to use the default for the client type
-            //  Defaults by client (note that Prysm is different in that it requires two images - a Beacon and a validator - separated by a comma):
+            //  Defaults by client:
             //  - lighthouse: sigp/lighthouse:latest
             //  - teku: consensys/teku:latest
-            //  - nimbus: statusim/nimbus-eth2:multiarch-latest
-            //  - prysm: gcr.io/prysmaticlabs/prysm/beacon-chain:latest,gcr.io/prysmaticlabs/prysm/validator:latest
             //  - lodestar: chainsafe/lodestar:next
             "cl_client_image": "",
 
@@ -71,11 +66,11 @@ these and other parameters are configurable through a json file Read more about 
             "cl_client_log_level": "",
 
             //  A list of optional extra params that will be passed to the CL client Beacon container for modifying its behaviour
-            //  If the client combines the Beacon & validator nodes (e.g. Teku, Nimbus), then this list will be passed to the combined Beacon-validator node
+            //  If the client combines the Beacon & validator nodes (e.g. Teku), then this list will be passed to the combined Beacon-validator node
             "beacon_extra_params": [],
 
             //  A list of optional extra params that will be passed to the CL client validator container for modifying its behaviour
-            //  If the client combines the Beacon & validator nodes (e.g. Teku, Nimbus), then this list will also be passed to the combined Beacon-validator node
+            //  If the client combines the Beacon & validator nodes (e.g. Teku), then this list will also be passed to the combined Beacon-validator node
             "validator_extra_params": [],
 
             // A set of parameters the node needs to reach an external block building network
@@ -133,10 +128,10 @@ For example, this `eth-network-params.json` adds a second node, running a differ
     "validator_extra_params": [],
     "builder_network_params": null
   },{
-    "el_client_type":         "erigon",
+    "el_client_type":         "geth",
     "el_client_image":        "",
     "el_client_log_level":    "",
-    "cl_client_type":         "nimbus",
+    "cl_client_type":         "teku",
     "cl_client_image":        "",
     "cl_client_log_level":    "",
     "beacon_extra_params":    [],
