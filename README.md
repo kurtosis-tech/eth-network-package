@@ -170,6 +170,6 @@ def run(plan, args):
     plan.print("Spinning up the Ethereum Network")
     # this will spin up the network and return the output of the Ethereum Network package
     # any args parsed to your package would get passed down to the Ethereum Network package
-    eth_network_run_output = eth_network_module.run(plan, args)
+    eth_network_participants = eth_network_module.run(plan, args)
 ```
 
