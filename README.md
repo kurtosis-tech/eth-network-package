@@ -17,7 +17,7 @@ kurtosis run github.com/kurtosis-tech/eth-network-package
 ### Configuring the Network
 
 By default, this package spins up a single node with a [`geth`](https://github.com/kurtosis-tech/eth-network-package/blob/main/src/el/geth/geth_launcher.star) EL client and [`lighthouse`](https://github.com/kurtosis-tech/eth-network-package/blob/main/src/cl/lighthouse/lighthouse_launcher.star) CL client and comes with [five prefunded keys](https://github.com/kurtosis-tech/eth-network-package/blob/main/src/prelaunch_data_generator/genesis_constants/genesis_constants.star) for testing, but
-these and other parameters are configurable through a json file Read more about the [node architecture here](https://ethereum.org/en/developers/docs/nodes-and-clients/node-architecture/).
+these and other parameters are configurable through a json file Read more about the [node architecture here](https://ethereum.org/en/developers/docs/nodes-and-clients/node-architecture/). The package supports `geth`, `nethermind`, `besu` el clients and `lodestar`, `lighthouse`, and `teku` cl clients.
 
 <details>
     <summary>Click to show all configuration options</summary>
@@ -34,7 +34,7 @@ these and other parameters are configurable through a json file Read more about 
 
             //  The Docker image that should be used for the EL client; leave blank to use the default for the client type
             //  Defaults by client:
-            //  - geth: ethereum/client-go:latest   
+            //  - geth: ethereum/client-go:v1.11.5   
             "el_client_image": "",
 
             //  The log level string that this participant's EL client should log at
@@ -53,9 +53,9 @@ these and other parameters are configurable through a json file Read more about 
 
             //  The Docker image that should be used for the EL client; leave blank to use the default for the client type
             //  Defaults by client:
-            //  - lighthouse: sigp/lighthouse:latest
-            //  - teku: consensys/teku:latest
-            //  - lodestar: chainsafe/lodestar:next
+            //  - lighthouse: sigp/lighthouse:v3.5.0
+            //  - teku: consensys/teku:23.1
+            //  - lodestar: chainsafe/lodestar:v1.7.2
             "cl_client_image": "",
 
             //  The log level string that this participant's EL client should log at
