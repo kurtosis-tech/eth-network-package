@@ -29,7 +29,7 @@ these and other parameters are configurable through a json file Read more about 
     "participants": [
         {
             //  The type of EL client that should be started
-            //  Valid values are "geth" 
+            //  Valid values are "geth, besu, nethermind" 
             "el_client_type": "geth",
 
             //  The Docker image that should be used for the EL client; leave blank to use the default for the client type
@@ -128,7 +128,7 @@ For example, this `eth-network-params.json` adds a second node, running a differ
     "validator_extra_params": [],
     "builder_network_params": null
   },{
-    "el_client_type":         "geth",
+    "el_client_type":         "nethermind",
     "el_client_image":        "",
     "el_client_log_level":    "",
     "cl_client_type":         "teku",
