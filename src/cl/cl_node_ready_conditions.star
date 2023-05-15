@@ -8,7 +8,7 @@ def get_ready_conditions(port_id):
         recipe = recipe,
         field = "code",
         assertion = "IN",
-        target_value = [200, 206, 503],
+        target_value = [200, 206],
         timeout = "15m",
     )
 
