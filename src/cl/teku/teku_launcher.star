@@ -2,7 +2,7 @@ shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/share
 input_parser = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
 cl_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_client_context.star")
 cl_node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_metrics_info.star")
-cl_node_health_checker = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_health_checker.star")
+cl_node_ready_conditions = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_ready_conditions.star")
 
 package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
 
@@ -85,8 +85,6 @@ def launch(
 	config = get_config(launcher.cl_genesis_data, image, bootnode_context, el_client_context, log_level, node_keystore_files, extra_params)
 
 	teku_service = plan.add_service(service_name, config)
-
-	cl_node_health_checker.wait_for_healthy(plan, service_name, HTTP_PORT_ID)
 
 	node_identity_recipe = GetHttpRequestRecipe(
 		endpoint = "/eth/v1/node/identity",
@@ -206,7 +204,8 @@ def get_config(
 			GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: genesis_data.files_artifact_uuid,
 			VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER: node_keystore_files.files_artifact_uuid,
 		},
-		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER
+		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
+		ready_conditions = cl_node_ready_conditions.get_ready_conditions(HTTP_PORT_ID)
 	)
 
 

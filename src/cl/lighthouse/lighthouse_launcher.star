@@ -2,7 +2,6 @@ shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/share
 input_parser = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
 cl_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_client_context.star")
 cl_node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_metrics_info.star")
-cl_node_health_checker = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_health_checker.star")
 
 package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
 
@@ -94,8 +93,6 @@ def launch(
 	)
 
 	beacon_service = plan.add_service(beacon_node_service_name, beacon_config)
-
-	cl_node_health_checker.wait_for_healthy(plan, beacon_node_service_name, BEACON_HTTP_PORT_ID)
 
 	beacon_http_port = beacon_service.ports[BEACON_HTTP_PORT_ID]
 
@@ -210,6 +207,18 @@ def get_beacon_config(
 		# this is a repeated<proto type>, we convert it into Starlark
 		cmd.extend([param for param in extra_params])
 
+	recipe = GetHttpRequestRecipe(
+		endpoint = "/lighthouse/health",
+		port_id = BEACON_HTTP_PORT_ID
+	)
+
+	ready_conditions = ReadyCondition(
+		recipe = recipe,
+		field = "code",
+		assertion = "IN",
+		target_value = [200, 206],
+		timeout = "15m",
+	)
 
 	return ServiceConfig(
 		image = image,
@@ -221,7 +230,8 @@ def get_beacon_config(
 		env_vars = {
 			RUST_BACKTRACE_ENVVAR_NAME: RUST_FULL_BACKTRACE_KEYWORD
 		},
-		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER
+		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
+		ready_conditions = ready_conditions
 	)
 
 
