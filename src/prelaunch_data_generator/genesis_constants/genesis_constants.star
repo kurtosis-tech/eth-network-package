@@ -42,7 +42,8 @@ new_prefunded_account(
 		"0x1F6298457C5d76270325B724Da5d1953923a6B88",
 		"7da08f856b5956d40a72968f93396f6acff17193f013e8053f6fbb6c08c194d6",
 	),
-	# UTC--2021-12-22T19-14-33.473095100Z--FE08e6f330F4E5E624Ad759625B71B2e52594FEB
+	# Use geth account import to generate the key inside genesis-prefunded-keys/geth
+	# UTC--2023-05-19T11-11-54.834097210Z--fe08e6f330f4e5e624ad759625b71b2e52594feb
 	# m/44'/60'/0'/0/6
 new_prefunded_account(
 		"0xFE08e6f330F4E5E624Ad759625B71B2e52594FEB",
