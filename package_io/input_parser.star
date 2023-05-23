@@ -152,8 +152,8 @@ def default_network_params():
 		"num_validator_keys_per_node":           64,
 		"network_id":                            "3151908",
 		"deposit_contract_address":              "0x4242424242424242424242424242424242424242",
-		"seconds_per_slot":                      1,
-		"slots_per_epoch":                       1,
+		"seconds_per_slot":                      12,
+		"slots_per_epoch":                       32,
 		"genesis_delay":                         120,
 		"capella_fork_epoch":                    5,
 	}
