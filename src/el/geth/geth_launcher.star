@@ -141,6 +141,7 @@ def get_config(network_id, genesis_data, prefunded_geth_keys_artifact_uuid, pref
 		"--authrpc.vhosts=*",
 		"--authrpc.jwtsecret={0}".format(jwt_secret_json_filepath_on_client),
 		"--syncmode=full",
+		"--rpc.allow-unprotected-txs"
 	]
 
 	bootnode_enode = ""
