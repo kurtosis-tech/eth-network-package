@@ -27,13 +27,13 @@ EL_CLIENT_SERVICE_NAME_PREFIX = "el-client-"
 BOOT_PARTICIPANT_INDEX = 0
 
 # The time that the CL genesis generation step takes to complete, based off what we've seen
-CL_GENESIS_DATA_GENERATION_TIME = 2 * time.minute
+CL_GENESIS_DATA_GENERATION_TIME = 5 * time.second
 
 # Each CL node takes about this time to start up and start processing blocks, so when we create the CL
 #  genesis data we need to set the genesis timestamp in the future so that nodes don't miss important slots
 # (e.g. Altair fork)
 # TODO(old) Make this client-specific (currently this is Nimbus)
-CL_NODE_STARTUP_TIME = 45 * time.second
+CL_NODE_STARTUP_TIME = 5 * time.second
 
 CL_CLIENT_CONTEXT_BOOTNODE = None
 
