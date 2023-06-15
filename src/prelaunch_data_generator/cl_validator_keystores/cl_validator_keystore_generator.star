@@ -60,21 +60,22 @@ def generate_cl_validator_keystores(
 
 
 	command_str = " && ".join(all_sub_command_strs)
+	write_prysm_password_file_cmd =  "echo '{0}' > {1}".format(PRYSM_PASSWORD, PRYSM_PASSWORD_FILEPATH_ON_GENERATOR)
 
 	result = plan.run_sh(
-		run = command_str,
-		image = "ethpandaops/ethereum-genesis-generator:1.0.14",
-		store = [output_dirpath for output_dirpath in all_output_dirpaths]
+		run = command_str + " && " + write_prysm_password_file_cmd,
+		image = prelaunch_data_generator_launcher.IMAGE,
+		store = [output_dirpath for output_dirpath in all_output_dirpaths] + [PRYSM_PASSWORD_FILEPATH_ON_GENERATOR]
 	)
 
 	# Store outputs into files artifacts
 	keystore_files = []
 	for idx, output_dirpath in enumerate(all_output_dirpaths):
-		artifact = result.files_artifacts[idx]
+		artifact = result.file_artifacts[idx]
 		# This is necessary because the way Kurtosis currently implements artifact-storing is
 		base_dirname_in_artifact = shared_utils.path_base(output_dirpath)
 		to_add = keystore_files_module.new_keystore_files(
-			artifact_name,
+			artifact,
 			shared_utils.path_join(base_dirname_in_artifact, RAW_KEYS_DIRNAME),
 			shared_utils.path_join(base_dirname_in_artifact, RAW_SECRETS_DIRNAME),
 			shared_utils.path_join(base_dirname_in_artifact, NIMBUS_KEYS_DIRNAME),
@@ -85,17 +86,8 @@ def generate_cl_validator_keystores(
 
 		keystore_files.append(to_add)
 
-
-	write_prysm_password_file_cmd =  "echo '{0}' > {1}".format(PRYSM_PASSWORD, PRYSM_PASSWORD_FILEPATH_ON_GENERATOR)
-
-	prym_result = plan.run_sh(
-		image = "ethpandaops/ethereum-genesis-generator:1.0.14",
-		run = write_prysm_password_file_cmd,
-		store = [PRYSM_PASSWORD_FILEPATH_ON_GENERATOR]
-	)
-
 	result = keystores_result.new_generate_keystores_result(
-		prym_result.files_artifacts[0],
+		result.file_artifacts[-1],
 		shared_utils.path_base(PRYSM_PASSWORD_FILEPATH_ON_GENERATOR),
 		keystore_files,
 	)
