@@ -34,11 +34,6 @@ def generate_cl_validator_keystores(
 	num_nodes,
 	num_validators_per_node):
 	
-	service_name = prelaunch_data_generator_launcher.launch_prelaunch_data_generator(
-		plan,
-		{},
-	)
-
 	all_output_dirpaths = []
 	all_sub_command_strs = []
 
@@ -66,14 +61,16 @@ def generate_cl_validator_keystores(
 
 	command_str = " && ".join(all_sub_command_strs)
 
-	command_result = plan.exec(recipe = ExecRecipe(command=["sh", "-c", command_str]), service_name=service_name)
-	plan.assert(command_result["code"], "==", SUCCESSFUL_EXEC_CMD_EXIT_CODE)
+	result = plan.run_sh(
+		run = command_str,
+		image = "ethpandaops/ethereum-genesis-generator:1.0.14",
+		store = [output_dirpath for output_dirpath in all_output_dirpaths]
+	)
 
 	# Store outputs into files artifacts
 	keystore_files = []
 	for idx, output_dirpath in enumerate(all_output_dirpaths):
-		artifact_name = plan.store_service_files(service_name, output_dirpath, name = "validator-keystore-" + str(idx))
-
+		artifact = result.files_artifacts[idx]
 		# This is necessary because the way Kurtosis currently implements artifact-storing is
 		base_dirname_in_artifact = shared_utils.path_base(output_dirpath)
 		to_add = keystore_files_module.new_keystore_files(
@@ -89,25 +86,18 @@ def generate_cl_validator_keystores(
 		keystore_files.append(to_add)
 
 
-	write_prysm_password_file_cmd = [
-		"sh",
-		"-c",
-		"echo '{0}' > {1}".format(
-			PRYSM_PASSWORD,
-			PRYSM_PASSWORD_FILEPATH_ON_GENERATOR,
-		),
-	]
-	write_prysm_password_file_cmd_result = plan.exec(recipe = ExecRecipe(command=write_prysm_password_file_cmd), service_name=service_name)
-	plan.assert(write_prysm_password_file_cmd_result["code"], "==", SUCCESSFUL_EXEC_CMD_EXIT_CODE)
+	write_prysm_password_file_cmd =  "echo '{0}' > {1}".format(PRYSM_PASSWORD, PRYSM_PASSWORD_FILEPATH_ON_GENERATOR)
 
-	prysm_password_artifact_name = plan.store_service_files(service_name, PRYSM_PASSWORD_FILEPATH_ON_GENERATOR, name = "prysm-password")
+	prym_result = plan.run_sh(
+		image = "ethpandaops/ethereum-genesis-generator:1.0.14",
+		run = write_prysm_password_file_cmd,
+		store = [PRYSM_PASSWORD_FILEPATH_ON_GENERATOR]
+	)
 
 	result = keystores_result.new_generate_keystores_result(
-		prysm_password_artifact_name,
+		prym_result.files_artifacts[0],
 		shared_utils.path_base(PRYSM_PASSWORD_FILEPATH_ON_GENERATOR),
 		keystore_files,
 	)
 
-	# we cleanup as the data generation is done
-	plan.remove_service(service_name)
 	return result
