@@ -155,7 +155,7 @@ def default_network_params():
 		"seconds_per_slot":                      4,
 		"slots_per_epoch":                       20,
 		"genesis_delay":                         10,
-		"capella_fork_epoch":                    5,
+		"capella_fork_epoch":                    1,
 	}
 
 def default_participant():
