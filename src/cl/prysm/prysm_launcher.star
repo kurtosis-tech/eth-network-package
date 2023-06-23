@@ -246,7 +246,8 @@ def get_validator_config(
 		# vvvvvvvvvvvvvvvvvvv METRICS CONFIG vvvvvvvvvvvvvvvvvvvvv
 		"--disable-monitoring=false",
 		"--monitoring-host=0.0.0.0",
-		"--monitoring-port={0}".format(VALIDATOR_MONITORING_PORT_NUM)
+		"--monitoring-port={0}".format(VALIDATOR_MONITORING_PORT_NUM),
+		"--enable-builder"
 		# ^^^^^^^^^^^^^^^^^^^ METRICS CONFIG ^^^^^^^^^^^^^^^^^^^^^
 	]
 

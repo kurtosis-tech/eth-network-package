@@ -198,6 +198,7 @@ def get_beacon_config(
 		"--metrics-allow-origin=*",
 		"--metrics-port={0}".format(BEACON_METRICS_PORT_NUM),
 		# ^^^^^^^^^^^^^^^^^^^ METRICS CONFIG ^^^^^^^^^^^^^^^^^^^^^
+		"--builder={0}".format("http://mev-boost-0:18550")
 	]
 
 	if boot_cl_client_ctx != None:
@@ -272,6 +273,7 @@ def get_validator_config(
 		"--metrics-allow-origin=*",
 		"--metrics-port={0}".format(VALIDATOR_METRICS_PORT_NUM),
 		# ^^^^^^^^^^^^^^^^^^^ PROMETHEUS CONFIG ^^^^^^^^^^^^^^^^^^^^^
+		"--builder-proosals",
 	]
 
 	if len(extra_params):
