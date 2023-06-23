@@ -273,7 +273,7 @@ def get_validator_config(
 		"--metrics-allow-origin=*",
 		"--metrics-port={0}".format(VALIDATOR_METRICS_PORT_NUM),
 		# ^^^^^^^^^^^^^^^^^^^ PROMETHEUS CONFIG ^^^^^^^^^^^^^^^^^^^^^
-		"--builder-proosals",
+		"--builder-proposals",
 	]
 
 	if len(extra_params):
