@@ -54,12 +54,14 @@ def launch(
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, ERIGON_LOG_LEVELS)
 
-	config = get_config(launcher.network_id, launcher.el_genesis_data,
+	config, jwt_secret_json_filepath_on_client = get_config(launcher.network_id, launcher.el_genesis_data,
                                     image, existing_el_clients, log_level, extra_params)
 
 	service = plan.add_service(service_name, config)
 
 	enode, enr = el_admin_node_info.get_enode_enr_for_node(plan, service_name, RPC_PORT_ID)
+
+	jwt_secret = shared_utils.read_file_from_service(plan, service_name, jwt_secret_json_filepath_on_client)
 
 	return el_client_context.new_el_client_context(
 		"erigon",
@@ -68,7 +70,8 @@ def launch(
 		service.ip_address,
 		RPC_PORT_NUM,
 		WS_PORT_NUM,
-		ENGINE_RPC_PORT_NUM
+		ENGINE_RPC_PORT_NUM,
+		jwt_secret
 	)
 
 
@@ -128,7 +131,7 @@ def get_config(network_id, genesis_data, image, existing_el_clients, verbosity_l
 		},
 		entrypoint = ENTRYPOINT_ARGS,
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER
-	)
+	), jwt_secret_json_filepath_on_client
 
 
 def new_erigon_launcher(network_id, el_genesis_data):
