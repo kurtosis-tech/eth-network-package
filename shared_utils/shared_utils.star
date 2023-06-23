@@ -30,3 +30,13 @@ def new_port_spec(number, transport_protocol, application_protocol = NOT_PROVIDE
 		return PortSpec(number = number, transport_protocol = transport_protocol, application_protocol = application_protocol)
 
 	return PortSpec(number = number, transport_protocol = transport_protocol, application_protocol = application_protocol, wait = wait)
+
+
+def read_file_from_service(plan, service_name, filename):
+    output = plan.exec(
+        service_name = service_name,
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "cat {} | tr -d '\n'".format(filename)]
+        )
+    )
+    return output["output"]

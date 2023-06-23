@@ -53,11 +53,13 @@ def launch(
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, NETHERMIND_LOG_LEVELS)
 
-	config = get_config(launcher.el_genesis_data, image, existing_el_clients, log_level, extra_params)
+	config, jwt_secret_json_filepath_on_client = get_config(launcher.el_genesis_data, image, existing_el_clients, log_level, extra_params)
 
 	service = plan.add_service(service_name, config)
 
 	enode = el_admin_node_info.get_enode_for_node(plan, service_name, RPC_PORT_ID)
+
+	jwt_secret = shared_utils.read_file_from_service(service_name, jwt_secret_json_filepath_on_client)
 
 	return el_client_context.new_el_client_context(
 		"nethermind",
@@ -68,6 +70,7 @@ def launch(
 		RPC_PORT_NUM,
 		WS_PORT_NUM,
 		ENGINE_RPC_PORT_NUM,
+		jwt_secret
 	)
 
 
@@ -122,7 +125,7 @@ def get_config(genesis_data, image, existing_el_clients, log_level, extra_params
 			GENESIS_DATA_MOUNT_DIRPATH: genesis_data.files_artifact_uuid,
 		},
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
-	)
+	), jwt_secret_json_filepath_on_client
 
 
 def new_nethermind_launcher(el_genesis_data):
