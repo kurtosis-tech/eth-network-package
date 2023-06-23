@@ -61,7 +61,7 @@ def launch(
 
 	enode, enr = el_admin_node_info.get_enode_enr_for_node(plan, service_name, RPC_PORT_ID)
 
-	jwt_secret = shared_utils.read_file_from_service(service_name, jwt_secret_json_filepath_on_client)
+	jwt_secret = shared_utils.read_file_from_service(plan, service_name, jwt_secret_json_filepath_on_client)
 
 	return el_client_context.new_el_client_context(
 		"erigon",
