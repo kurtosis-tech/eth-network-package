@@ -1,6 +1,6 @@
-shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/shared_utils/shared_utils.star")
-cl_genesis_data = import_module("github.com/kurtosis-tech/eth-network-package/src/prelaunch_data_generator/cl_genesis/cl_genesis_data.star")
-prelaunch_data_generator_launcher = import_module("github.com/kurtosis-tech/eth-network-package/src/prelaunch_data_generator/prelaunch_data_generator_launcher/prelaunch_data_generator_launcher.star")
+shared_utils = import_module("github.com/parithosh/eth-network-package/shared_utils/shared_utils.star")
+cl_genesis_data = import_module("github.com/parithosh/eth-network-package/src/prelaunch_data_generator/cl_genesis/cl_genesis_data.star")
+prelaunch_data_generator_launcher = import_module("github.com/parithosh/eth-network-package/src/prelaunch_data_generator/prelaunch_data_generator_launcher/prelaunch_data_generator_launcher.star")
 
 
 # Needed to copy the JWT secret and the EL genesis.json file
