@@ -87,6 +87,9 @@ def parse_input(input_args):
 	if result["network_params"]["capella_fork_epoch"] == 0:
 		fail("capella_fork_epoch is 0 needs to be > 0 ")
 
+	if result["network_params"]["deneb_fork_epoch"] == 0:
+		fail("deneb_fork_epoch is 0 needs to be > 0 ")
+
 	required_num_validtors = 2 * result["network_params"]["slots_per_epoch"]
 	actual_num_validators = len(result["participants"]) * result["network_params"]["num_validator_keys_per_node"]
 	if required_num_validtors > actual_num_validators:
@@ -117,6 +120,7 @@ def parse_input(input_args):
 			seconds_per_slot=result["network_params"]["seconds_per_slot"],
 			slots_per_epoch=result["network_params"]["slots_per_epoch"],
 			capella_fork_epoch=result["network_params"]["capella_fork_epoch"],
+            deneb_fork_epoch=result["network_params"]["deneb_fork_epoch"],
 			genesis_delay=result["network_params"]["genesis_delay"]
 		),
 		wait_for_finalization=result["wait_for_finalization"],
@@ -155,7 +159,8 @@ def default_network_params():
 		"seconds_per_slot":                      4,
 		"slots_per_epoch":                       20,
 		"genesis_delay":                         10,
-		"capella_fork_epoch":                    1,
+		"capella_fork_epoch":                    2,
+        "deneb_fork_epoch":                      5
 	}
 
 def default_participant():
