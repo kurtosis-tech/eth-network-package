@@ -36,7 +36,7 @@ def generate_cl_genesis_data(
 		total_num_validator_keys_to_preregister,
 		genesis_delay,
 		capella_fork_epoch,
-        deneb_fork_epoch
+		deneb_fork_epoch,
 	):
 
 	template_data = new_cl_genesis_config_template_data(
