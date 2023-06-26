@@ -147,7 +147,7 @@ For example, this `eth-network-params.json` adds a second node, running a differ
     "seconds_per_slot": 12,
     "genesis_delay": 120,
     "capella_fork_epoch": 5,
-    "dencun_fork_epoch": 10
+    "deneb_fork_epoch": 10
   },
   "global_client_log_level": "info"
 }
