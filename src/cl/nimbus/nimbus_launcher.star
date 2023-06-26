@@ -1,10 +1,10 @@
-shared_utils = import_module("github.com/parithosh/eth-network-package/shared_utils/shared_utils.star")
-input_parser = import_module("github.com/parithosh/eth-network-package/package_io/input_parser.star")
-cl_client_context = import_module("github.com/parithosh/eth-network-package/src/cl/cl_client_context.star")
-cl_node_metrics = import_module("github.com/parithosh/eth-network-package/src/cl/cl_node_metrics_info.star")
-cl_node_ready_conditions = import_module("github.com/parithosh/eth-network-package/src/cl/cl_node_ready_conditions.star")
+shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/shared_utils/shared_utils.star")
+input_parser = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
+cl_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_client_context.star")
+cl_node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_metrics_info.star")
+cl_node_ready_conditions = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_ready_conditions.star")
 
-package_io = import_module("github.com/parithosh/eth-network-package/package_io/constants.star")
+package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
 
 GENESIS_DATA_MOUNTPOINT_ON_CLIENT = "/genesis-data"
 
@@ -130,7 +130,7 @@ def get_config(
 	#  1) https://github.com/status-im/nimbus-eth2/blob/stable/scripts/launch_local_testnet.sh
 	#  2) https://github.com/status-im/nimbus-eth2/blob/67ab477a27e358d605e99bffeb67f98d18218eca/scripts/launch_local_testnet.sh#L417
 	# WARNING: Do NOT set the --max-peers flag here, as doing so to the exact number of nodes seems to mess things up!
-	# See: https://github.com/parithosh/eth2-merge-kurtosis-module/issues/26
+	# See: https://github.com/kurtosis-tech/eth2-merge-kurtosis-module/issues/26
 	cmd = [
 		"mkdir",
 		CONSENSUS_DATA_DIRPATH_IN_SERVICE_CONTAINER,

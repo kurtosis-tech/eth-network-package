@@ -1,8 +1,8 @@
-participant_network = import_module("github.com/parithosh/eth-network-package/src/participant_network.star")
-input_parser = import_module("github.com/parithosh/eth-network-package/package_io/input_parser.star")
+participant_network = import_module("github.com/kurtosis-tech/eth-network-package/src/participant_network.star")
+input_parser = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
 
-static_files = import_module("github.com/parithosh/eth-network-package/static_files/static_files.star")
-genesis_constants = import_module("github.com/parithosh/eth-network-package/src/prelaunch_data_generator/genesis_constants/genesis_constants.star")
+static_files = import_module("github.com/kurtosis-tech/eth-network-package/static_files/static_files.star")
+genesis_constants = import_module("github.com/kurtosis-tech/eth-network-package/src/prelaunch_data_generator/genesis_constants/genesis_constants.star")
 
 def run(plan, args):
     args_with_right_defaults = input_parser.parse_input(args)
