@@ -47,7 +47,7 @@ def generate_cl_genesis_data(
 		preregistered_validator_keys_mnemonic,
 		deposit_contract_address,
 		genesis_delay,
-		capella_fork_epo
+		capella_fork_epoch,
         deneb_fork_epoch
         	)
 
