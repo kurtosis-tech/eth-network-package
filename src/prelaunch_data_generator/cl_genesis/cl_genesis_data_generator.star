@@ -48,7 +48,7 @@ def generate_cl_genesis_data(
 		deposit_contract_address,
 		genesis_delay,
 		capella_fork_epoch,
-        deneb_fork_epoch
+		deneb_fork_epoch
         	)
 
 	genesis_generation_mnemonics_template_and_data = shared_utils.new_template_and_data(genesis_generation_mnemonics_yml_template, template_data)
