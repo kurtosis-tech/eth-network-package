@@ -173,5 +173,3 @@ def run(plan, args):
     # any args parsed to your package would get passed down to the Ethereum Network package
     eth_network_participants, cl_genesis_timestamp = eth_network_module.run(plan, args)
 ```
-
-
