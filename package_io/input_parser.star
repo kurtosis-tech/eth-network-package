@@ -159,7 +159,7 @@ def default_network_params():
 		"seconds_per_slot":                      4,
 		"slots_per_epoch":                       20,
 		"genesis_delay":                         10,
-		"capella_fork_epoch":                    2,
+		"capella_fork_epoch":                    2*6,
 		"deneb_fork_epoch":                      5,
 	}
 
