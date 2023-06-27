@@ -62,7 +62,8 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		network_params.network_id,
 		network_params.deposit_contract_address,
 		network_params.genesis_delay,
-		network_params.capella_fork_epoch
+		network_params.capella_fork_epoch,
+		network_params.deneb_fork_epoch
 	)
 
 
@@ -125,7 +126,8 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		network_params.preregistered_validator_keys_mnemonic,
 		total_number_of_validator_keys,
         network_params.genesis_delay,
-        network_params.capella_fork_epoch
+        network_params.capella_fork_epoch,
+        network_params.deneb_fork_epoch
 	)
 
 	plan.print(json.indent(json.encode(cl_genesis_data)))

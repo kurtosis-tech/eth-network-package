@@ -146,7 +146,8 @@ For example, this `eth-network-params.json` adds a second node, running a differ
     "deposit_contract_address": "0x4242424242424242424242424242424242424242",
     "seconds_per_slot": 12,
     "genesis_delay": 120,
-    "capella_fork_epoch": 5
+    "capella_fork_epoch": 5,
+    "deneb_fork_epoch": 10
   },
   "global_client_log_level": "info"
 }
@@ -172,4 +173,3 @@ def run(plan, args):
     # any args parsed to your package would get passed down to the Ethereum Network package
     eth_network_participants, cl_genesis_timestamp = eth_network_module.run(plan, args)
 ```
-
