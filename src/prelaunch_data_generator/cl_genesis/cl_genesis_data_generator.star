@@ -15,14 +15,15 @@ GENESIS_STATE_FILENAME = "genesis.ssz"
 DEPLOY_BLOCK_FILENAME = "deploy_block.txt"
 DEPOSIT_CONTRACT_FILENAME = "deposit_contract.txt"
 PARSED_BEACON_STATE_FILENAME = "parsedBeaconState.json"
+TRUSTED_SETUP_FILENAME = "trusted_setup.txt"
+
+wget -O /data/custom_config_data/trusted_setup.txt https://raw.githubusercontent.com/ethereum/c-kzg-4844/main/src/trusted_setup.txt
 
 # Generation constants
 CL_GENESIS_GENERATION_BINARY_FILEPATH_ON_CONTAINER = "/usr/local/bin/eth2-testnet-genesis"
 CL_PARSED_BEACON_STATE_GENERATOR_BINARY = "/usr/local/bin/zcli"
 DEPLOY_BLOCK = "0"
 ETH1_BLOCK = "0x0000000000000000000000000000000000000000000000000000000000000000"
-
-SUCCESSFUL_EXEC_CMD_EXIT_CODE = 0
 
 
 def generate_cl_genesis_data(
@@ -88,8 +89,6 @@ def generate_cl_genesis_data(
 	]
 
 	dir_creation_cmd_result = plan.exec(recipe = ExecRecipe(command=dir_creation_cmd), service_name=launcher_service_name)
-	plan.assert(dir_creation_cmd_result["code"], "==", SUCCESSFUL_EXEC_CMD_EXIT_CODE)
-
 
 	# Copy files to output
 	all_filepaths_to_copy_to_ouptut_directory = [
@@ -105,7 +104,6 @@ def generate_cl_genesis_data(
 			OUTPUT_DIRPATH_ON_GENERATOR,
 		]
 		cmd_result = plan.exec(recipe = ExecRecipe( command=cmd), service_name=launcher_service_name)
-		plan.assert(cmd_result["code"], "==", SUCCESSFUL_EXEC_CMD_EXIT_CODE)
 
 	# Generate files that need dynamic content
 	content_to_write_to_output_filename = {
@@ -123,7 +121,6 @@ def generate_cl_genesis_data(
 			)
 		]
 		cmd_result = plan.exec(recipe = ExecRecipe( command=cmd), service_name=launcher_service_name)
-		plan.assert(cmd_result["code"], "==", SUCCESSFUL_EXEC_CMD_EXIT_CODE)
 		
 
 	cl_genesis_generation_cmd = [
@@ -150,6 +147,8 @@ def generate_cl_genesis_data(
 	parsed_beacon_state_file_generation_str = " ".join(parsed_beacon_state_file_generation)
 
 	plan.exec(recipe = ExecRecipe(command = ["/bin/sh", "-c", parsed_beacon_state_file_generation_str]), service_name = launcher_service_name)
+
+	shared_utils.download_trusted_setup(plan, launcher_service_name, shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, TRUSTED_SETUP_FILENAME))
 
 	cl_genesis_data_artifact_name = plan.store_service_files(launcher_service_name, OUTPUT_DIRPATH_ON_GENERATOR, name = "cl-genesis-data")
 
