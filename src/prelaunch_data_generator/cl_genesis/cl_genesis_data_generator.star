@@ -14,9 +14,11 @@ TRANCHES_DIRANME = "tranches"
 GENESIS_STATE_FILENAME = "genesis.ssz"
 DEPLOY_BLOCK_FILENAME = "deploy_block.txt"
 DEPOSIT_CONTRACT_FILENAME = "deposit_contract.txt"
+PARSED_BEACON_STATE_FILENAME = "parsedBeaconState.json"
 
 # Generation constants
 CL_GENESIS_GENERATION_BINARY_FILEPATH_ON_CONTAINER = "/usr/local/bin/eth2-testnet-genesis"
+CL_PARSED_BEACON_STATE_GENERATOR_BINARY = "/usr/local/bin/zcli"
 DEPLOY_BLOCK = "0"
 ETH1_BLOCK = "0x0000000000000000000000000000000000000000000000000000000000000000"
 
@@ -134,8 +136,19 @@ def generate_cl_genesis_data(
 		"--state-output", shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, GENESIS_STATE_FILENAME)
 	]
 
-	genesis_generation_result = plan.exec(recipe = ExecRecipe(command=cl_genesis_generation_cmd), service_name=launcher_service_name)
-	plan.assert(genesis_generation_result["code"], "==", SUCCESSFUL_EXEC_CMD_EXIT_CODE)
+	plan.exec(recipe = ExecRecipe(command=cl_genesis_generation_cmd), service_name=launcher_service_name)
+
+	parsed_beacon_state_file_generation = [
+		CL_PARSED_BEACON_STATE_GENERATOR_BINARY,
+		"pretty",
+		"Bellatrix",
+		"BeaconState",
+		shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, GENESIS_STATE_FILENAME),
+		">",
+		shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, PARSED_BEACON_STATE_FILENAME),
+	]
+
+
 
 	cl_genesis_data_artifact_name = plan.store_service_files(launcher_service_name, OUTPUT_DIRPATH_ON_GENERATOR, name = "cl-genesis-data")
 
