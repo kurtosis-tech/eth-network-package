@@ -11,6 +11,7 @@ GETH_GENESIS_FILENAME       = "genesis.json"
 ERIGON_GENESIS_FILENAME     = "erigon.json"
 NETHERMIND_GENESIS_FILENAME = "nethermind.json"
 BESU_GENESIS_FILENAME       = "besu.json"
+TRUSTED_SETUP_FILENAME = "trusted_setup.txt"
 
 JWT_SECRET_FILENAME = "jwtsecret"
 
@@ -107,6 +108,7 @@ def generate_el_genesis_data(
 			output_filename,
 		)
 
+	shared_utils.download_trusted_setup(plan, launcher_service_name, shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, TRUSTED_SETUP_FILENAME))
 
 	jwt_secret_filepath_on_generator = shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, JWT_SECRET_FILENAME)
 	jwt_secret_generation_cmd = [
