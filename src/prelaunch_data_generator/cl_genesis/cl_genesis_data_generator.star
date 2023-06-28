@@ -141,7 +141,7 @@ def generate_cl_genesis_data(
 	parsed_beacon_state_file_generation = [
 		CL_PARSED_BEACON_STATE_GENERATOR_BINARY,
 		"pretty",
-		"Bellatrix",
+		"bellatrix",
 		"BeaconState",
 		shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, GENESIS_STATE_FILENAME),
 		">",
