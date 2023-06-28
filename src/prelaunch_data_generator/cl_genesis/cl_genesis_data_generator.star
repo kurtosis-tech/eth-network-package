@@ -174,6 +174,6 @@ def new_cl_genesis_config_template_data(network_id, seconds_per_slot, unix_times
 		"DepositContractAddress": deposit_contract_address,
 		"GenesisDelay": genesis_delay,
 		# each capella epoch is around 2 seconds, we multiply it with 3 so that it happens around the time of EL
-		"CapellaForkEpoch": capella_fork_epoch,
+		"CapellaForkEpoch": capella_fork_epoch*6,
         "DenebForkEpoch": deneb_fork_epoch
     	}

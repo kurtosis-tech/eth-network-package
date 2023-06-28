@@ -160,7 +160,7 @@ def default_network_params():
 		"slots_per_epoch":                       20,
 		"genesis_delay":                         10,
 		"capella_fork_epoch":                    2,
-		"deneb_fork_epoch":                      5,
+		"deneb_fork_epoch":                      13,
 	}
 
 def default_participant():
