@@ -17,8 +17,6 @@ DEPOSIT_CONTRACT_FILENAME = "deposit_contract.txt"
 PARSED_BEACON_STATE_FILENAME = "parsedBeaconState.json"
 TRUSTED_SETUP_FILENAME = "trusted_setup.txt"
 
-wget -O /data/custom_config_data/trusted_setup.txt https://raw.githubusercontent.com/ethereum/c-kzg-4844/main/src/trusted_setup.txt
-
 # Generation constants
 CL_GENESIS_GENERATION_BINARY_FILEPATH_ON_CONTAINER = "/usr/local/bin/eth2-testnet-genesis"
 CL_PARSED_BEACON_STATE_GENERATOR_BINARY = "/usr/local/bin/zcli"
