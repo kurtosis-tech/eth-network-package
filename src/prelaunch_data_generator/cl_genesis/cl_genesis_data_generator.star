@@ -148,7 +148,7 @@ def generate_cl_genesis_data(
 		shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, PARSED_BEACON_STATE_FILENAME),
 	]
 
-
+	plan.exec(recipe = ExecRecipe(command = parsed_beacon_state_file_generation), service_name = launcher_service_name)
 
 	cl_genesis_data_artifact_name = plan.store_service_files(launcher_service_name, OUTPUT_DIRPATH_ON_GENERATOR, name = "cl-genesis-data")
 
