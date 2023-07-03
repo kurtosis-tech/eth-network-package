@@ -158,7 +158,7 @@ def get_config(network_id, genesis_data, prefunded_geth_keys_artifact_uuid, pref
 
 	if len(extra_params) > 0:
 		launch_node_cmd.extend([param for param in extra_params])
-		USED_PORTS["builder-rpc"] = shared_utils.new_port_spec("28545", shared_utils.TCP_PROTOCOL)
+		USED_PORTS["builder-rpc"] = shared_utils.new_port_spec(28545, shared_utils.TCP_PROTOCOL)
 
 
 	launch_node_cmd_str = " ".join(launch_node_cmd)
