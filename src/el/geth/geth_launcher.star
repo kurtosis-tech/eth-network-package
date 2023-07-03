@@ -156,7 +156,7 @@ def get_config(network_id, genesis_data, prefunded_geth_keys_artifact_uuid, pref
 		'--bootnodes="{0}"'.format(bootnode_enode),
 	)
 
-	ports = USED_PORTS
+	ports = {k:v for k,v in USED_PORTS.items()}
 
 	if len(extra_params) > 0:
 		launch_node_cmd.extend([param for param in extra_params])
