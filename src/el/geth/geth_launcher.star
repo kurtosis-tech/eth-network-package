@@ -40,7 +40,7 @@ USED_PORTS = {
 	WS_PORT_ID: shared_utils.new_port_spec(WS_PORT_NUM, shared_utils.TCP_PROTOCOL),
 	TCP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.TCP_PROTOCOL),
 	UDP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.UDP_PROTOCOL),
-	ENGINE_RPC_PORT_ID: shared_utils.new_port_spec(ENGINE_RPC_PORT_NUM, shared_utils.TCP_PROTOCOL)
+	ENGINE_RPC_PORT_ID: shared_utils.new_port_spec(ENGINE_RPC_PORT_NUM, shared_utils.TCP_PROTOCOL),
 }
 
 ENTRYPOINT_ARGS = ["sh", "-c"]
@@ -157,8 +157,8 @@ def get_config(network_id, genesis_data, prefunded_geth_keys_artifact_uuid, pref
 	)
 
 	if len(extra_params) > 0:
-		# this is a repeated<proto type>, we convert it into Starlark
 		launch_node_cmd.extend([param for param in extra_params])
+		USED_PORTS["builder-rpc"] = shared_utils.new_port_spec("28545", shared_utils.TCP_PROTOCOL)
 
 
 	launch_node_cmd_str = " ".join(launch_node_cmd)
