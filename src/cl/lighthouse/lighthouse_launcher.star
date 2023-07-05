@@ -208,7 +208,7 @@ def get_beacon_config(
 		cmd.extend([param for param in extra_params])
 
 	recipe = GetHttpRequestRecipe(
-		endpoint = "/lighthouse/health",
+		endpoint = "/eth/v1/node/identity",
 		port_id = BEACON_HTTP_PORT_ID
 	)
 

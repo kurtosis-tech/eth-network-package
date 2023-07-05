@@ -93,16 +93,12 @@ def get_config(genesis_data, image, existing_el_clients, log_level, extra_params
 		"--JsonRpc.Enabled=true",
 		"--JsonRpc.EnabledModules=net,eth,consensus,subscribe,web3,admin",
 		"--JsonRpc.Host=0.0.0.0",
-		# TODO(old) Set Eth isMining?
 		"--JsonRpc.Port={0}".format(RPC_PORT_NUM),
 		"--JsonRpc.WebSocketsPort={0}".format(WS_PORT_NUM),
 		"--Network.ExternalIp={0}".format(PRIVATE_IP_ADDRESS_PLACEHOLDER),
 		"--Network.LocalIp={0}".format(PRIVATE_IP_ADDRESS_PLACEHOLDER),
 		"--Network.DiscoveryPort={0}".format(DISCOVERY_PORT_NUM),
 		"--Network.P2PPort={0}".format(DISCOVERY_PORT_NUM),
-		"--Merge.Enabled=true",
-		"--Merge.TerminalTotalDifficulty=0", # merge has happened already
-		"--Merge.TerminalBlockNumber=null",
 		"--JsonRpc.JwtSecretFile={0}".format(jwt_secret_json_filepath_on_client),
 		"--JsonRpc.AdditionalRpcUrls=[\"http://0.0.0.0:{0}|http;ws|net;eth;subscribe;engine;web3;client\"]".format(ENGINE_RPC_PORT_NUM),
 		"--Network.OnlyStaticPeers=true",
