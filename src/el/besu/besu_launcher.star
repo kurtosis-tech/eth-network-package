@@ -110,6 +110,8 @@ def get_config(network_id, genesis_data, image, existing_el_clients, log_level, 
 		"--engine-jwt-secret={0}".format(jwt_secret_json_filepath_on_client),
 		"--engine-host-allowlist=*",
 		"--engine-rpc-port={0}".format(ENGINE_HTTP_RPC_PORT_NUM),
+		"--sync-mode=FULL",
+		"--data-storage-format=BONSAI",
 	]
 
 	if len(existing_el_clients) > 0:
