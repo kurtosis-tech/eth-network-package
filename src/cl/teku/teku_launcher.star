@@ -151,7 +151,6 @@ def get_config(
 		DEST_VALIDATOR_SECRETS_DIRPATH_IN_SERVICE_CONTAINER,
 		"&&",
 		TEKU_BINARY_FILEPATH_IN_IMAGE,
-		"--Xee-version kilnv2",
 		"--logging=" + log_level,
 		"--log-destination=CONSOLE",
 		"--network=" + genesis_config_filepath,
@@ -162,7 +161,6 @@ def get_config(
 		# Set per Pari's recommendation, to reduce noise in the logs
 		"--p2p-subscribe-all-subnets-enabled=true",
 		"--p2p-peer-lower-bound={0}".format(MIN_PEERS),
-		"--eth1-endpoints=" + el_client_rpc_url_str,
 		"--p2p-advertised-ip=" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		"--rest-api-enabled=true",
 		"--rest-api-docs-enabled=true",
