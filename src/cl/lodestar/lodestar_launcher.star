@@ -21,7 +21,6 @@ VALIDATOR_METRICS_PORT_ID = "validator-metrics"
 DISCOVERY_PORT_NUM        = 9000
 HTTP_PORT_NUM                    = 4000
 METRICS_PORT_NUM           = 8008
-VALIDATOR_METRICS_PORT_NUM        = 5064
 
 BEACON_SUFFIX_SERVICE_NAME    = "beacon"
 VALIDATOR_SUFFIX_SERVICE_NAME = "validator"
@@ -30,12 +29,15 @@ METRICS_PATH = "/metrics"
 
 PRIVATE_IP_ADDRESS_PLACEHOLDER = "KURTOSIS_IP_ADDR_PLACEHOLDER"
 
-USED_PORTS = {
+BEACON_USED_PORTS = {
     TCP_DISCOVERY_PORT_ID:     shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.TCP_PROTOCOL),
     UDP_DISCOVERY_PORT_ID:     shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.UDP_PROTOCOL),
     HTTP_PORT_ID:              shared_utils.new_port_spec(HTTP_PORT_NUM, shared_utils.TCP_PROTOCOL),
     METRICS_PORT_ID:           shared_utils.new_port_spec(METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL),
-    VALIDATOR_METRICS_PORT_ID: shared_utils.new_port_spec(VALIDATOR_METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL)
+}
+
+VALIDATOR_USED_PORTS = {
+    METRICS_PORT_ID:           shared_utils.new_port_spec(METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL),
 }
 
 
@@ -184,7 +186,7 @@ def get_beacon_config(
 	
 	return ServiceConfig(
 		image = image,
-		ports = USED_PORTS,
+		ports = BEACON_USED_PORTS,
 		cmd = cmd,
 		files = {
 			GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: genesis_data.files_artifact_uuid
@@ -220,7 +222,7 @@ def get_validator_config(
 		# vvvvvvvvvvvvvvvvvvv PROMETHEUS CONFIG vvvvvvvvvvvvvvvvvvvvv
 		"--metrics",
 		"--metrics.address=0.0.0.0",
-		"--metrics.port={0}".format(VALIDATOR_METRICS_PORT_NUM),
+		"--metrics.port={0}".format(METRICS_PORT_NUM),
 		# ^^^^^^^^^^^^^^^^^^^ PROMETHEUS CONFIG ^^^^^^^^^^^^^^^^^^^^^
 	]
 
@@ -231,7 +233,7 @@ def get_validator_config(
 
 	return ServiceConfig(
 		image = image,
-		ports = USED_PORTS,
+		ports = VALIDATOR_USED_PORTS,
 		cmd = cmd,
 		files = {
 			GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: genesis_data.files_artifact_uuid,
