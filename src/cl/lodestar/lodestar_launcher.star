@@ -215,6 +215,10 @@ def get_validator_config(
 		"--server=" + beacon_client_http_url,
 		"--keystoresDir=" + validator_keys_dirpath,
 		"--secretsDir=" + validator_secrets_dirpath,
+		"--rest=true",
+		"--rest.address=0.0.0.0",
+		"--rest.namespace=*",
+		"--rest.port={0}".format(HTTP_PORT_NUM),
 		# vvvvvvvvvvvvvvvvvvv PROMETHEUS CONFIG vvvvvvvvvvvvvvvvvvvvv
 		"--metrics",
 		"--metrics.address=0.0.0.0",
