@@ -29,10 +29,14 @@ METRICS_PATH = "/metrics"
 
 PRIVATE_IP_ADDRESS_PLACEHOLDER = "KURTOSIS_IP_ADDR_PLACEHOLDER"
 
-USED_PORTS = {
+BEACON_USED_PORTS = {
     TCP_DISCOVERY_PORT_ID:     shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.TCP_PROTOCOL),
     UDP_DISCOVERY_PORT_ID:     shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.UDP_PROTOCOL),
     HTTP_PORT_ID:              shared_utils.new_port_spec(HTTP_PORT_NUM, shared_utils.TCP_PROTOCOL),
+    METRICS_PORT_ID:           shared_utils.new_port_spec(METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL),
+}
+
+VALIDATOR_USED_PORTS = {
     METRICS_PORT_ID:           shared_utils.new_port_spec(METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL),
 }
 
@@ -215,13 +219,6 @@ def get_validator_config(
 		"--server=" + beacon_client_http_url,
 		"--keystoresDir=" + validator_keys_dirpath,
 		"--secretsDir=" + validator_secrets_dirpath,
-		"--enr.ip=" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
-		"--enr.tcp={0}".format(DISCOVERY_PORT_NUM),
-		"--enr.udp={0}".format(DISCOVERY_PORT_NUM),
-		"--rest=true",
-		"--rest.address=0.0.0.0",
-		"--rest.namespace=*",
-		"--rest.port={0}".format(HTTP_PORT_NUM),
 		# vvvvvvvvvvvvvvvvvvv PROMETHEUS CONFIG vvvvvvvvvvvvvvvvvvvvv
 		"--metrics",
 		"--metrics.address=0.0.0.0",
