@@ -186,7 +186,7 @@ def get_beacon_config(
 	
 	return ServiceConfig(
 		image = image,
-		ports = USED_PORTS,
+		ports = BEACON_USED_PORTS,
 		cmd = cmd,
 		files = {
 			GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: genesis_data.files_artifact_uuid
@@ -233,7 +233,7 @@ def get_validator_config(
 
 	return ServiceConfig(
 		image = image,
-		ports = USED_PORTS,
+		ports = VALIDATOR_USED_PORTS,
 		cmd = cmd,
 		files = {
 			GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: genesis_data.files_artifact_uuid,
