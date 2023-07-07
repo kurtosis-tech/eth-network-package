@@ -1,6 +1,6 @@
-shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/shared_utils/shared_utils.star")
-el_genesis = import_module("github.com/kurtosis-tech/eth-network-package/src/prelaunch_data_generator/el_genesis/el_genesis_data.star")
-prelaunch_data_generator_launcher = import_module("github.com/kurtosis-tech/eth-network-package/src/prelaunch_data_generator/prelaunch_data_generator_launcher/prelaunch_data_generator_launcher.star")
+shared_utils = import_module("github.com/barnabasbusa/eth-network-package/shared_utils/shared_utils.star")
+el_genesis = import_module("github.com/barnabasbusa/eth-network-package/src/prelaunch_data_generator/el_genesis/el_genesis_data.star")
+prelaunch_data_generator_launcher = import_module("github.com/barnabasbusa/eth-network-package/src/prelaunch_data_generator/prelaunch_data_generator_launcher/prelaunch_data_generator_launcher.star")
 
 CONFIG_DIRPATH_ON_GENERATOR = "/config"
 GENESIS_CONFIG_FILENAME    = "genesis-config.yaml"
