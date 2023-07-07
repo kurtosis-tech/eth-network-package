@@ -36,8 +36,7 @@ def generate_cl_genesis_data(
 		preregistered_validator_keys_mnemonic,
 		total_num_validator_keys_to_preregister,
 		genesis_delay,
-		capella_fork_epoch,
-		deneb_fork_epoch,
+		deneb_fork_epoch
 	):
 
 	template_data = new_cl_genesis_config_template_data(
@@ -48,7 +47,6 @@ def generate_cl_genesis_data(
 		preregistered_validator_keys_mnemonic,
 		deposit_contract_address,
 		genesis_delay,
-		capella_fork_epoch,
 		deneb_fork_epoch
   )
 
@@ -175,7 +173,7 @@ def generate_cl_genesis_data(
 
 
 
-def new_cl_genesis_config_template_data(network_id, seconds_per_slot, unix_timestamp, num_validator_keys_to_preregister, preregistered_validator_keys_mnemonic, deposit_contract_address, genesis_delay, capella_fork_epoch, deneb_fork_epoch):
+def new_cl_genesis_config_template_data(network_id, seconds_per_slot, unix_timestamp, num_validator_keys_to_preregister, preregistered_validator_keys_mnemonic, deposit_contract_address, genesis_delay, deneb_fork_epoch):
 	return {
 		"NetworkId": network_id,
 		"SecondsPerSlot": seconds_per_slot,
@@ -184,6 +182,5 @@ def new_cl_genesis_config_template_data(network_id, seconds_per_slot, unix_times
 		"PreregisteredValidatorKeysMnemonic": preregistered_validator_keys_mnemonic,
 		"DepositContractAddress": deposit_contract_address,
 		"GenesisDelay": genesis_delay,
-		"CapellaForkEpoch": capella_fork_epoch,
     "DenebForkEpoch": deneb_fork_epoch
   }

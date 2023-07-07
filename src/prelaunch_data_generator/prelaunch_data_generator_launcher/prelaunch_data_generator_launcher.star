@@ -1,4 +1,4 @@
-IMAGE = "bbusa/ethereum-genesis-generator:capella-1"
+IMAGE = "bbusa/ethereum-genesis-generator:capella"
 
 SERVICE_NAME_PREFIX = "prelaunch-data-generator-"
 
