@@ -155,8 +155,8 @@ def default_network_params():
 		"deposit_contract_address":              "0x4242424242424242424242424242424242424242",
 		"seconds_per_slot":                      12,
 		"slots_per_epoch":                       32,
-		"genesis_delay":                         10,
-		"capella_fork_epoch":                    2,
+		"genesis_delay":                         120,
+		"capella_fork_epoch":                    0,
 		"deneb_fork_epoch":                      5,
 	}
 

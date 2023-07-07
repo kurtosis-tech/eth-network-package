@@ -17,7 +17,6 @@ WS_PORT_ID           = "ws"
 TCP_DISCOVERY_PORT_ID = "tcp-discovery"
 UDP_DISCOVERY_PORT_ID = "udp-discovery"
 ENGINE_RPC_PORT_ID    = "engine-rpc"
-ENGINE_WS_PORT_ID     = "engineWs"
 
 # TODO(old) Scale this dynamically based on CPUs available and Geth nodes mining
 NUM_MINING_THREADS = 1
