@@ -13,14 +13,14 @@ VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER = "/validator-keys"
 # Port IDs
 TCP_DISCOVERY_PORT_ID     = "tcp-discovery"
 UDP_DISCOVERY_PORT_ID     = "udp-discovery"
-HTTP_PORT_ID             = "http"
-METRICS_PORT_ID          = "metrics"
+HTTP_PORT_ID             	= "http"
+METRICS_PORT_ID          	= "metrics"
 VALIDATOR_METRICS_PORT_ID = "validator-metrics"
 
 # Port nums
 DISCOVERY_PORT_NUM        = 9000
-HTTP_PORT_NUM                    = 4000
-METRICS_PORT_NUM           = 8008
+HTTP_PORT_NUM             = 4000
+METRICS_PORT_NUM          = 8008
 
 BEACON_SUFFIX_SERVICE_NAME    = "beacon"
 VALIDATOR_SUFFIX_SERVICE_NAME = "validator"
@@ -216,7 +216,7 @@ def get_validator_config(
 		"--logLevel=" + log_level,
 		"--dataDir=" + root_dirpath,
 		"--paramsFile=" + genesis_config_filepath,
-		"--server=" + beacon_client_http_url,
+		"--beaconNodes=" + beacon_client_http_url,
 		"--keystoresDir=" + validator_keys_dirpath,
 		"--secretsDir=" + validator_secrets_dirpath,
 		# vvvvvvvvvvvvvvvvvvv PROMETHEUS CONFIG vvvvvvvvvvvvvvvvvvvvv
