@@ -117,7 +117,7 @@ def parse_input(input_args):
 			seconds_per_slot=result["network_params"]["seconds_per_slot"],
 			slots_per_epoch=result["network_params"]["slots_per_epoch"],
 			capella_fork_epoch=result["network_params"]["capella_fork_epoch"],
-            deneb_fork_epoch=result["network_params"]["deneb_fork_epoch"],
+      deneb_fork_epoch=result["network_params"]["deneb_fork_epoch"],
 			genesis_delay=result["network_params"]["genesis_delay"]
 		),
 		wait_for_finalization=result["wait_for_finalization"],
