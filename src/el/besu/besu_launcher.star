@@ -30,7 +30,6 @@ USED_PORTS = {
 	TCP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.TCP_PROTOCOL),
 	UDP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.UDP_PROTOCOL),
 	ENGINE_HTTP_RPC_PORT_ID: shared_utils.new_port_spec(ENGINE_HTTP_RPC_PORT_NUM, shared_utils.TCP_PROTOCOL),
-	ENGINE_WS_RPC_PORT_ID: shared_utils.new_port_spec(ENGINE_WS_RPC_PORT_NUM, shared_utils.TCP_PROTOCOL)
 }
 
 ENTRYPOINT_ARGS = ["sh", "-c"]
