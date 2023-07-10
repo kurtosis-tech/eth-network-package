@@ -180,6 +180,6 @@ def default_participant():
 			"beacon_extra_params":    [],
 			"el_extra_params":        [],
 			"validator_extra_params": [],
-			"builder_network_params": None
+			"builder_network_params": None,
 			"count": 0
 	}
