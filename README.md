@@ -83,7 +83,11 @@ these and other parameters are configurable through a json file Read more about 
             //   "https://0xdeadbeefcafc@relay.example.com",
             //   "https://0xdeadbeefcafd@relay.example.com"
             //  ]
-            "builder_network_params": null
+            "builder_network_params": null,
+
+            // The number of times this participant should be repeated
+            // defaults to 1. This is optional.
+            "count": 1
         }
     ],
 
@@ -126,7 +130,7 @@ For example, this `eth-network-params.json` adds a second node, running a differ
     "beacon_extra_params":    [],
     "el_extra_params":        [],
     "validator_extra_params": [],
-    "builder_network_params": null
+    "builder_network_params": null,
   },{
     "el_client_type":         "nethermind",
     "el_client_image":        "",

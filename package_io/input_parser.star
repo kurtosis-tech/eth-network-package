@@ -37,7 +37,8 @@ def parse_input(input_args):
 				for sub_attr, sub_value in participant.items():
 					# if the value is set in input we set it in participant
 					new_participant[sub_attr] = sub_value
-				participants.append(new_participant)
+				for _ in range(0, new_participant["count"]):
+					participants.append(new_participant)
 			result["participants"] = participants
 
 	# validation of the above defaults
@@ -180,4 +181,5 @@ def default_participant():
 			"el_extra_params":        [],
 			"validator_extra_params": [],
 			"builder_network_params": None
+			"count": 0
 	}
