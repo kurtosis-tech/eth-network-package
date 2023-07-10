@@ -86,7 +86,7 @@ these and other parameters are configurable through a json file Read more about 
             "builder_network_params": null,
 
             // The number of times this participant should be repeated
-            // defaults to 1. This is optional.
+            // defaults to 1(i.e no repetition). This is optional.
             "count": 1
         }
     ],
@@ -131,6 +131,7 @@ For example, this `eth-network-params.json` adds a second node, running a differ
     "el_extra_params":        [],
     "validator_extra_params": [],
     "builder_network_params": null,
+    "count": 1
   },{
     "el_client_type":         "nethermind",
     "el_client_image":        "",
@@ -141,7 +142,8 @@ For example, this `eth-network-params.json` adds a second node, running a differ
     "beacon_extra_params":    [],
     "el_extra_params":        [],
     "validator_extra_params": [],
-    "builder_network_params": null
+    "builder_network_params": null,
+    "count": 1
   }],
   "network_params":{
     "preregistered_validator_keys_mnemonic": "giant issue aisle success illegal bike spike question tent bar rely arctic volcano long crawl hungry vocal artwork sniff fantasy very lucky have athlete",
