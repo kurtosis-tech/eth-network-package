@@ -1,10 +1,10 @@
-shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/shared_utils/shared_utils.star")
-input_parser = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
-cl_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_client_context.star")
-cl_node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_metrics_info.star")
-cl_node_ready_conditions = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_ready_conditions.star")
+shared_utils = import_module("github.com/barnabasbusa/eth-network-package/shared_utils/shared_utils.star")
+input_parser = import_module("github.com/barnabasbusa/eth-network-package/package_io/input_parser.star")
+cl_client_context = import_module("github.com/barnabasbusa/eth-network-package/src/cl/cl_client_context.star")
+cl_node_metrics = import_module("github.com/barnabasbusa/eth-network-package/src/cl/cl_node_metrics_info.star")
+cl_node_ready_conditions = import_module("github.com/barnabasbusa/eth-network-package/src/cl/cl_node_ready_conditions.star")
 
-package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
+package_io = import_module("github.com/barnabasbusa/eth-network-package/package_io/constants.star")
 
 TEKU_BINARY_FILEPATH_IN_IMAGE = "/opt/teku/bin/teku"
 

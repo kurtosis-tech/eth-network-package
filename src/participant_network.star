@@ -1,25 +1,25 @@
-cl_validator_keystores = import_module("github.com/kurtosis-tech/eth-network-package/src/prelaunch_data_generator/cl_validator_keystores/cl_validator_keystore_generator.star")
-el_genesis_data_generator = import_module("github.com/kurtosis-tech/eth-network-package/src/prelaunch_data_generator/el_genesis/el_genesis_data_generator.star")
-cl_genesis_data_generator = import_module("github.com/kurtosis-tech/eth-network-package/src/prelaunch_data_generator/cl_genesis/cl_genesis_data_generator.star")
+cl_validator_keystores = import_module("github.com/barnabasbusa/eth-network-package/src/prelaunch_data_generator/cl_validator_keystores/cl_validator_keystore_generator.star")
+el_genesis_data_generator = import_module("github.com/barnabasbusa/eth-network-package/src/prelaunch_data_generator/el_genesis/el_genesis_data_generator.star")
+cl_genesis_data_generator = import_module("github.com/barnabasbusa/eth-network-package/src/prelaunch_data_generator/cl_genesis/cl_genesis_data_generator.star")
 
-static_files = import_module("github.com/kurtosis-tech/eth-network-package/static_files/static_files.star")
+static_files = import_module("github.com/barnabasbusa/eth-network-package/static_files/static_files.star")
 
-geth = import_module("github.com/kurtosis-tech/eth-network-package/src/el/geth/geth_launcher.star")
-besu = import_module("github.com/kurtosis-tech/eth-network-package/src/el/besu/besu_launcher.star")
-erigon = import_module("github.com/kurtosis-tech/eth-network-package/src/el/erigon/erigon_launcher.star")
-nethermind = import_module("github.com/kurtosis-tech/eth-network-package/src/el/nethermind/nethermind_launcher.star")
+geth = import_module("github.com/barnabasbusa/eth-network-package/src/el/geth/geth_launcher.star")
+besu = import_module("github.com/barnabasbusa/eth-network-package/src/el/besu/besu_launcher.star")
+erigon = import_module("github.com/barnabasbusa/eth-network-package/src/el/erigon/erigon_launcher.star")
+nethermind = import_module("github.com/barnabasbusa/eth-network-package/src/el/nethermind/nethermind_launcher.star")
 
 
-lighthouse = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/lighthouse/lighthouse_launcher.star")
-lodestar = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/lodestar/lodestar_launcher.star")
-nimbus = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/nimbus/nimbus_launcher.star")
-prysm = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/prysm/prysm_launcher.star")
-teku = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/teku/teku_launcher.star")
+lighthouse = import_module("github.com/barnabasbusa/eth-network-package/src/cl/lighthouse/lighthouse_launcher.star")
+lodestar = import_module("github.com/barnabasbusa/eth-network-package/src/cl/lodestar/lodestar_launcher.star")
+nimbus = import_module("github.com/barnabasbusa/eth-network-package/src/cl/nimbus/nimbus_launcher.star")
+prysm = import_module("github.com/barnabasbusa/eth-network-package/src/cl/prysm/prysm_launcher.star")
+teku = import_module("github.com/barnabasbusa/eth-network-package/src/cl/teku/teku_launcher.star")
 
-genesis_constants = import_module("github.com/kurtosis-tech/eth-network-package/src/prelaunch_data_generator/genesis_constants/genesis_constants.star")
-participant_module = import_module("github.com/kurtosis-tech/eth-network-package/src/participant.star")
+genesis_constants = import_module("github.com/barnabasbusa/eth-network-package/src/prelaunch_data_generator/genesis_constants/genesis_constants.star")
+participant_module = import_module("github.com/barnabasbusa/eth-network-package/src/participant.star")
 
-package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
+package_io = import_module("github.com/barnabasbusa/eth-network-package/package_io/constants.star")
 
 BOOT_PARTICIPANT_INDEX = 0
 
@@ -60,7 +60,6 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		network_params.deposit_contract_address,
 		network_params.genesis_delay,
 		network_params.seconds_per_slot,
-		network_params.capella_fork_epoch,
 		network_params.deneb_fork_epoch
 	)
 
@@ -124,9 +123,8 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		network_params.seconds_per_slot,
 		network_params.preregistered_validator_keys_mnemonic,
 		total_number_of_validator_keys,
-        network_params.genesis_delay,
-        network_params.capella_fork_epoch,
-        network_params.deneb_fork_epoch
+		network_params.genesis_delay,
+		network_params.deneb_fork_epoch
 	)
 
 	plan.print(json.indent(json.encode(cl_genesis_data)))

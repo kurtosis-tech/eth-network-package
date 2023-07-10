@@ -1,6 +1,6 @@
-shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/shared_utils/shared_utils.star")
-cl_genesis_data = import_module("github.com/kurtosis-tech/eth-network-package/src/prelaunch_data_generator/cl_genesis/cl_genesis_data.star")
-prelaunch_data_generator_launcher = import_module("github.com/kurtosis-tech/eth-network-package/src/prelaunch_data_generator/prelaunch_data_generator_launcher/prelaunch_data_generator_launcher.star")
+shared_utils = import_module("github.com/barnabasbusa/eth-network-package/shared_utils/shared_utils.star")
+cl_genesis_data = import_module("github.com/barnabasbusa/eth-network-package/src/prelaunch_data_generator/cl_genesis/cl_genesis_data.star")
+prelaunch_data_generator_launcher = import_module("github.com/barnabasbusa/eth-network-package/src/prelaunch_data_generator/prelaunch_data_generator_launcher/prelaunch_data_generator_launcher.star")
 
 
 # Needed to copy the JWT secret and the EL genesis.json file
@@ -36,8 +36,7 @@ def generate_cl_genesis_data(
 		preregistered_validator_keys_mnemonic,
 		total_num_validator_keys_to_preregister,
 		genesis_delay,
-		capella_fork_epoch,
-		deneb_fork_epoch,
+		deneb_fork_epoch
 	):
 
 	template_data = new_cl_genesis_config_template_data(
@@ -48,9 +47,8 @@ def generate_cl_genesis_data(
 		preregistered_validator_keys_mnemonic,
 		deposit_contract_address,
 		genesis_delay,
-		capella_fork_epoch,
 		deneb_fork_epoch
-        	)
+  )
 
 	genesis_generation_mnemonics_template_and_data = shared_utils.new_template_and_data(genesis_generation_mnemonics_yml_template, template_data)
 	genesis_generation_config_template_and_data = shared_utils.new_template_and_data(genesis_generation_config_yml_template, template_data)
@@ -123,7 +121,7 @@ def generate_cl_genesis_data(
 
 	cl_genesis_generation_cmd = [
 		CL_GENESIS_GENERATION_BINARY_FILEPATH_ON_CONTAINER,
-		"merge",
+		"capella",
 		"--config", shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, GENESIS_CONFIG_YML_FILENAME),
 		"--mnemonics", shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, MNEMONICS_YML_FILENAME),
 		"--eth1-config", shared_utils.path_join(EL_GENESIS_DIRPATH_ON_GENERATOR, el_genesis_data.geth_genesis_json_relative_filepath),
@@ -136,7 +134,7 @@ def generate_cl_genesis_data(
 	parsed_beacon_state_file_generation = [
 		CL_PARSED_BEACON_STATE_GENERATOR_BINARY,
 		"pretty",
-		"bellatrix",
+		"capella",
 		"BeaconState",
 		shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, GENESIS_STATE_FILENAME),
 		">",
@@ -175,7 +173,7 @@ def generate_cl_genesis_data(
 
 
 
-def new_cl_genesis_config_template_data(network_id, seconds_per_slot, unix_timestamp, num_validator_keys_to_preregister, preregistered_validator_keys_mnemonic, deposit_contract_address, genesis_delay, capella_fork_epoch, deneb_fork_epoch):
+def new_cl_genesis_config_template_data(network_id, seconds_per_slot, unix_timestamp, num_validator_keys_to_preregister, preregistered_validator_keys_mnemonic, deposit_contract_address, genesis_delay, deneb_fork_epoch):
 	return {
 		"NetworkId": network_id,
 		"SecondsPerSlot": seconds_per_slot,
@@ -184,6 +182,5 @@ def new_cl_genesis_config_template_data(network_id, seconds_per_slot, unix_times
 		"PreregisteredValidatorKeysMnemonic": preregistered_validator_keys_mnemonic,
 		"DepositContractAddress": deposit_contract_address,
 		"GenesisDelay": genesis_delay,
-		"CapellaForkEpoch": capella_fork_epoch,
-        "DenebForkEpoch": deneb_fork_epoch
-    	}
+    "DenebForkEpoch": deneb_fork_epoch
+  }
