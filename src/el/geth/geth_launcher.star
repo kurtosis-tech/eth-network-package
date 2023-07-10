@@ -1,9 +1,9 @@
-shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/shared_utils/shared_utils.star")
-input_parser = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
-el_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/el/el_client_context.star")
-el_admin_node_info = import_module("github.com/kurtosis-tech/eth-network-package/src/el/el_admin_node_info.star")
+shared_utils = import_module("github.com/barnabasbusa/eth-network-package/shared_utils/shared_utils.star")
+input_parser = import_module("github.com/barnabasbusa/eth-network-package/package_io/input_parser.star")
+el_client_context = import_module("github.com/barnabasbusa/eth-network-package/src/el/el_client_context.star")
+el_admin_node_info = import_module("github.com/barnabasbusa/eth-network-package/src/el/el_admin_node_info.star")
 
-package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
+package_io = import_module("github.com/barnabasbusa/eth-network-package/package_io/constants.star")
 
 
 RPC_PORT_NUM       = 8545
@@ -17,7 +17,6 @@ WS_PORT_ID           = "ws"
 TCP_DISCOVERY_PORT_ID = "tcp-discovery"
 UDP_DISCOVERY_PORT_ID = "udp-discovery"
 ENGINE_RPC_PORT_ID    = "engine-rpc"
-ENGINE_WS_PORT_ID     = "engineWs"
 
 # TODO(old) Scale this dynamically based on CPUs available and Geth nodes mining
 NUM_MINING_THREADS = 1

@@ -1,8 +1,8 @@
-shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/shared_utils/shared_utils.star")
-input_parser = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
-el_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/el/el_client_context.star")
-el_admin_node_info = import_module("github.com/kurtosis-tech/eth-network-package/src/el/el_admin_node_info.star")
-package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
+shared_utils = import_module("github.com/barnabasbusa/eth-network-package/shared_utils/shared_utils.star")
+input_parser = import_module("github.com/barnabasbusa/eth-network-package/package_io/input_parser.star")
+el_client_context = import_module("github.com/barnabasbusa/eth-network-package/src/el/el_client_context.star")
+el_admin_node_info = import_module("github.com/barnabasbusa/eth-network-package/src/el/el_admin_node_info.star")
+package_io = import_module("github.com/barnabasbusa/eth-network-package/package_io/constants.star")
 
 # The dirpath of the execution data directory on the client container
 EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/opt/besu/execution-data"
@@ -12,16 +12,14 @@ GENESIS_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/opt/besu/genesis"
 RPC_PORT_NUM = 8545
 WS_PORT_NUM = 8546
 DISCOVERY_PORT_NUM = 30303
-ENGINE_HTTP_RPC_PORT_NUM = 8550
-ENGINE_WS_RPC_PORT_NUM = 8551
+ENGINE_HTTP_RPC_PORT_NUM = 8551
 
 # Port IDs
 RPC_PORT_ID = "rpc"
 WS_PORT_ID = "ws"
 TCP_DISCOVERY_PORT_ID = "tcp-discovery"
 UDP_DISCOVERY_PORT_ID = "udp-discovery"
-ENGINE_HTTP_RPC_PORT_ID = "engineHttpRpc"
-ENGINE_WS_RPC_PORT_ID = "engineWsRpc"
+ENGINE_HTTP_RPC_PORT_ID = "engine-rpc"
 
 PRIVATE_IP_ADDRESS_PLACEHOLDER = "KURTOSIS_IP_ADDR_PLACEHOLDER"
 
@@ -31,7 +29,6 @@ USED_PORTS = {
 	TCP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.TCP_PROTOCOL),
 	UDP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.UDP_PROTOCOL),
 	ENGINE_HTTP_RPC_PORT_ID: shared_utils.new_port_spec(ENGINE_HTTP_RPC_PORT_NUM, shared_utils.TCP_PROTOCOL),
-	ENGINE_WS_RPC_PORT_ID: shared_utils.new_port_spec(ENGINE_WS_RPC_PORT_NUM, shared_utils.TCP_PROTOCOL)
 }
 
 ENTRYPOINT_ARGS = ["sh", "-c"]
