@@ -21,9 +21,6 @@ participant_module = import_module("github.com/barnabasbusa/eth-network-package/
 
 package_io = import_module("github.com/barnabasbusa/eth-network-package/package_io/constants.star")
 
-CL_CLIENT_SERVICE_NAME_PREFIX = "cl-client-"
-EL_CLIENT_SERVICE_NAME_PREFIX = "el-client-"
-
 BOOT_PARTICIPANT_INDEX = 0
 
 # The time that the CL genesis generation step takes to complete, based off what we've seen
@@ -91,7 +88,8 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 			fail("Unsupported launcher '{0}', need one of '{1}'".format(el_client_type, ",".join([el.name for el in el_launchers.keys()])))
 		
 		el_launcher, launch_method = el_launchers[el_client_type]["launcher"], el_launchers[el_client_type]["launch_method"]
-		el_service_name = "{0}{1}".format(EL_CLIENT_SERVICE_NAME_PREFIX, index)
+		el_service_name = "{0}-{1}-{2}".format(el_client_type, participant.cl_client_type, index)
+
 
 		el_client_context = launch_method(
 			plan,
@@ -151,7 +149,7 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 			fail("Unsupported launcher '{0}', need one of '{1}'".format(cl_client_type, ",".join([cl.name for cl in cl_launchers.keys()])))
 		
 		cl_launcher, launch_method = cl_launchers[cl_client_type]["launcher"], cl_launchers[cl_client_type]["launch_method"]
-		cl_service_name = "{0}{1}".format(CL_CLIENT_SERVICE_NAME_PREFIX, index)
+		cl_service_name = "{0}-{1}-{2}".format(cl_client_type, participant.el_client_type, index)
 
 		new_cl_node_validator_keystores = preregistered_validator_keys_for_nodes[index]
 

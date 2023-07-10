@@ -145,8 +145,9 @@ For example, this `eth-network-params.json` adds a second node, running a differ
     "network_id": "3151908",
     "deposit_contract_address": "0x4242424242424242424242424242424242424242",
     "seconds_per_slot": 12,
+    "slots_per_epoch": 32,
     "genesis_delay": 120,
-    "deneb_fork_epoch": 5
+    "deneb_fork_epoch": 500
   },
   "global_client_log_level": "info"
 }
