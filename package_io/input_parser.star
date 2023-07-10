@@ -181,5 +181,5 @@ def default_participant():
 			"el_extra_params":        [],
 			"validator_extra_params": [],
 			"builder_network_params": None,
-			"count": 0
+			"count": 1
 	}
