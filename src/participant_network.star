@@ -35,185 +35,185 @@ CL_NODE_STARTUP_TIME = 5 * time.second
 CL_CLIENT_CONTEXT_BOOTNODE = None
 
 def launch_participant_network(plan, participants, network_params, global_log_level):
-	num_participants = len(participants)
+    num_participants = len(participants)
 
-	plan.print("Generating cl validator key stores")
-	cl_validator_data = cl_validator_keystores.generate_cl_validator_keystores(
-		plan,
-		network_params.preregistered_validator_keys_mnemonic,
-		num_participants,
-		network_params.num_validator_keys_per_node,
-	)
-
-
-	plan.print(json.indent(json.encode(cl_validator_data)))
-
-	# We need to send the same genesis time to both the EL and the CL to ensure that timestamp based forking works as expected
-	final_genesis_timestamp = (time.now() + CL_GENESIS_DATA_GENERATION_TIME + num_participants*CL_NODE_STARTUP_TIME).unix
-	plan.print("Generating EL data")
-	el_genesis_generation_config_template = read_file(static_files.EL_GENESIS_GENERATION_CONFIG_TEMPLATE_FILEPATH)
-	el_genesis_data = el_genesis_data_generator.generate_el_genesis_data(
-		plan,
-		el_genesis_generation_config_template,
-		final_genesis_timestamp,
-		network_params.network_id,
-		network_params.deposit_contract_address,
-		network_params.genesis_delay,
-		network_params.seconds_per_slot,
-		network_params.deneb_fork_epoch
-	)
+    plan.print("Generating cl validator key stores")
+    cl_validator_data = cl_validator_keystores.generate_cl_validator_keystores(
+        plan,
+        network_params.preregistered_validator_keys_mnemonic,
+        num_participants,
+        network_params.num_validator_keys_per_node,
+    )
 
 
-	plan.print(json.indent(json.encode(el_genesis_data)))
+    plan.print(json.indent(json.encode(cl_validator_data)))
 
-	plan.print("Uploading GETH prefunded keys")
-
-	geth_prefunded_keys_artifact_name = plan.upload_files(static_files.GETH_PREFUNDED_KEYS_DIRPATH, name="geth-prefunded-keys")
-
-	plan.print("Uploaded GETH files succesfully, launching EL participants")
-
-	el_launchers = {
-		package_io.EL_CLIENT_TYPE.geth : {"launcher": geth.new_geth_launcher(network_params.network_id, el_genesis_data, geth_prefunded_keys_artifact_name, genesis_constants.PRE_FUNDED_ACCOUNTS), "launch_method": geth.launch},
-		package_io.EL_CLIENT_TYPE.besu : {"launcher": besu.new_besu_launcher(network_params.network_id, el_genesis_data), "launch_method": besu.launch},
-		package_io.EL_CLIENT_TYPE.erigon : {"launcher": erigon.new_erigon_launcher(network_params.network_id, el_genesis_data), "launch_method": erigon.launch},
-		package_io.EL_CLIENT_TYPE.nethermind : {"launcher": nethermind.new_nethermind_launcher(el_genesis_data), "launch_method": nethermind.launch},
-	}
-
-	all_el_client_contexts = []
-
-	for index, participant in enumerate(participants):
-		el_client_type = participant.el_client_type
-		cl_client_type = participant.cl_client_type
-		pair_id = "-".join([el_client_type, cl_client_type])
-
-		# Update the counter for this pair and fetch the current count
-		client_pair_counter[pair_id] = client_pair_counter.get(pair_id, -1) + 1
-		pair_index = client_pair_counter[pair_id]
-
-		if el_client_type not in el_launchers:
-			fail("Unsupported launcher '{0}', need one of '{1}'".format(el_client_type, ",".join([el.name for el in el_launchers.keys()])))
-
-		el_launcher, launch_method = el_launchers[el_client_type]["launcher"], el_launchers[el_client_type]["launch_method"]
-		el_service_name = "{0}-{1}-{2}".format(el_client_type, cl_client_type, pair_index)
+    # We need to send the same genesis time to both the EL and the CL to ensure that timestamp based forking works as expected
+    final_genesis_timestamp = (time.now() + CL_GENESIS_DATA_GENERATION_TIME + num_participants*CL_NODE_STARTUP_TIME).unix
+    plan.print("Generating EL data")
+    el_genesis_generation_config_template = read_file(static_files.EL_GENESIS_GENERATION_CONFIG_TEMPLATE_FILEPATH)
+    el_genesis_data = el_genesis_data_generator.generate_el_genesis_data(
+        plan,
+        el_genesis_generation_config_template,
+        final_genesis_timestamp,
+        network_params.network_id,
+        network_params.deposit_contract_address,
+        network_params.genesis_delay,
+        network_params.seconds_per_slot,
+        network_params.deneb_fork_epoch
+    )
 
 
-		el_client_context = launch_method(
-			plan,
-			el_launcher,
-			el_service_name,
-			participant.el_client_image,
-			participant.el_client_log_level,
-			global_log_level,
-			all_el_client_contexts,
-			participant.el_extra_params
-		)
+    plan.print(json.indent(json.encode(el_genesis_data)))
 
-		all_el_client_contexts.append(el_client_context)
+    plan.print("Uploading GETH prefunded keys")
 
-	plan.print("Succesfully added {0} EL participants".format(num_participants))
+    geth_prefunded_keys_artifact_name = plan.upload_files(static_files.GETH_PREFUNDED_KEYS_DIRPATH, name="geth-prefunded-keys")
+
+    plan.print("Uploaded GETH files succesfully, launching EL participants")
+
+    el_launchers = {
+        package_io.EL_CLIENT_TYPE.geth : {"launcher": geth.new_geth_launcher(network_params.network_id, el_genesis_data, geth_prefunded_keys_artifact_name, genesis_constants.PRE_FUNDED_ACCOUNTS), "launch_method": geth.launch},
+        package_io.EL_CLIENT_TYPE.besu : {"launcher": besu.new_besu_launcher(network_params.network_id, el_genesis_data), "launch_method": besu.launch},
+        package_io.EL_CLIENT_TYPE.erigon : {"launcher": erigon.new_erigon_launcher(network_params.network_id, el_genesis_data), "launch_method": erigon.launch},
+        package_io.EL_CLIENT_TYPE.nethermind : {"launcher": nethermind.new_nethermind_launcher(el_genesis_data), "launch_method": nethermind.launch},
+    }
+
+    all_el_client_contexts = []
+
+    for index, participant in enumerate(participants):
+        el_client_type = participant.el_client_type
+        cl_client_type = participant.cl_client_type
+        pair_id = "-".join([el_client_type, cl_client_type])
+
+        # Update the counter for this pair and fetch the current count
+        client_pair_counter[pair_id] = client_pair_counter.get(pair_id, -1) + 1
+        pair_index = client_pair_counter[pair_id]
+
+        if el_client_type not in el_launchers:
+            fail("Unsupported launcher '{0}', need one of '{1}'".format(el_client_type, ",".join([el.name for el in el_launchers.keys()])))
+
+        el_launcher, launch_method = el_launchers[el_client_type]["launcher"], el_launchers[el_client_type]["launch_method"]
+        el_service_name = "{0}-{1}-{2}".format(el_client_type, cl_client_type, pair_index)
 
 
-	plan.print("Generating CL data")
+        el_client_context = launch_method(
+            plan,
+            el_launcher,
+            el_service_name,
+            participant.el_client_image,
+            participant.el_client_log_level,
+            global_log_level,
+            all_el_client_contexts,
+            participant.el_extra_params
+        )
 
-	genesis_generation_config_yml_template = read_file(static_files.CL_GENESIS_GENERATION_CONFIG_TEMPLATE_FILEPATH)
-	genesis_generation_mnemonics_yml_template = read_file(static_files.CL_GENESIS_GENERATION_MNEMONICS_TEMPLATE_FILEPATH)
-	total_number_of_validator_keys = network_params.num_validator_keys_per_node * num_participants
-	cl_genesis_data = cl_genesis_data_generator.generate_cl_genesis_data(
-		plan,
-		genesis_generation_config_yml_template,
-		genesis_generation_mnemonics_yml_template,
-		el_genesis_data,
-		final_genesis_timestamp,
-		network_params.network_id,
-		network_params.deposit_contract_address,
-		network_params.seconds_per_slot,
-		network_params.preregistered_validator_keys_mnemonic,
-		total_number_of_validator_keys,
+        all_el_client_contexts.append(el_client_context)
+
+    plan.print("Succesfully added {0} EL participants".format(num_participants))
+
+
+    plan.print("Generating CL data")
+
+    genesis_generation_config_yml_template = read_file(static_files.CL_GENESIS_GENERATION_CONFIG_TEMPLATE_FILEPATH)
+    genesis_generation_mnemonics_yml_template = read_file(static_files.CL_GENESIS_GENERATION_MNEMONICS_TEMPLATE_FILEPATH)
+    total_number_of_validator_keys = network_params.num_validator_keys_per_node * num_participants
+    cl_genesis_data = cl_genesis_data_generator.generate_cl_genesis_data(
+        plan,
+        genesis_generation_config_yml_template,
+        genesis_generation_mnemonics_yml_template,
+        el_genesis_data,
+        final_genesis_timestamp,
+        network_params.network_id,
+        network_params.deposit_contract_address,
+        network_params.seconds_per_slot,
+        network_params.preregistered_validator_keys_mnemonic,
+        total_number_of_validator_keys,
         network_params.genesis_delay,
         network_params.deneb_fork_epoch
-	)
+    )
 
-	plan.print(json.indent(json.encode(cl_genesis_data)))
+    plan.print(json.indent(json.encode(cl_genesis_data)))
 
-	plan.print("Launching CL network")
+    plan.print("Launching CL network")
 
-	cl_launchers = {
-		package_io.CL_CLIENT_TYPE.lighthouse : {"launcher": lighthouse.new_lighthouse_launcher(cl_genesis_data), "launch_method": lighthouse.launch},
-		package_io.CL_CLIENT_TYPE.lodestar: {"launcher": lodestar.new_lodestar_launcher(cl_genesis_data), "launch_method": lodestar.launch},
-		package_io.CL_CLIENT_TYPE.nimbus: {"launcher": nimbus.new_nimbus_launcher(cl_genesis_data), "launch_method": nimbus.launch},
-		package_io.CL_CLIENT_TYPE.prysm: {"launcher": prysm.new_prysm_launcher(cl_genesis_data, cl_validator_data.prysm_password_relative_filepath, cl_validator_data.prysm_password_artifact_uuid), "launch_method": prysm.launch},
-		package_io.CL_CLIENT_TYPE.teku: {"launcher": teku.new_teku_launcher(cl_genesis_data), "launch_method": teku.launch},
-	}
+    cl_launchers = {
+        package_io.CL_CLIENT_TYPE.lighthouse : {"launcher": lighthouse.new_lighthouse_launcher(cl_genesis_data), "launch_method": lighthouse.launch},
+        package_io.CL_CLIENT_TYPE.lodestar: {"launcher": lodestar.new_lodestar_launcher(cl_genesis_data), "launch_method": lodestar.launch},
+        package_io.CL_CLIENT_TYPE.nimbus: {"launcher": nimbus.new_nimbus_launcher(cl_genesis_data), "launch_method": nimbus.launch},
+        package_io.CL_CLIENT_TYPE.prysm: {"launcher": prysm.new_prysm_launcher(cl_genesis_data, cl_validator_data.prysm_password_relative_filepath, cl_validator_data.prysm_password_artifact_uuid), "launch_method": prysm.launch},
+        package_io.CL_CLIENT_TYPE.teku: {"launcher": teku.new_teku_launcher(cl_genesis_data), "launch_method": teku.launch},
+    }
 
-	all_cl_client_contexts = []
-	preregistered_validator_keys_for_nodes = cl_validator_data.per_node_keystores
+    all_cl_client_contexts = []
+    preregistered_validator_keys_for_nodes = cl_validator_data.per_node_keystores
 
-	for index, participant in enumerate(participants):
-		cl_client_type = participant.cl_client_type
-		el_client_type = participant.el_client_type
+    for index, participant in enumerate(participants):
+        cl_client_type = participant.cl_client_type
+        el_client_type = participant.el_client_type
 
-		# Update the counter for this pair and fetch the current count
-   	 	client_pair_counter[pair_id] = client_pair_counter.get(pair_id, -1) + 1
-    	pair_index = client_pair_counter[pair_id]
+        # Update the counter for this pair and fetch the current count
+        client_pair_counter[pair_id] = client_pair_counter.get(pair_id, -1) + 1
+        pair_index = client_pair_counter[pair_id]
 
-		if cl_client_type not in cl_launchers:
-			fail("Unsupported launcher '{0}', need one of '{1}'".format(cl_client_type, ",".join([cl.name for cl in cl_launchers.keys()])))
+        if cl_client_type not in cl_launchers:
+            fail("Unsupported launcher '{0}', need one of '{1}'".format(cl_client_type, ",".join([cl.name for cl in cl_launchers.keys()])))
 
-		cl_launcher, launch_method = cl_launchers[cl_client_type]["launcher"], cl_launchers[cl_client_type]["launch_method"]
-		cl_service_name = "{0}-{1}-{2}".format(cl_client_type, participant.el_client_type, pair_index)
+        cl_launcher, launch_method = cl_launchers[cl_client_type]["launcher"], cl_launchers[cl_client_type]["launch_method"]
+        cl_service_name = "{0}-{1}-{2}".format(cl_client_type, participant.el_client_type, pair_index)
 
-		new_cl_node_validator_keystores = preregistered_validator_keys_for_nodes[index]
+        new_cl_node_validator_keystores = preregistered_validator_keys_for_nodes[index]
 
-		el_client_context = all_el_client_contexts[index]
+        el_client_context = all_el_client_contexts[index]
 
-		cl_client_context = None
+        cl_client_context = None
 
-		if index == 0:
-			cl_client_context = launch_method(
-				plan,
-				cl_launcher,
-				cl_service_name,
-				participant.cl_client_image,
-				participant.cl_client_log_level,
-				global_log_level,
-				CL_CLIENT_CONTEXT_BOOTNODE,
-				el_client_context,
-				new_cl_node_validator_keystores,
-				participant.beacon_extra_params,
-				participant.validator_extra_params
-			)
-		else:
-			boot_cl_client_ctx = all_cl_client_contexts[0]
-			cl_client_context = launch_method(
-				plan,
-				cl_launcher,
-				cl_service_name,
-				participant.cl_client_image,
-				participant.cl_client_log_level,
-				global_log_level,
-				boot_cl_client_ctx,
-				el_client_context,
-				new_cl_node_validator_keystores,
-				participant.beacon_extra_params,
-				participant.validator_extra_params
-			)
+        if index == 0:
+            cl_client_context = launch_method(
+                plan,
+                cl_launcher,
+                cl_service_name,
+                participant.cl_client_image,
+                participant.cl_client_log_level,
+                global_log_level,
+                CL_CLIENT_CONTEXT_BOOTNODE,
+                el_client_context,
+                new_cl_node_validator_keystores,
+                participant.beacon_extra_params,
+                participant.validator_extra_params
+            )
+        else:
+            boot_cl_client_ctx = all_cl_client_contexts[0]
+            cl_client_context = launch_method(
+                plan,
+                cl_launcher,
+                cl_service_name,
+                participant.cl_client_image,
+                participant.cl_client_log_level,
+                global_log_level,
+                boot_cl_client_ctx,
+                el_client_context,
+                new_cl_node_validator_keystores,
+                participant.beacon_extra_params,
+                participant.validator_extra_params
+            )
 
-		all_cl_client_contexts.append(cl_client_context)
+        all_cl_client_contexts.append(cl_client_context)
 
-	plan.print("Succesfully added {0} CL participants".format(num_participants))
+    plan.print("Succesfully added {0} CL participants".format(num_participants))
 
-	all_participants = []
+    all_participants = []
 
-	for index, participant in enumerate(participants):
-		el_client_type = participant.el_client_type
-		cl_client_type = participant.cl_client_type
+    for index, participant in enumerate(participants):
+        el_client_type = participant.el_client_type
+        cl_client_type = participant.cl_client_type
 
-		el_client_context = all_el_client_contexts[index]
-		cl_client_context = all_cl_client_contexts[index]
+        el_client_context = all_el_client_contexts[index]
+        cl_client_context = all_cl_client_contexts[index]
 
-		participant_entry = participant_module.new_participant(el_client_type, cl_client_type, el_client_context, cl_client_context)
+        participant_entry = participant_module.new_participant(el_client_type, cl_client_type, el_client_context, cl_client_context)
 
-		all_participants.append(participant_entry)
+        all_participants.append(participant_entry)
 
 
-	return all_participants, final_genesis_timestamp
+    return all_participants, final_genesis_timestamp
