@@ -83,13 +83,18 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 
 	for index, participant in enumerate(participants):
 		el_client_type = participant.el_client_type
+		cl_client_type = participant.cl_client_type
+    	pair_id = "-".join([el_client_type, cl_client_type])
+
+		# Update the counter for this pair and fetch the current count
+    	client_pair_counter[pair_id] = client_pair_counter.get(pair_id, -1) + 1
+    	pair_index = client_pair_counter[pair_id]
 
 		if el_client_type not in el_launchers:
 			fail("Unsupported launcher '{0}', need one of '{1}'".format(el_client_type, ",".join([el.name for el in el_launchers.keys()])))
 		
 		el_launcher, launch_method = el_launchers[el_client_type]["launcher"], el_launchers[el_client_type]["launch_method"]
-		el_service_name = "{0}-{1}-{2}".format(el_client_type, participant.cl_client_type, index)
-
+		el_service_name = "{0}-{1}-{2}".format(el_client_type, cl_client_type, pair_index)
 
 		el_client_context = launch_method(
 			plan,
@@ -123,8 +128,8 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		network_params.seconds_per_slot,
 		network_params.preregistered_validator_keys_mnemonic,
 		total_number_of_validator_keys,
-		network_params.genesis_delay,
-		network_params.deneb_fork_epoch
+        network_params.genesis_delay,
+        network_params.deneb_fork_epoch
 	)
 
 	plan.print(json.indent(json.encode(cl_genesis_data)))
@@ -144,12 +149,17 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 
 	for index, participant in enumerate(participants):
 		cl_client_type = participant.cl_client_type
+		el_client_type = participant.el_client_type
+
+		# Update the counter for this pair and fetch the current count
+   	 	client_pair_counter[pair_id] = client_pair_counter.get(pair_id, -1) + 1
+    	pair_index = client_pair_counter[pair_id]
 
 		if cl_client_type not in cl_launchers:
 			fail("Unsupported launcher '{0}', need one of '{1}'".format(cl_client_type, ",".join([cl.name for cl in cl_launchers.keys()])))
 		
 		cl_launcher, launch_method = cl_launchers[cl_client_type]["launcher"], cl_launchers[cl_client_type]["launch_method"]
-		cl_service_name = "{0}-{1}-{2}".format(cl_client_type, participant.el_client_type, index)
+		cl_service_name = "{0}-{1}-{2}".format(cl_client_type, participant.el_client_type, pair_index)
 
 		new_cl_node_validator_keystores = preregistered_validator_keys_for_nodes[index]
 
@@ -206,4 +216,3 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 
 
 	return all_participants, final_genesis_timestamp
-
