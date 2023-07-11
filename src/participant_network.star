@@ -96,6 +96,7 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		el_launcher, launch_method = el_launchers[el_client_type]["launcher"], el_launchers[el_client_type]["launch_method"]
 		el_service_name = "{0}-{1}-{2}".format(el_client_type, cl_client_type, pair_index)
 
+
 		el_client_context = launch_method(
 			plan,
 			el_launcher,
@@ -128,8 +129,8 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		network_params.seconds_per_slot,
 		network_params.preregistered_validator_keys_mnemonic,
 		total_number_of_validator_keys,
-        network_params.genesis_delay,
-        network_params.deneb_fork_epoch
+    network_params.genesis_delay,
+    network_params.deneb_fork_epoch
 	)
 
 	plan.print(json.indent(json.encode(cl_genesis_data)))
