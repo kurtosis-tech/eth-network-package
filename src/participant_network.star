@@ -60,6 +60,7 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		network_params.deposit_contract_address,
 		network_params.genesis_delay,
 		network_params.seconds_per_slot,
+		network_params.capella_fork_epoch,
 		network_params.deneb_fork_epoch
 	)
 
@@ -84,11 +85,11 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 	for index, participant in enumerate(participants):
 		el_client_type = participant.el_client_type
 		cl_client_type = participant.cl_client_type
-    	pair_id = "-".join([el_client_type, cl_client_type])
+	pair_id = "-".join([el_client_type, cl_client_type])
 
-		# Update the counter for this pair and fetch the current count
-    	client_pair_counter[pair_id] = client_pair_counter.get(pair_id, -1) + 1
-    	pair_index = client_pair_counter[pair_id]
+	# Update the counter for this pair and fetch the current count
+	client_pair_counter[pair_id] = client_pair_counter.get(pair_id, -1) + 1
+	pair_index = client_pair_counter[pair_id]
 
 		if el_client_type not in el_launchers:
 			fail("Unsupported launcher '{0}', need one of '{1}'".format(el_client_type, ",".join([el.name for el in el_launchers.keys()])))
@@ -130,6 +131,7 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		network_params.preregistered_validator_keys_mnemonic,
 		total_number_of_validator_keys,
         network_params.genesis_delay,
+        network_params.capella_fork_epoch,
         network_params.deneb_fork_epoch
 	)
 
