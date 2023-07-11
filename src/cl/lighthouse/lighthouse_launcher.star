@@ -39,7 +39,6 @@ VALIDATOR_HTTP_PORT_WAIT_DISABLED = None
 
 METRICS_PATH = "/metrics"
 
-BEACON_SUFFIX_SERVICE_NAME    = "beacon"
 VALIDATOR_SUFFIX_SERVICE_NAME = "validator"
 
 PRIVATE_IP_ADDRESS_PLACEHOLDER = "KURTOSIS_IP_ADDR_PLACEHOLDER"
@@ -77,7 +76,7 @@ def launch(
 	extra_beacon_params,
 	extra_validator_params):
 
-	beacon_node_service_name = "{0}-{1}".format(service_name, BEACON_SUFFIX_SERVICE_NAME)
+	beacon_node_service_name = "{0}".format(service_name)
 	validator_node_service_name = "{0}-{1}".format(service_name, VALIDATOR_SUFFIX_SERVICE_NAME)
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, LIGHTHOUSE_LOG_LEVELS)
