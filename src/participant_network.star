@@ -155,7 +155,7 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		el_client_type = participant.el_client_type
 
 		# Update the counter for this pair and fetch the current count
-   	 	client_pair_counter[pair_id] = client_pair_counter.get(pair_id, -1) + 1
+		client_pair_counter[pair_id] = client_pair_counter.get(pair_id, -1) + 1
 		pair_index = client_pair_counter[pair_id]
 
 		if cl_client_type not in cl_launchers:
