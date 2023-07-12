@@ -8,20 +8,20 @@ keystores_result = import_module("github.com/kurtosis-tech/eth-network-package/s
 NODE_KEYSTORES_OUTPUT_DIRPATH_FORMAT_STR = "/node-{0}-keystores"
 
 # Prysm keystores are encrypted with a password
-PRYSM_PASSWORD                    = "password"
-PRYSM_PASSWORD_FILEPATH_ON_GENERATOR = "/tmp/prysm-password.txt"
+PRYSM_PASSWORD							= "password"
+PRYSM_PASSWORD_FILEPATH_ON_GENERATOR 	= "/tmp/prysm-password.txt"
 
 KEYSTORES_GENERATION_TOOL_NAME = "eth2-val-tools"
 
 SUCCESSFUL_EXEC_CMD_EXIT_CODE = 0
 
-RAW_KEYS_DIRNAME    = "keys"
+RAW_KEYS_DIRNAME	= "keys"
 RAW_SECRETS_DIRNAME = "secrets"
 
 NIMBUS_KEYS_DIRNAME = "nimbus-keys"
-PRYSM_DIRNAME      = "prysm"
+PRYSM_DIRNAME		= "prysm"
 
-TEKU_KEYS_DIRNAME    = "teku-keys"
+TEKU_KEYS_DIRNAME	= "teku-keys"
 TEKU_SECRETS_DIRNAME = "teku-secrets"
 
 
@@ -33,7 +33,7 @@ def generate_cl_validator_keystores(
 	mnemonic,
 	num_nodes,
 	num_validators_per_node):
-	
+
 	service_name = prelaunch_data_generator_launcher.launch_prelaunch_data_generator(
 		plan,
 		{},

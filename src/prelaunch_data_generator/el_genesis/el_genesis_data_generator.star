@@ -3,14 +3,14 @@ el_genesis = import_module("github.com/kurtosis-tech/eth-network-package/src/pre
 prelaunch_data_generator_launcher = import_module("github.com/kurtosis-tech/eth-network-package/src/prelaunch_data_generator/prelaunch_data_generator_launcher/prelaunch_data_generator_launcher.star")
 
 CONFIG_DIRPATH_ON_GENERATOR = "/config"
-GENESIS_CONFIG_FILENAME    = "genesis-config.yaml"
+GENESIS_CONFIG_FILENAME		= "genesis-config.yaml"
 
 OUTPUT_DIRPATH_ON_GENERATOR = "/output"
 
-GETH_GENESIS_FILENAME       = "genesis.json"
-ERIGON_GENESIS_FILENAME     = "erigon.json"
+GETH_GENESIS_FILENAME		= "genesis.json"
+ERIGON_GENESIS_FILENAME		= "erigon.json"
 NETHERMIND_GENESIS_FILENAME = "nethermind.json"
-BESU_GENESIS_FILENAME       = "besu.json"
+BESU_GENESIS_FILENAME		= "besu.json"
 TRUSTED_SETUP_FILENAME = "trusted_setup.txt"
 
 JWT_SECRET_FILENAME = "jwtsecret"
@@ -35,8 +35,8 @@ def generate_el_genesis_data(
 	genesis_delay,
 	seconds_per_slot,
 	capella_fork_epoch,
-    deneb_fork_epoch
-    ):
+	deneb_fork_epoch
+	):
 
 	template_data = genesis_generation_config_template_data(
 		network_id,
@@ -44,8 +44,8 @@ def generate_el_genesis_data(
 		genesis_unix_timestamp,
 		genesis_delay,
 		seconds_per_slot,
-        capella_fork_epoch,
-        deneb_fork_epoch
+		capella_fork_epoch,
+		deneb_fork_epoch
 	)
 
 	genesis_config_file_template_and_data = shared_utils.new_template_and_data(genesis_generation_config_template, template_data)
@@ -71,7 +71,7 @@ def generate_el_genesis_data(
 	]
 
 	all_dirpath_creation_commands = []
-	
+
 	for dirpath_to_create_on_generator in all_dirpaths_to_create_on_generator:
 		all_dirpath_creation_commands.append(
 			"mkdir -p {0}".format(dirpath_to_create_on_generator),
@@ -148,5 +148,5 @@ def genesis_generation_config_template_data(network_id, deposit_contract_address
 		"GenesisDelay": genesis_delay,
 		"SecondsPerSlot": seconds_per_slot,
 		"CapellaForkEpoch": capella_fork_epoch,
-        "DenebForkEpoch": deneb_fork_epoch
-        }
+		"DenebForkEpoch": deneb_fork_epoch
+		}

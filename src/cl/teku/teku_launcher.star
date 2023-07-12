@@ -21,15 +21,15 @@ VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER = "/validator-keys"
 VALIDATING_REWARDS_ACCOUNT = "0x0000000000000000000000000000000000000000"
 
 # Port IDs
-TCP_DISCOVERY_PORT_ID = "tcp-discovery"
-UDP_DISCOVERY_PORT_ID = "udp-discovery"
-HTTP_PORT_ID         = "http"
-METRICS_PORT_ID      = "metrics"
+TCP_DISCOVERY_PORT_ID	= "tcp-discovery"
+UDP_DISCOVERY_PORT_ID	= "udp-discovery"
+HTTP_PORT_ID			= "http"
+METRICS_PORT_ID			= "metrics"
 
 # Port nums
-DISCOVERY_PORT_NUM = 9000
-HTTP_PORT_NUM             = 4000
-METRICS_PORT_NUM = 8008
+DISCOVERY_PORT_NUM	= 9000
+HTTP_PORT_NUM		= 4000
+METRICS_PORT_NUM	= 8008
 
 # 1) The Teku container runs as the "teku" user
 # 2) Teku requires write access to the validator secrets directory, so it can write a lockfile into it as it uses the keys
@@ -38,7 +38,7 @@ METRICS_PORT_NUM = 8008
 #  the shared directory, it does so as 'root'. When Teku tries to consum the same files, it will get a failure because it
 #  doesn't have permission to write to the 'validator-secrets' directory.
 # To get around this, we copy the files AGAIN from
-DEST_VALIDATOR_KEYS_DIRPATH_IN_SERVICE_CONTAINER    = "$HOME/validator-keys"
+DEST_VALIDATOR_KEYS_DIRPATH_IN_SERVICE_CONTAINER	= "$HOME/validator-keys"
 DEST_VALIDATOR_SECRETS_DIRPATH_IN_SERVICE_CONTAINER = "$HOME/validator-secrets"
 
 MIN_PEERS = 1
@@ -48,10 +48,10 @@ METRICS_PATH = "/metrics"
 PRIVATE_IP_ADDRESS_PLACEHOLDER = "KURTOSIS_IP_ADDR_PLACEHOLDER"
 
 USED_PORTS = {
-	TCP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.TCP_PROTOCOL),
-	UDP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.UDP_PROTOCOL),
-	HTTP_PORT_ID:         shared_utils.new_port_spec(HTTP_PORT_NUM, shared_utils.TCP_PROTOCOL),
-	METRICS_PORT_ID:      shared_utils.new_port_spec(METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL),
+	TCP_DISCOVERY_PORT_ID:	shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.TCP_PROTOCOL),
+	UDP_DISCOVERY_PORT_ID:	shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.UDP_PROTOCOL),
+	HTTP_PORT_ID:			shared_utils.new_port_spec(HTTP_PORT_NUM, shared_utils.TCP_PROTOCOL),
+	METRICS_PORT_ID:		shared_utils.new_port_spec(METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL),
 }
 
 ENTRYPOINT_ARGS = ["sh", "-c"]
@@ -81,7 +81,7 @@ def launch(
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, TEKU_LOG_LEVELS)
 
 	extra_params = [param for param in extra_beacon_params] + [param for param in extra_validator_params]
-	
+
 	config = get_config(launcher.cl_genesis_data, image, bootnode_context, el_client_context, log_level, node_keystore_files, extra_params)
 
 	teku_service = plan.add_service(service_name, config)
@@ -136,7 +136,7 @@ def get_config(
 	jwt_secret_filepath = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, genesis_data.jwt_secret_rel_filepath)
 	validator_keys_dirpath = shared_utils.path_join(VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.teku_keys_relative_dirpath)
 	validator_secrets_dirpath = shared_utils.path_join(VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.teku_secrets_relative_dirpath)
-	
+
 	cmd = [
 		# Needed because the generated keys are owned by root and the Teku image runs as the 'teku' user
 		"cp",

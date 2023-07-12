@@ -1,4 +1,4 @@
-# Package object containing information about the keystores that were generated for validators 
+# Package object containing information about the keystores that were generated for validators
 # during genesis creation
 def new_generate_keystores_result(prysm_password_artifact_uuid, prysm_password_relative_filepath, per_node_keystores):
 	return struct(
