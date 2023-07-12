@@ -50,7 +50,7 @@ def generate_cl_genesis_data(
 		genesis_delay,
 		capella_fork_epoch,
 		deneb_fork_epoch
-        	)
+		)
 
 	genesis_generation_mnemonics_template_and_data = shared_utils.new_template_and_data(genesis_generation_mnemonics_yml_template, template_data)
 	genesis_generation_config_template_and_data = shared_utils.new_template_and_data(genesis_generation_config_yml_template, template_data)
@@ -105,8 +105,8 @@ def generate_cl_genesis_data(
 
 	# Generate files that need dynamic content
 	content_to_write_to_output_filename = {
-		DEPLOY_BLOCK:            DEPLOY_BLOCK_FILENAME,
-		deposit_contract_address: DEPOSIT_CONTRACT_FILENAME,
+		DEPLOY_BLOCK:				DEPLOY_BLOCK_FILENAME,
+		deposit_contract_address: 	DEPOSIT_CONTRACT_FILENAME,
 	}
 	for content, destFilename in content_to_write_to_output_filename.items():
 		destFilepath = shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, destFilename)
@@ -119,7 +119,7 @@ def generate_cl_genesis_data(
 			)
 		]
 		cmd_result = plan.exec(recipe = ExecRecipe( command=cmd), service_name=launcher_service_name)
-		
+
 
 	cl_genesis_generation_cmd = [
 		CL_GENESIS_GENERATION_BINARY_FILEPATH_ON_CONTAINER,
@@ -185,5 +185,5 @@ def new_cl_genesis_config_template_data(network_id, seconds_per_slot, unix_times
 		"DepositContractAddress": deposit_contract_address,
 		"GenesisDelay": genesis_delay,
 		"CapellaForkEpoch": capella_fork_epoch,
-        "DenebForkEpoch": deneb_fork_epoch
-    	}
+		"DenebForkEpoch": deneb_fork_epoch
+	}

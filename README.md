@@ -1,5 +1,4 @@
-Ethereum Network Package
-===========================
+# Ethereum Network Package
 
 ![Run of the Ethereum Network Package](/run.gif)
 
@@ -10,6 +9,7 @@ This is a Kurtosis Starlark Package that spins up an Ethereum network.
 This assumes you have the [Kurtosis CLI](https://docs.kurtosis.com/cli/) installed and the [Docker daemon](https://docs.kurtosis.com/install#i-install--start-docker) running on your local machine.
 
 To get started, simply run
+
 ```bash
 kurtosis run github.com/kurtosis-tech/eth-network-package
 ```
@@ -23,129 +23,135 @@ these and other parameters are configurable through a json file Read more about 
     <summary>Click to show all configuration options</summary>
 
 <!-- Yes, it's weird that none of this is indented but it's intentional - indenting anything inside this "details" expandable will cause it to render weird" -->
+
 ```json
 {
-    //  Specification of the participants in the network
-    "participants": [
-        {
-            //  The type of EL client that should be started
-            //  Valid values are "geth, besu, nethermind" 
-            "el_client_type": "geth",
+  //  Specification of the participants in the network
+  "participants": [
+    {
+      //  The type of EL client that should be started
+      //  Valid values are "geth, besu, nethermind"
+      "el_client_type": "geth",
 
-            //  The Docker image that should be used for the EL client; leave blank to use the default for the client type
-            //  Defaults by client:
-            //  - geth: ethereum/client-go:v1.11.5   
-            "el_client_image": "",
+      //  The Docker image that should be used for the EL client; leave blank to use the default for the client type
+      //  Defaults by client:
+      //  - geth: ethereum/client-go:v1.11.5
+      "el_client_image": "",
 
-            //  The log level string that this participant's EL client should log at
-            //  If this is emptystring then the global `logLevel` parameter's value will be translated into a string appropriate for the client (e.g. if
-            //   global `logLevel` = `info` then Geth would receive `3`)
-            //  If this is not emptystring, then this value will override the global `logLevel` setting to allow for fine-grained control
-            //   over a specific participant's logging
-            "el_client_log_level": "",
+      //  The log level string that this participant's EL client should log at
+      //  If this is emptystring then the global `logLevel` parameter's value will be translated into a string appropriate for the client (e.g. if
+      //   global `logLevel` = `info` then Geth would receive `3`)
+      //  If this is not emptystring, then this value will override the global `logLevel` setting to allow for fine-grained control
+      //   over a specific participant's logging
+      "el_client_log_level": "",
 
-            //  A list of optional extra params that will be passed to the EL client container for modifying its behaviour
-            "el_extra_params": [],
+      //  A list of optional extra params that will be passed to the EL client container for modifying its behaviour
+      "el_extra_params": [],
 
-            //  The type of CL client that should be started
-            //  Valid values are "lighthouse", "lodestar", "teku"
-            "cl_client_type": "lighthouse",
+      //  The type of CL client that should be started
+      //  Valid values are "lighthouse", "lodestar", "teku"
+      "cl_client_type": "lighthouse",
 
-            //  The Docker image that should be used for the EL client; leave blank to use the default for the client type
-            //  Defaults by client:
-            //  - lighthouse: sigp/lighthouse:v3.5.0
-            //  - teku: consensys/teku:23.1
-            //  - lodestar: chainsafe/lodestar:v1.7.2
-            "cl_client_image": "",
+      //  The Docker image that should be used for the EL client; leave blank to use the default for the client type
+      //  Defaults by client:
+      //  - lighthouse: sigp/lighthouse:v3.5.0
+      //  - teku: consensys/teku:23.1
+      //  - lodestar: chainsafe/lodestar:v1.7.2
+      "cl_client_image": "",
 
-            //  The log level string that this participant's EL client should log at
-            //  If this is emptystring then the global `logLevel` parameter's value will be translated into a string appropriate for the client (e.g. if
-            //   global `logLevel` = `info` then Teku would receive `INFO`, Prysm would receive `info`, etc.)
-            //  If this is not emptystring, then this value will override the global `logLevel` setting to allow for fine-grained control
-            //   over a specific participant's logging
-            "cl_client_log_level": "",
+      //  The log level string that this participant's EL client should log at
+      //  If this is emptystring then the global `logLevel` parameter's value will be translated into a string appropriate for the client (e.g. if
+      //   global `logLevel` = `info` then Teku would receive `INFO`, Prysm would receive `info`, etc.)
+      //  If this is not emptystring, then this value will override the global `logLevel` setting to allow for fine-grained control
+      //   over a specific participant's logging
+      "cl_client_log_level": "",
 
-            //  A list of optional extra params that will be passed to the CL client Beacon container for modifying its behaviour
-            //  If the client combines the Beacon & validator nodes (e.g. Teku), then this list will be passed to the combined Beacon-validator node
-            "beacon_extra_params": [],
+      //  A list of optional extra params that will be passed to the CL client Beacon container for modifying its behaviour
+      //  If the client combines the Beacon & validator nodes (e.g. Teku), then this list will be passed to the combined Beacon-validator node
+      "beacon_extra_params": [],
 
-            //  A list of optional extra params that will be passed to the CL client validator container for modifying its behaviour
-            //  If the client combines the Beacon & validator nodes (e.g. Teku), then this list will also be passed to the combined Beacon-validator node
-            "validator_extra_params": [],
+      //  A list of optional extra params that will be passed to the CL client validator container for modifying its behaviour
+      //  If the client combines the Beacon & validator nodes (e.g. Teku), then this list will also be passed to the combined Beacon-validator node
+      "validator_extra_params": [],
 
-            // A set of parameters the node needs to reach an external block building network
-            // If `null` then the builder infrastructure will not be instantiated
-            // Example:
-            // 
-            // "relay_endpoints": [
-            //   "https://0xdeadbeefcafa@relay.example.com",
-            //   "https://0xdeadbeefcafb@relay.example.com",
-            //   "https://0xdeadbeefcafc@relay.example.com",
-            //   "https://0xdeadbeefcafd@relay.example.com"
-            //  ]
-            "builder_network_params": null,
+      // A set of parameters the node needs to reach an external block building network
+      // If `null` then the builder infrastructure will not be instantiated
+      // Example:
+      //
+      // "relay_endpoints": [
+      //   "https://0xdeadbeefcafa@relay.example.com",
+      //   "https://0xdeadbeefcafb@relay.example.com",
+      //   "https://0xdeadbeefcafc@relay.example.com",
+      //   "https://0xdeadbeefcafd@relay.example.com"
+      //  ]
+      "builder_network_params": null,
 
-            // The number of times this participant should be repeated
-            // defaults to 1(i.e no repetition). This is optional.
-            "count": 1
-        }
-    ],
+      // The number of times this participant should be repeated
+      // defaults to 1(i.e no repetition). This is optional.
+      "count": 1
+    }
+  ],
 
-    //  Configuration parameters for the Eth network
-    "network_params": {
-        //  The network ID of the Eth1 network
-        "network_id": "3151908",
+  //  Configuration parameters for the Eth network
+  "network_params": {
+    //  The network ID of the Eth1 network
+    "network_id": "3151908",
 
-        //  The address of the staking contract address on the Eth1 chain
-        "deposit_contract_address": "0x4242424242424242424242424242424242424242",
+    //  The address of the staking contract address on the Eth1 chain
+    "deposit_contract_address": "0x4242424242424242424242424242424242424242",
 
-        //  Number of seconds per slot on the Beacon chain
-        "seconds_per_slot": 12,
+    //  Number of seconds per slot on the Beacon chain
+    "seconds_per_slot": 12,
 
-        //  Number of slots in an epoch on the Beacon chain
-        "slots_per_epoch": 32,
+    //  Number of slots in an epoch on the Beacon chain
+    "slots_per_epoch": 32,
 
-        //  The number of validator keys that each CL validator node should get
-        "num_validator_keys_per_node": 64,
+    //  The number of validator keys that each CL validator node should get
+    "num_validator_keys_per_node": 64,
 
-        //  This mnemonic will a) be used to create keystores for all the types of validators that we have and b) be used to generate a CL genesis.ssz that has the children
-        //   validator keys already preregistered as validators
-        "preregistered_validator_keys_mnemonic": "giant issue aisle success illegal bike spike question tent bar rely arctic volcano long crawl hungry vocal artwork sniff fantasy very lucky have athlete"
-    },
+    //  This mnemonic will a) be used to create keystores for all the types of validators that we have and b) be used to generate a CL genesis.ssz that has the children
+    //   validator keys already preregistered as validators
+    "preregistered_validator_keys_mnemonic": "giant issue aisle success illegal bike spike question tent bar rely arctic volcano long crawl hungry vocal artwork sniff fantasy very lucky have athlete"
+  }
 }
 ```
+
 </details>
 
 For example, this `eth-network-params.json` adds a second node, running a different EL/CL client configuration.
+
 ```json
 {
   "//note": "each participant struct in particpants corresponds to a node in the network",
-  "participants":[{
-    "el_client_type":         "geth",
-    "el_client_image":        "",
-    "el_client_log_level":    "",
-    "cl_client_type":         "lighthouse",
-    "cl_client_image":        "",
-    "cl_client_log_level":    "",
-    "beacon_extra_params":    [],
-    "el_extra_params":        [],
-    "validator_extra_params": [],
-    "builder_network_params": null,
-    "count": 1
-  },{
-    "el_client_type":         "nethermind",
-    "el_client_image":        "",
-    "el_client_log_level":    "",
-    "cl_client_type":         "teku",
-    "cl_client_image":        "",
-    "cl_client_log_level":    "",
-    "beacon_extra_params":    [],
-    "el_extra_params":        [],
-    "validator_extra_params": [],
-    "builder_network_params": null,
-    "count": 1
-  }],
-  "network_params":{
+  "participants": [
+    {
+      "el_client_type": "geth",
+      "el_client_image": "",
+      "el_client_log_level": "",
+      "cl_client_type": "lighthouse",
+      "cl_client_image": "",
+      "cl_client_log_level": "",
+      "beacon_extra_params": [],
+      "el_extra_params": [],
+      "validator_extra_params": [],
+      "builder_network_params": null,
+      "count": 1
+    },
+    {
+      "el_client_type": "nethermind",
+      "el_client_image": "",
+      "el_client_log_level": "",
+      "cl_client_type": "teku",
+      "cl_client_image": "",
+      "cl_client_log_level": "",
+      "beacon_extra_params": [],
+      "el_extra_params": [],
+      "validator_extra_params": [],
+      "builder_network_params": null,
+      "count": 1
+    }
+  ],
+  "network_params": {
     "preregistered_validator_keys_mnemonic": "giant issue aisle success illegal bike spike question tent bar rely arctic volcano long crawl hungry vocal artwork sniff fantasy very lucky have athlete",
     "num_validator_keys_per_node": 64,
     "network_id": "3151908",
@@ -159,7 +165,9 @@ For example, this `eth-network-params.json` adds a second node, running a differ
   "global_client_log_level": "info"
 }
 ```
+
 To run the package with your desired configuration (as specified in your `eth-network-params.json` file), simply run:
+
 ```bash
 kurtosis run github.com/kurtosis-tech/eth-network-package "$(cat ~/eth-network-params.json)"
 ```

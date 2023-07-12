@@ -43,18 +43,18 @@ METRICS_PATH = "/metrics"
 PRIVATE_IP_ADDRESS_PLACEHOLDER = "KURTOSIS_IP_ADDR_PLACEHOLDER"
 
 USED_PORTS = {
-    TCP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.TCP_PROTOCOL),
-    UDP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.UDP_PROTOCOL),
-    HTTP_PORT_ID:          shared_utils.new_port_spec(HTTP_PORT_NUM, shared_utils.TCP_PROTOCOL),
-    METRICS_PORT_ID:       shared_utils.new_port_spec(METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL),
+	TCP_DISCOVERY_PORT_ID:  shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.TCP_PROTOCOL),
+	UDP_DISCOVERY_PORT_ID:  shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.UDP_PROTOCOL),
+	HTTP_PORT_ID:			shared_utils.new_port_spec(HTTP_PORT_NUM, shared_utils.TCP_PROTOCOL),
+	METRICS_PORT_ID:		shared_utils.new_port_spec(METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL),
 }
 
 NIMBUS_LOG_LEVELS = {
-    package_io.GLOBAL_CLIENT_LOG_LEVEL.error: "ERROR",
-    package_io.GLOBAL_CLIENT_LOG_LEVEL.warn:  "WARN",
-    package_io.GLOBAL_CLIENT_LOG_LEVEL.info:  "INFO",
-    package_io.GLOBAL_CLIENT_LOG_LEVEL.debug: "DEBUG",
-    package_io.GLOBAL_CLIENT_LOG_LEVEL.trace: "TRACE",
+	package_io.GLOBAL_CLIENT_LOG_LEVEL.error: "ERROR",
+	package_io.GLOBAL_CLIENT_LOG_LEVEL.warn:  "WARN",
+	package_io.GLOBAL_CLIENT_LOG_LEVEL.info:  "INFO",
+	package_io.GLOBAL_CLIENT_LOG_LEVEL.debug: "DEBUG",
+	package_io.GLOBAL_CLIENT_LOG_LEVEL.trace: "TRACE",
 }
 
 ENTRYPOINT_ARGS = ["sh", "-c"]
