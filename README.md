@@ -16,7 +16,7 @@ kurtosis run github.com/kurtosis-tech/eth-network-package
 
 ### Configuring the Network
 
-By default, this package spins up a single node with a [`geth`](https://github.com/kurtosis-tech/eth-network-package/blob/main/src/el/geth/geth_launcher.star) EL client and [`lighthouse`](https://github.com/kurtosis-tech/eth-network-package/blob/main/src/cl/lighthouse/lighthouse_launcher.star) CL client and comes with [five prefunded keys](https://github.com/kurtosis-tech/eth-network-package/blob/main/src/prelaunch_data_generator/genesis_constants/genesis_constants.star) for testing, but
+By default, this package spins up a single node with a [`geth`](https://github.com/kurtosis-tech/eth-network-package/blob/main/src/el/geth/geth_launcher.star) EL client and [`lighthouse`](https://github.com/kurtosis-tech/eth-network-package/blob/main/src/cl/lighthouse/lighthouse_launcher.star) CL client and comes with [seven prefunded keys](https://github.com/kurtosis-tech/eth-network-package/blob/main/src/prelaunch_data_generator/genesis_constants/genesis_constants.star) for testing, but
 these and other parameters are configurable through a json file Read more about the [node architecture here](https://ethereum.org/en/developers/docs/nodes-and-clients/node-architecture/). The package supports `geth`, `nethermind`, `besu` el clients and `lodestar`, `lighthouse`, and `teku` cl clients.
 
 <details>
@@ -83,7 +83,11 @@ these and other parameters are configurable through a json file Read more about 
             //   "https://0xdeadbeefcafc@relay.example.com",
             //   "https://0xdeadbeefcafd@relay.example.com"
             //  ]
-            "builder_network_params": null
+            "builder_network_params": null,
+
+            // The number of times this participant should be repeated
+            // defaults to 1(i.e no repetition). This is optional.
+            "count": 1
         }
     ],
 
@@ -126,7 +130,8 @@ For example, this `eth-network-params.json` adds a second node, running a differ
     "beacon_extra_params":    [],
     "el_extra_params":        [],
     "validator_extra_params": [],
-    "builder_network_params": null
+    "builder_network_params": null,
+    "count": 1
   },{
     "el_client_type":         "nethermind",
     "el_client_image":        "",
@@ -137,7 +142,8 @@ For example, this `eth-network-params.json` adds a second node, running a differ
     "beacon_extra_params":    [],
     "el_extra_params":        [],
     "validator_extra_params": [],
-    "builder_network_params": null
+    "builder_network_params": null,
+    "count": 1
   }],
   "network_params":{
     "preregistered_validator_keys_mnemonic": "giant issue aisle success illegal bike spike question tent bar rely arctic volcano long crawl hungry vocal artwork sniff fantasy very lucky have athlete",
@@ -145,9 +151,10 @@ For example, this `eth-network-params.json` adds a second node, running a differ
     "network_id": "3151908",
     "deposit_contract_address": "0x4242424242424242424242424242424242424242",
     "seconds_per_slot": 12,
-    "genesis_delay": 120,
-    "capella_fork_epoch": 5,
-    "deneb_fork_epoch": 10
+    "slots_per_epoch": 32,
+    "genesis_delay": 10,
+    "capella_fork_epoch": 2,
+    "deneb_fork_epoch": 500
   },
   "global_client_log_level": "info"
 }

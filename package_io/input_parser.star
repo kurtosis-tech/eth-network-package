@@ -15,6 +15,7 @@ DEFAULT_CL_IMAGES = {
 
 BESU_NODE_NAME = "besu"
 NETHERMIND_NODE_NAME = "nethermind"
+NIMBUS_NODE_NAME = "nimbus"
 
 ATTR_TO_BE_SKIPPED_AT_ROOT = ("network_params", "participants")
 
@@ -36,7 +37,8 @@ def parse_input(input_args):
 				for sub_attr, sub_value in participant.items():
 					# if the value is set in input we set it in participant
 					new_participant[sub_attr] = sub_value
-				participants.append(new_participant)
+				for _ in range(0, new_participant["count"]):
+					participants.append(new_participant)
 			result["participants"] = participants
 
 	# validation of the above defaults
@@ -46,6 +48,8 @@ def parse_input(input_args):
 
 		if index == 0 and el_client_type in (BESU_NODE_NAME, NETHERMIND_NODE_NAME):
 			fail("besu/nethermind cant be the first participant")
+		if cl_client_type in (NIMBUS_NODE_NAME) and (result["network_params"]["seconds_per_slot"] < 12):
+			fail("nimbus can't be run with slot times below 12 seconds")			
 		el_image = participant["el_client_image"]
 		if el_image == "":
 			default_image = DEFAULT_EL_IMAGES.get(el_client_type, "")
@@ -160,7 +164,9 @@ def default_network_params():
 		"slots_per_epoch":                       32,
 		"genesis_delay":                         10,
 		"capella_fork_epoch":                    2,
-		"deneb_fork_epoch":                      5,
+		# arbitrarily large while we sort out https://github.com/kurtosis-tech/eth-network-package/issues/42
+		# this will take 53~ hoours for now
+		"deneb_fork_epoch":                      500,
 	}
 
 def default_participant():
@@ -174,5 +180,6 @@ def default_participant():
 			"beacon_extra_params":    [],
 			"el_extra_params":        [],
 			"validator_extra_params": [],
-			"builder_network_params": None
+			"builder_network_params": None,
+			"count": 1
 	}
