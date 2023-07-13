@@ -85,6 +85,7 @@ def launch(
 		WS_PORT_NUM,
 		ENGINE_RPC_PORT_NUM,
 		jwt_secret,
+		service_name,
 	)
 
 def get_config(network_id, genesis_data, prefunded_geth_keys_artifact_uuid, prefunded_account_info, image, existing_el_clients, verbosity_level, extra_params):

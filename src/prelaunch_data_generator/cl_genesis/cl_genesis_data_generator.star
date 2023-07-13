@@ -13,6 +13,7 @@ OUTPUT_DIRPATH_ON_GENERATOR = "/output"
 TRANCHES_DIRANME = "tranches"
 GENESIS_STATE_FILENAME = "genesis.ssz"
 DEPLOY_BLOCK_FILENAME = "deploy_block.txt"
+DEPOSIT_CONTRACT_BLOCK_HASH_FILENAME = "deposit_contract_block_hash.txt"
 DEPOSIT_CONTRACT_FILENAME = "deposit_contract.txt"
 PARSED_BEACON_STATE_FILENAME = "parsedBeaconState.json"
 TRUSTED_SETUP_FILENAME = "trusted_setup.txt"
@@ -143,6 +144,19 @@ def generate_cl_genesis_data(
 	parsed_beacon_state_file_generation_str = " ".join(parsed_beacon_state_file_generation)
 
 	plan.exec(recipe = ExecRecipe(command = ["/bin/sh", "-c", parsed_beacon_state_file_generation_str]), service_name = launcher_service_name)
+
+	# Generate the deposit contract block hash file
+	deposit_block_hash_generation_cmd = [
+		"jq",
+		"-r",
+		"'.eth1_data.block_hash'",
+		shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, PARSED_BEACON_STATE_FILENAME),
+		">",
+		shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, DEPOSIT_CONTRACT_BLOCK_HASH_FILENAME),
+	]
+
+	deposit_block_hash_file_generation_str = " ".join(deposit_block_hash_generation_cmd)
+	plan.exec(recipe = ExecRecipe(command = ["/bin/sh", "-c", deposit_block_hash_file_generation_str]), service_name = launcher_service_name)
 
 	shared_utils.download_trusted_setup(plan, launcher_service_name, shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, TRUSTED_SETUP_FILENAME))
 
