@@ -216,7 +216,7 @@ def get_validator_config(
 		"--logLevel=" + log_level,
 		"--dataDir=" + root_dirpath,
 		"--paramsFile=" + genesis_config_filepath,
-		"--server=" + beacon_client_http_url,
+		"--beaconNodes=" + beacon_client_http_url,
 		"--keystoresDir=" + validator_keys_dirpath,
 		"--secretsDir=" + validator_secrets_dirpath,
 		# vvvvvvvvvvvvvvvvvvv PROMETHEUS CONFIG vvvvvvvvvvvvvvvvvvvvv
