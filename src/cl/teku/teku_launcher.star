@@ -1,10 +1,10 @@
-shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/shared_utils/shared_utils.star")
-input_parser = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
-cl_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_client_context.star")
-cl_node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_metrics_info.star")
-cl_node_ready_conditions = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_ready_conditions.star")
+shared_utils = import_module("github.com/barnabasbusa/eth-network-package/shared_utils/shared_utils.star")
+input_parser = import_module("github.com/barnabasbusa/eth-network-package/package_io/input_parser.star")
+cl_client_context = import_module("github.com/barnabasbusa/eth-network-package/src/cl/cl_client_context.star")
+cl_node_metrics = import_module("github.com/barnabasbusa/eth-network-package/src/cl/cl_node_metrics_info.star")
+cl_node_ready_conditions = import_module("github.com/barnabasbusa/eth-network-package/src/cl/cl_node_ready_conditions.star")
 
-package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
+package_io = import_module("github.com/barnabasbusa/eth-network-package/package_io/constants.star")
 
 TEKU_BINARY_FILEPATH_IN_IMAGE = "/opt/teku/bin/teku"
 
@@ -23,13 +23,13 @@ VALIDATING_REWARDS_ACCOUNT = "0x0000000000000000000000000000000000000000"
 # Port IDs
 TCP_DISCOVERY_PORT_ID = "tcp-discovery"
 UDP_DISCOVERY_PORT_ID = "udp-discovery"
-HTTP_PORT_ID         = "http"
-METRICS_PORT_ID      = "metrics"
+HTTP_PORT_ID         	= "http"
+METRICS_PORT_ID      	= "metrics"
 
 # Port nums
-DISCOVERY_PORT_NUM = 9000
-HTTP_PORT_NUM             = 4000
-METRICS_PORT_NUM = 8008
+DISCOVERY_PORT_NUM 	= 9000
+HTTP_PORT_NUM      	= 4000
+METRICS_PORT_NUM		= 8008
 
 # 1) The Teku container runs as the "teku" user
 # 2) Teku requires write access to the validator secrets directory, so it can write a lockfile into it as it uses the keys

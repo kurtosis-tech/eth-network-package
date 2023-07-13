@@ -1,10 +1,10 @@
-shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/shared_utils/shared_utils.star")
-input_parser = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
-cl_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_client_context.star")
-cl_node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_metrics_info.star")
-cl_node_ready_conditions = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_ready_conditions.star")
+shared_utils = import_module("github.com/barnabasbusa/eth-network-package/shared_utils/shared_utils.star")
+input_parser = import_module("github.com/barnabasbusa/eth-network-package/package_io/input_parser.star")
+cl_client_context = import_module("github.com/barnabasbusa/eth-network-package/src/cl/cl_client_context.star")
+cl_node_metrics = import_module("github.com/barnabasbusa/eth-network-package/src/cl/cl_node_metrics_info.star")
+cl_node_ready_conditions = import_module("github.com/barnabasbusa/eth-network-package/src/cl/cl_node_ready_conditions.star")
 
-package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
+package_io = import_module("github.com/barnabasbusa/eth-network-package/package_io/constants.star")
 
 IMAGE_SEPARATOR_DELIMITER = ","
 EXPECTED_NUM_IMAGES       = 2
@@ -30,7 +30,6 @@ HTTP_PORT_NUM                 = 3500
 BEACON_MONITORING_PORT_NUM     = 8080
 VALIDATOR_MONITORING_PORT_NUM  = 8081
 
-BEACON_SUFFIX_SERVICE_NAME    = "beacon"
 VALIDATOR_SUFFIX_SERVICE_NAME = "validator"
 
 MIN_PEERS = 1
@@ -85,7 +84,7 @@ def launch(
 		fail("An empty validator image was provided")
 
 
-	beacon_node_service_name = "{0}-{1}".format(service_name, BEACON_SUFFIX_SERVICE_NAME)
+	beacon_node_service_name = "{0}".format(service_name)
 	validator_node_service_name = "{0}-{1}".format(service_name, VALIDATOR_SUFFIX_SERVICE_NAME)
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, PRYSM_LOG_LEVELS)
