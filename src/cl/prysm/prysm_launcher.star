@@ -232,10 +232,11 @@ def get_validator_config(
 	consensus_data_dirpath = shared_utils.path_join(CONSENSUS_DATA_DIRPATH_ON_SERVICE_CONTAINER, service_name)
 	prysm_keystore_dirpath = shared_utils.path_join(VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.prysm_relative_dirpath)
 	prysm_password_filepath = shared_utils.path_join(PRYSM_PASSWORD_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, prysm_password_relative_filepath)
+	genesis_config_filepath = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, genesis_data.config_yml_rel_filepath)
 
 	cmd = [
 		"--accept-terms-of-use=true",#it's mandatory in order to run the node
-		"--prater",                  #it's a tesnet setup, it's mandatory to set a network (https://docs.prylabs.network/docs/install/install-with-script#before-you-begin-pick-your-network-1)
+		"--chain-config-file=" + genesis_config_filepath,
 		"--beacon-rpc-gateway-provider=" + beacon_http_endpoint,
 		"--beacon-rpc-provider=" + beacon_rpc_endpoint,
 		"--wallet-dir=" + prysm_keystore_dirpath,
