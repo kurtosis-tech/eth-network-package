@@ -137,6 +137,7 @@ def launch(
 		BEACON_HTTP_PORT_NUM,
 		nodes_metrics_info,
 		beacon_node_service_name,
+		validator_node_service_name
 	)
 
 
