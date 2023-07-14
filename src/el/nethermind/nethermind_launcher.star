@@ -70,7 +70,8 @@ def launch(
 		RPC_PORT_NUM,
 		WS_PORT_NUM,
 		ENGINE_RPC_PORT_NUM,
-		jwt_secret
+		jwt_secret,
+		service_name
 	)
 
 

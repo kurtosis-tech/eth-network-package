@@ -162,6 +162,7 @@ def get_config(
 		"--p2p-subscribe-all-subnets-enabled=true",
 		"--p2p-peer-lower-bound={0}".format(MIN_PEERS),
 		"--p2p-advertised-ip=" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
+		"--p2p-discovery-site-local-addresses-enabled",
 		"--rest-api-enabled=true",
 		"--rest-api-docs-enabled=true",
 		"--rest-api-interface=0.0.0.0",
