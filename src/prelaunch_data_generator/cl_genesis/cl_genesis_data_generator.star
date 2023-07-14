@@ -37,6 +37,7 @@ def generate_cl_genesis_data(
 		preregistered_validator_keys_mnemonic,
 		total_num_validator_keys_to_preregister,
 		genesis_delay,
+		capella_fork_epoch,
 		deneb_fork_epoch,
 	):
 
@@ -48,6 +49,7 @@ def generate_cl_genesis_data(
 		preregistered_validator_keys_mnemonic,
 		deposit_contract_address,
 		genesis_delay,
+		capella_fork_epoch,
 		deneb_fork_epoch
         	)
 
@@ -122,7 +124,7 @@ def generate_cl_genesis_data(
 
 	cl_genesis_generation_cmd = [
 		CL_GENESIS_GENERATION_BINARY_FILEPATH_ON_CONTAINER,
-		"capella",
+		"merge",
 		"--config", shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, GENESIS_CONFIG_YML_FILENAME),
 		"--mnemonics", shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, MNEMONICS_YML_FILENAME),
 		"--eth1-config", shared_utils.path_join(EL_GENESIS_DIRPATH_ON_GENERATOR, el_genesis_data.geth_genesis_json_relative_filepath),
@@ -135,7 +137,7 @@ def generate_cl_genesis_data(
 	parsed_beacon_state_file_generation = [
 		CL_PARSED_BEACON_STATE_GENERATOR_BINARY,
 		"pretty",
-		"capella",
+		"bellatrix",
 		"BeaconState",
 		shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, GENESIS_STATE_FILENAME),
 		">",
@@ -187,7 +189,7 @@ def generate_cl_genesis_data(
 
 
 
-def new_cl_genesis_config_template_data(network_id, seconds_per_slot, unix_timestamp, num_validator_keys_to_preregister, preregistered_validator_keys_mnemonic, deposit_contract_address, genesis_delay, deneb_fork_epoch):
+def new_cl_genesis_config_template_data(network_id, seconds_per_slot, unix_timestamp, num_validator_keys_to_preregister, preregistered_validator_keys_mnemonic, deposit_contract_address, genesis_delay, capella_fork_epoch, deneb_fork_epoch):
 	return {
 		"NetworkId": network_id,
 		"SecondsPerSlot": seconds_per_slot,
@@ -196,5 +198,6 @@ def new_cl_genesis_config_template_data(network_id, seconds_per_slot, unix_times
 		"PreregisteredValidatorKeysMnemonic": preregistered_validator_keys_mnemonic,
 		"DepositContractAddress": deposit_contract_address,
 		"GenesisDelay": genesis_delay,
+		"CapellaForkEpoch": capella_fork_epoch,
         "DenebForkEpoch": deneb_fork_epoch
     	}
