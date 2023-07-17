@@ -6,31 +6,31 @@ cl_node_ready_conditions = import_module("github.com/kurtosis-tech/eth-network-p
 
 package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
 
-IMAGE_SEPARATOR_DELIMITER = ","
-EXPECTED_NUM_IMAGES       = 2
+IMAGE_SEPARATOR_DELIMITER	= ","
+EXPECTED_NUM_IMAGES			= 2
 
-CONSENSUS_DATA_DIRPATH_ON_SERVICE_CONTAINER      = "/consensus-data"
-GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER   = "/genesis"
-VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER = "/validator-keys"
-PRYSM_PASSWORD_MOUNT_DIRPATH_ON_SERVICE_CONTAINER = "/prysm-password"
+CONSENSUS_DATA_DIRPATH_ON_SERVICE_CONTAINER			= "/consensus-data"
+GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER		= "/genesis"
+VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER	= "/validator-keys"
+PRYSM_PASSWORD_MOUNT_DIRPATH_ON_SERVICE_CONTAINER	= "/prysm-password"
 
 # Port IDs
-TCP_DISCOVERY_PORT_ID        = "tcp-discovery"
-UDP_DISCOVERY_PORT_ID        = "udp-discovery"
-RPC_PORT_ID                 = "rpc"
-HTTP_PORT_ID                = "http"
-BEACON_MONITORING_PORT_ID    = "monitoring"
-VALIDATOR_MONITORING_PORT_ID = "monitoring"
+TCP_DISCOVERY_PORT_ID		= "tcp-discovery"
+UDP_DISCOVERY_PORT_ID		= "udp-discovery"
+RPC_PORT_ID					= "rpc"
+HTTP_PORT_ID				= "http"
+BEACON_MONITORING_PORT_ID	= "monitoring"
+VALIDATOR_MONITORING_PORT_ID= "monitoring"
 
 # Port nums
-DISCOVERY_TCP_PORT_NUM         = 13000
-DISCOVERY_UDP_PORT_NUM         = 12000
-RPC_PORT_NUM                  = 4000
-HTTP_PORT_NUM                 = 3500
-BEACON_MONITORING_PORT_NUM     = 8080
+DISCOVERY_TCP_PORT_NUM		= 13000
+DISCOVERY_UDP_PORT_NUM		= 12000
+RPC_PORT_NUM				= 4000
+HTTP_PORT_NUM				= 3500
+BEACON_MONITORING_PORT_NUM	= 8080
 VALIDATOR_MONITORING_PORT_NUM  = 8081
 
-BEACON_SUFFIX_SERVICE_NAME    = "beacon"
+BEACON_SUFFIX_SERVICE_NAME	= "beacon"
 VALIDATOR_SUFFIX_SERVICE_NAME = "validator"
 
 MIN_PEERS = 1
@@ -40,11 +40,11 @@ METRICS_PATH = "/metrics"
 PRIVATE_IP_ADDRESS_PLACEHOLDER = "KURTOSIS_IP_ADDR_PLACEHOLDER"
 
 BEACON_NODE_USED_PORTS = {
-	TCP_DISCOVERY_PORT_ID:     shared_utils.new_port_spec(DISCOVERY_TCP_PORT_NUM, shared_utils.TCP_PROTOCOL),
-	UDP_DISCOVERY_PORT_ID:     shared_utils.new_port_spec(DISCOVERY_UDP_PORT_NUM, shared_utils.UDP_PROTOCOL),
-	RPC_PORT_ID:              shared_utils.new_port_spec(RPC_PORT_NUM, shared_utils.TCP_PROTOCOL),
-	HTTP_PORT_ID:             shared_utils.new_port_spec(HTTP_PORT_NUM, shared_utils.TCP_PROTOCOL),
-	BEACON_MONITORING_PORT_ID: shared_utils.new_port_spec(BEACON_MONITORING_PORT_NUM, shared_utils.TCP_PROTOCOL),
+	TCP_DISCOVERY_PORT_ID:		shared_utils.new_port_spec(DISCOVERY_TCP_PORT_NUM, shared_utils.TCP_PROTOCOL),
+	UDP_DISCOVERY_PORT_ID:		shared_utils.new_port_spec(DISCOVERY_UDP_PORT_NUM, shared_utils.UDP_PROTOCOL),
+	RPC_PORT_ID:				shared_utils.new_port_spec(RPC_PORT_NUM, shared_utils.TCP_PROTOCOL),
+	HTTP_PORT_ID:				shared_utils.new_port_spec(HTTP_PORT_NUM, shared_utils.TCP_PROTOCOL),
+	BEACON_MONITORING_PORT_ID:	shared_utils.new_port_spec(BEACON_MONITORING_PORT_NUM, shared_utils.TCP_PROTOCOL),
 }
 
 VALIDATOR_NODE_USED_PORTS = {
@@ -264,7 +264,7 @@ def get_validator_config(
 		files = {
 			GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: genesis_data.files_artifact_uuid,
 			VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: node_keystore_files.files_artifact_uuid,
-			PRYSM_PASSWORD_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: prysm_password_artifact_uuid,			
+			PRYSM_PASSWORD_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: prysm_password_artifact_uuid,
 		},
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER
 	)

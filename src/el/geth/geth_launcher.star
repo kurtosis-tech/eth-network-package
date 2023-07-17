@@ -6,18 +6,18 @@ el_admin_node_info = import_module("github.com/kurtosis-tech/eth-network-package
 package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
 
 
-RPC_PORT_NUM       = 8545
-WS_PORT_NUM        = 8546
-DISCOVERY_PORT_NUM = 30303
+RPC_PORT_NUM		= 8545
+WS_PORT_NUM			= 8546
+DISCOVERY_PORT_NUM	= 30303
 ENGINE_RPC_PORT_NUM = 8551
 
 # Port IDs
-RPC_PORT_ID          = "rpc"
-WS_PORT_ID           = "ws"
+RPC_PORT_ID			= "rpc"
+WS_PORT_ID			= "ws"
 TCP_DISCOVERY_PORT_ID = "tcp-discovery"
 UDP_DISCOVERY_PORT_ID = "udp-discovery"
-ENGINE_RPC_PORT_ID    = "engine-rpc"
-ENGINE_WS_PORT_ID     = "engineWs"
+ENGINE_RPC_PORT_ID	= "engine-rpc"
+ENGINE_WS_PORT_ID	= "engineWs"
 
 # TODO(old) Scale this dynamically based on CPUs available and Geth nodes mining
 NUM_MINING_THREADS = 1
@@ -28,9 +28,9 @@ PREFUNDED_KEYS_MOUNT_DIRPATH = "/prefunded-keys"
 
 # The dirpath of the execution data directory on the client container
 EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/execution-data"
-KEYSTORE_DIRPATH_ON_CLIENT_CONTAINER      = EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER + "/keystore"
+KEYSTORE_DIRPATH_ON_CLIENT_CONTAINER	= EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER + "/keystore"
 
-GETH_ACCOUNT_PASSWORD      = "password"          #  Password that the Geth accounts will be locked with
+GETH_ACCOUNT_PASSWORD	= "password"		#  Password that the Geth accounts will be locked with
 GETH_ACCOUNT_PASSWORDS_FILE = "/tmp/password.txt" #  Importing an account to
 
 PRIVATE_IP_ADDRESS_PLACEHOLDER = "KURTOSIS_IP_ADDR_PLACEHOLDER"
@@ -69,7 +69,7 @@ def launch(
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, VERBOSITY_LEVELS)
 
 	config, jwt_secret_json_filepath_on_client = get_config(launcher.network_id, launcher.el_genesis_data, launcher.prefunded_geth_keys_artifact_uuid,
-                                    launcher.prefunded_account_info, image, existing_el_clients, log_level, extra_params)
+									launcher.prefunded_account_info, image, existing_el_clients, log_level, extra_params)
 
 	service = plan.add_service(service_name, config)
 

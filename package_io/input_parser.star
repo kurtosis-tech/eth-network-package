@@ -1,16 +1,16 @@
 DEFAULT_EL_IMAGES = {
-	"geth": "ethereum/client-go:latest",
-	"erigon": "thorax/erigon:devel",
-	"nethermind": "nethermind/nethermind:latest",
-	"besu": "hyperledger/besu:develop"
+	"geth":			"ethereum/client-go:latest",
+	"erigon":		"thorax/erigon:devel",
+	"nethermind":	"nethermind/nethermind:latest",
+	"besu":			"hyperledger/besu:develop"
 }
 
 DEFAULT_CL_IMAGES = {
-	"lighthouse": "sigp/lighthouse:latest",
-	"teku":       "consensys/teku:latest",
-	"nimbus":     "statusim/nimbus-eth2:multiarch-latest",
-	"prysm":      "prysmaticlabs/prysm-beacon-chain:latest,prysmaticlabs/prysm-validator:latest",
-	"lodestar": "chainsafe/lodestar:latest",
+	"lighthouse":	"sigp/lighthouse:latest",
+	"teku":			"consensys/teku:latest",
+	"nimbus":		"statusim/nimbus-eth2:multiarch-latest",
+	"prysm":		"prysmaticlabs/prysm-beacon-chain:latest,prysmaticlabs/prysm-validator:latest",
+	"lodestar":		"chainsafe/lodestar:latest",
 }
 
 BESU_NODE_NAME = "besu"
@@ -49,7 +49,7 @@ def parse_input(input_args):
 		if index == 0 and el_client_type in (BESU_NODE_NAME, NETHERMIND_NODE_NAME):
 			fail("besu/nethermind cant be the first participant")
 		if cl_client_type in (NIMBUS_NODE_NAME) and (result["network_params"]["seconds_per_slot"] < 12):
-			fail("nimbus can't be run with slot times below 12 seconds")			
+			fail("nimbus can't be run with slot times below 12 seconds")
 		el_image = participant["el_client_image"]
 		if el_image == "":
 			default_image = DEFAULT_EL_IMAGES.get(el_client_type, "")
@@ -124,7 +124,7 @@ def parse_input(input_args):
 			seconds_per_slot=result["network_params"]["seconds_per_slot"],
 			slots_per_epoch=result["network_params"]["slots_per_epoch"],
 			capella_fork_epoch=result["network_params"]["capella_fork_epoch"],
-            deneb_fork_epoch=result["network_params"]["deneb_fork_epoch"],
+			deneb_fork_epoch=result["network_params"]["deneb_fork_epoch"],
 			genesis_delay=result["network_params"]["genesis_delay"]
 		),
 		wait_for_finalization=result["wait_for_finalization"],
@@ -145,41 +145,41 @@ def default_input_args():
 	network_params = default_network_params()
 	participants = [default_participant()]
 	return {
-		"participants":                participants,
-		"network_params":              network_params,
-		"wait_for_finalization":       False,
-		"wait_for_verifications":      False,
-		"verifications_epoch_limit":   5,
-		"global_client_log_level":     "info"
+		"participants":					participants,
+		"network_params":				network_params,
+		"wait_for_finalization":		False,
+		"wait_for_verifications":		False,
+		"verifications_epoch_limit":	5,
+		"global_client_log_level":		"info"
 	}
 
 def default_network_params():
 	# this is temporary till we get params working
 	return {
 		"preregistered_validator_keys_mnemonic": "giant issue aisle success illegal bike spike question tent bar rely arctic volcano long crawl hungry vocal artwork sniff fantasy very lucky have athlete",
-		"num_validator_keys_per_node":           64,
-		"network_id":                            "3151908",
-		"deposit_contract_address":              "0x4242424242424242424242424242424242424242",
-		"seconds_per_slot":                      12,
-		"slots_per_epoch":                       32,
-		"genesis_delay":                         10,
-		"capella_fork_epoch":                    1,
+		"num_validator_keys_per_node":	64,
+		"network_id":					"3151908",
+		"deposit_contract_address":		"0x4242424242424242424242424242424242424242",
+		"seconds_per_slot":				12,
+		"slots_per_epoch":				32,
+		"genesis_delay":				120,
+		"capella_fork_epoch":			1,
 		# arbitrarily large while we sort out https://github.com/kurtosis-tech/eth-network-package/issues/42
 		# this will take 53~ hoours for now
-		"deneb_fork_epoch":                      500,
+		"deneb_fork_epoch":				500,
 	}
 
 def default_participant():
 	return {
-			"el_client_type":         "geth",
-			"el_client_image":        "",
-			"el_client_log_level":    "",
-			"cl_client_type":         "lighthouse",
-			"cl_client_image":        "",
-			"cl_client_log_level":    "",
-			"beacon_extra_params":    [],
-			"el_extra_params":        [],
-			"validator_extra_params": [],
-			"builder_network_params": None,
-			"count": 1
+			"el_client_type":			"geth",
+			"el_client_image":			"",
+			"el_client_log_level":		"",
+			"cl_client_type":			"lighthouse",
+			"cl_client_image":			"",
+			"cl_client_log_level":		"",
+			"beacon_extra_params":		[],
+			"el_extra_params":			[],
+			"validator_extra_params": 	[],
+			"builder_network_params": 	None,
+			"count": 					1
 	}
