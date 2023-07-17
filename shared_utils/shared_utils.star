@@ -33,13 +33,13 @@ def new_port_spec(number, transport_protocol, application_protocol = NOT_PROVIDE
 
 
 def read_file_from_service(plan, service_name, filename):
-    output = plan.exec(
-        service_name = service_name,
-        recipe = ExecRecipe(
-            command = ["/bin/sh", "-c", "cat {} | tr -d '\n'".format(filename)]
-        )
-    )
-    return output["output"]
+	output = plan.exec(
+		service_name = service_name,
+		recipe = ExecRecipe(
+			command = ["/bin/sh", "-c", "cat {} | tr -d '\n'".format(filename)]
+		)
+	)
+	return output["output"]
 
 
 def download_trusted_setup(plan, service_name, output_filepath):

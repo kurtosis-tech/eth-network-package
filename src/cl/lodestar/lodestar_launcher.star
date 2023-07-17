@@ -6,23 +6,23 @@ cl_node_ready_conditions = import_module("github.com/kurtosis-tech/eth-network-p
 
 package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
 
-CONSENSUS_DATA_DIRPATH_ON_SERVICE_CONTAINER      = "/consensus-data"
+CONSENSUS_DATA_DIRPATH_ON_SERVICE_CONTAINER		  = "/consensus-data"
 GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER   = "/genesis"
 VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER = "/validator-keys"
 
 # Port IDs
-TCP_DISCOVERY_PORT_ID     = "tcp-discovery"
-UDP_DISCOVERY_PORT_ID     = "udp-discovery"
-HTTP_PORT_ID             = "http"
-METRICS_PORT_ID          = "metrics"
-VALIDATOR_METRICS_PORT_ID = "validator-metrics"
+TCP_DISCOVERY_PORT_ID		= "tcp-discovery"
+UDP_DISCOVERY_PORT_ID		= "udp-discovery"
+HTTP_PORT_ID				= "http"
+METRICS_PORT_ID				= "metrics"
+VALIDATOR_METRICS_PORT_ID	= "validator-metrics"
 
 # Port nums
-DISCOVERY_PORT_NUM        = 9000
-HTTP_PORT_NUM                    = 4000
-METRICS_PORT_NUM           = 8008
+DISCOVERY_PORT_NUM			= 9000
+HTTP_PORT_NUM				= 4000
+METRICS_PORT_NUM			= 8008
 
-BEACON_SUFFIX_SERVICE_NAME    = "beacon"
+BEACON_SUFFIX_SERVICE_NAME	= "beacon"
 VALIDATOR_SUFFIX_SERVICE_NAME = "validator"
 
 METRICS_PATH = "/metrics"
@@ -30,14 +30,14 @@ METRICS_PATH = "/metrics"
 PRIVATE_IP_ADDRESS_PLACEHOLDER = "KURTOSIS_IP_ADDR_PLACEHOLDER"
 
 BEACON_USED_PORTS = {
-    TCP_DISCOVERY_PORT_ID:     shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.TCP_PROTOCOL),
-    UDP_DISCOVERY_PORT_ID:     shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.UDP_PROTOCOL),
-    HTTP_PORT_ID:              shared_utils.new_port_spec(HTTP_PORT_NUM, shared_utils.TCP_PROTOCOL),
-    METRICS_PORT_ID:           shared_utils.new_port_spec(METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL),
+	TCP_DISCOVERY_PORT_ID:	shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.TCP_PROTOCOL),
+	UDP_DISCOVERY_PORT_ID:	shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.UDP_PROTOCOL),
+	HTTP_PORT_ID:			shared_utils.new_port_spec(HTTP_PORT_NUM, shared_utils.TCP_PROTOCOL),
+	METRICS_PORT_ID:		shared_utils.new_port_spec(METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL),
 }
 
 VALIDATOR_USED_PORTS = {
-    METRICS_PORT_ID:           shared_utils.new_port_spec(METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL),
+	METRICS_PORT_ID:		shared_utils.new_port_spec(METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL),
 }
 
 
@@ -121,7 +121,8 @@ def launch(
 		beacon_service.ip_address,
 		HTTP_PORT_NUM,
 		nodes_metrics_info,
-		beacon_node_service_name
+		beacon_node_service_name,
+		validator_node_service_name
 	)
 
 
@@ -183,7 +184,7 @@ def get_beacon_config(
 	if len(extra_params) > 0:
 		# this is a repeated<proto type>, we convert it into Starlark
 		cmd.extend([param for param in extra_params])
-	
+
 	return ServiceConfig(
 		image = image,
 		ports = BEACON_USED_PORTS,
@@ -216,7 +217,7 @@ def get_validator_config(
 		"--logLevel=" + log_level,
 		"--dataDir=" + root_dirpath,
 		"--paramsFile=" + genesis_config_filepath,
-		"--server=" + beacon_client_http_url,
+		"--beaconNodes=" + beacon_client_http_url,
 		"--keystoresDir=" + validator_keys_dirpath,
 		"--secretsDir=" + validator_secrets_dirpath,
 		# vvvvvvvvvvvvvvvvvvv PROMETHEUS CONFIG vvvvvvvvvvvvvvvvvvvvv

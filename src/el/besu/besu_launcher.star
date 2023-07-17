@@ -12,16 +12,14 @@ GENESIS_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/opt/besu/genesis"
 RPC_PORT_NUM = 8545
 WS_PORT_NUM = 8546
 DISCOVERY_PORT_NUM = 30303
-ENGINE_HTTP_RPC_PORT_NUM = 8550
-ENGINE_WS_RPC_PORT_NUM = 8551
+ENGINE_HTTP_RPC_PORT_NUM = 8551
 
 # Port IDs
 RPC_PORT_ID = "rpc"
 WS_PORT_ID = "ws"
 TCP_DISCOVERY_PORT_ID = "tcp-discovery"
 UDP_DISCOVERY_PORT_ID = "udp-discovery"
-ENGINE_HTTP_RPC_PORT_ID = "engineHttpRpc"
-ENGINE_WS_RPC_PORT_ID = "engineWsRpc"
+ENGINE_HTTP_RPC_PORT_ID = "engine-rpc"
 
 PRIVATE_IP_ADDRESS_PLACEHOLDER = "KURTOSIS_IP_ADDR_PLACEHOLDER"
 
@@ -31,7 +29,6 @@ USED_PORTS = {
 	TCP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.TCP_PROTOCOL),
 	UDP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.UDP_PROTOCOL),
 	ENGINE_HTTP_RPC_PORT_ID: shared_utils.new_port_spec(ENGINE_HTTP_RPC_PORT_NUM, shared_utils.TCP_PROTOCOL),
-	ENGINE_WS_RPC_PORT_ID: shared_utils.new_port_spec(ENGINE_WS_RPC_PORT_NUM, shared_utils.TCP_PROTOCOL)
 }
 
 ENTRYPOINT_ARGS = ["sh", "-c"]
@@ -57,7 +54,7 @@ def launch(
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, BESU_LOG_LEVELS)
 
 	config, jwt_secret_json_filepath_on_client = get_config(launcher.network_id, launcher.el_genesis_data,
-                                    image, existing_el_clients, log_level, extra_params)
+									image, existing_el_clients, log_level, extra_params)
 
 	service = plan.add_service(service_name, config)
 
@@ -74,6 +71,7 @@ def launch(
 		WS_PORT_NUM,
 		ENGINE_HTTP_RPC_PORT_NUM,
 		jwt_secret,
+		service_name
 	)
 
 
