@@ -34,8 +34,8 @@ def generate_el_genesis_data(
 	deposit_contract_address,
 	genesis_delay,
 	seconds_per_slot,
-    deneb_fork_epoch
-    ):
+	deneb_fork_epoch
+	):
 
 	template_data = genesis_generation_config_template_data(
 		network_id,
@@ -43,7 +43,7 @@ def generate_el_genesis_data(
 		genesis_unix_timestamp,
 		genesis_delay,
 		seconds_per_slot,
-        deneb_fork_epoch
+		deneb_fork_epoch
 	)
 
 	genesis_config_file_template_and_data = shared_utils.new_template_and_data(genesis_generation_config_template, template_data)
@@ -145,5 +145,5 @@ def genesis_generation_config_template_data(network_id, deposit_contract_address
 		"UnixTimestamp": unix_timestamp,
 		"GenesisDelay": genesis_delay,
 		"SecondsPerSlot": seconds_per_slot,
-        "DenebForkEpoch": deneb_fork_epoch
-        }
+		"DenebForkEpoch": deneb_fork_epoch
+	}

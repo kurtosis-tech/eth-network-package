@@ -49,7 +49,7 @@ def generate_cl_genesis_data(
 		deposit_contract_address,
 		genesis_delay,
 		deneb_fork_epoch
-        	)
+		)
 
 	genesis_generation_mnemonics_template_and_data = shared_utils.new_template_and_data(genesis_generation_mnemonics_yml_template, template_data)
 	genesis_generation_config_template_and_data = shared_utils.new_template_and_data(genesis_generation_config_yml_template, template_data)
@@ -196,5 +196,5 @@ def new_cl_genesis_config_template_data(network_id, seconds_per_slot, unix_times
 		"PreregisteredValidatorKeysMnemonic": preregistered_validator_keys_mnemonic,
 		"DepositContractAddress": deposit_contract_address,
 		"GenesisDelay": genesis_delay,
-        "DenebForkEpoch": deneb_fork_epoch
-    	}
+		"DenebForkEpoch": deneb_fork_epoch
+	}
