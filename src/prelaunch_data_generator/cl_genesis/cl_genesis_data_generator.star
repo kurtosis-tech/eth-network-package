@@ -104,8 +104,8 @@ def generate_cl_genesis_data(
 
 	# Generate files that need dynamic content
 	content_to_write_to_output_filename = {
-		DEPLOY_BLOCK:            DEPLOY_BLOCK_FILENAME,
-		deposit_contract_address: DEPOSIT_CONTRACT_FILENAME,
+		DEPLOY_BLOCK:				DEPLOY_BLOCK_FILENAME,
+		deposit_contract_address: 	DEPOSIT_CONTRACT_FILENAME,
 	}
 	for content, destFilename in content_to_write_to_output_filename.items():
 		destFilepath = shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, destFilename)
@@ -118,7 +118,7 @@ def generate_cl_genesis_data(
 			)
 		]
 		cmd_result = plan.exec(recipe = ExecRecipe( command=cmd), service_name=launcher_service_name)
-		
+
 
 	cl_genesis_generation_cmd = [
 		CL_GENESIS_GENERATION_BINARY_FILEPATH_ON_CONTAINER,

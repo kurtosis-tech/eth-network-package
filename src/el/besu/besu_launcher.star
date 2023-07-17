@@ -54,7 +54,7 @@ def launch(
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, BESU_LOG_LEVELS)
 
 	config, jwt_secret_json_filepath_on_client = get_config(launcher.network_id, launcher.el_genesis_data,
-                                    image, existing_el_clients, log_level, extra_params)
+									image, existing_el_clients, log_level, extra_params)
 
 	service = plan.add_service(service_name, config)
 
