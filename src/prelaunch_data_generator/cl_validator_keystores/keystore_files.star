@@ -8,5 +8,5 @@ def new_keystore_files(files_artifact_uuid, raw_keys_relative_dirpath, raw_secre
 		nimbus_keys_relative_dirpath =  nimbus_keys_relative_dirpath,
 		prysm_relative_dirpath =  prysm_relative_dirpath,
 		teku_keys_relative_dirpath =  teku_keys_relative_dirpath,
-		teku_secrets_relative_dirpath =  teku_secrets_relative_dirpath 
+		teku_secrets_relative_dirpath =  teku_secrets_relative_dirpath
 	)

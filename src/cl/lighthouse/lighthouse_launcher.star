@@ -11,8 +11,8 @@ GENESIS_DATA_MOUNTPOINT_ON_CLIENTS = "/genesis"
 
 VALIDATOR_KEYS_MOUNTPOINT_ON_CLIENTS = "/validator-keys"
 
-RUST_BACKTRACE_ENVVAR_NAME  = "RUST_BACKTRACE"
-RUST_FULL_BACKTRACE_KEYWORD = "full"
+RUST_BACKTRACE_ENVVAR_NAME		= "RUST_BACKTRACE"
+RUST_FULL_BACKTRACE_KEYWORD		= "full"
 
 #  ---------------------------------- Beacon client -------------------------------------
 CONSENSUS_DATA_DIRPATH_ON_BEACON_SERVICE_CONTAINER = "/consensus-data"
@@ -20,25 +20,24 @@ CONSENSUS_DATA_DIRPATH_ON_BEACON_SERVICE_CONTAINER = "/consensus-data"
 # Port IDs
 BEACON_TCP_DISCOVERY_PORT_ID = "tcp-discovery"
 BEACON_UDP_DISCOVERY_PORT_ID = "udp-discovery"
-BEACON_HTTP_PORT_ID         = "http"
-BEACON_METRICS_PORT_ID      = "metrics"
+BEACON_HTTP_PORT_ID			= "http"
+BEACON_METRICS_PORT_ID		= "metrics"
 
 # Port nums
-BEACON_DISCOVERY_PORT_NUM = 9000
-BEACON_HTTP_PORT_NUM      = 4000
-BEACON_METRICS_PORT_NUM   = 5054
+BEACON_DISCOVERY_PORT_NUM	= 9000
+BEACON_HTTP_PORT_NUM		= 4000
+BEACON_METRICS_PORT_NUM		= 5054
 
 #  ---------------------------------- Validator client -------------------------------------
-VALIDATING_REWARDS_ACCOUNT = "0x0000000000000000000000000000000000000000"
+VALIDATING_REWARDS_ACCOUNT	= "0x0000000000000000000000000000000000000000"
 
-VALIDATOR_HTTP_PORT_ID     = "http"
-VALIDATOR_METRICS_PORT_ID  = "metrics"
-VALIDATOR_HTTP_PORT_NUM    = 5042
-VALIDATOR_METRICS_PORT_NUM = 5064
+VALIDATOR_HTTP_PORT_ID		= "http"
+VALIDATOR_METRICS_PORT_ID	= "metrics"
+VALIDATOR_HTTP_PORT_NUM		= 5042
+VALIDATOR_METRICS_PORT_NUM	= 5064
 VALIDATOR_HTTP_PORT_WAIT_DISABLED = None
 
 METRICS_PATH = "/metrics"
-
 VALIDATOR_SUFFIX_SERVICE_NAME = "validator"
 
 PRIVATE_IP_ADDRESS_PLACEHOLDER = "KURTOSIS_IP_ADDR_PLACEHOLDER"
@@ -46,13 +45,13 @@ PRIVATE_IP_ADDRESS_PLACEHOLDER = "KURTOSIS_IP_ADDR_PLACEHOLDER"
 BEACON_USED_PORTS = {
 	BEACON_TCP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(BEACON_DISCOVERY_PORT_NUM, shared_utils.TCP_PROTOCOL),
 	BEACON_UDP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(BEACON_DISCOVERY_PORT_NUM, shared_utils.UDP_PROTOCOL),
-	BEACON_HTTP_PORT_ID:         shared_utils.new_port_spec(BEACON_HTTP_PORT_NUM, shared_utils.TCP_PROTOCOL, shared_utils.HTTP_APPLICATION_PROTOCOL),
-	BEACON_METRICS_PORT_ID:      shared_utils.new_port_spec(BEACON_METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL, shared_utils.HTTP_APPLICATION_PROTOCOL),
+	BEACON_HTTP_PORT_ID:		shared_utils.new_port_spec(BEACON_HTTP_PORT_NUM, shared_utils.TCP_PROTOCOL, shared_utils.HTTP_APPLICATION_PROTOCOL),
+	BEACON_METRICS_PORT_ID:		shared_utils.new_port_spec(BEACON_METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL, shared_utils.HTTP_APPLICATION_PROTOCOL),
 }
 
 VALIDATOR_USED_PORTS = {
-	VALIDATOR_HTTP_PORT_ID:    shared_utils.new_port_spec(VALIDATOR_HTTP_PORT_NUM, shared_utils.TCP_PROTOCOL, shared_utils.NOT_PROVIDED_APPLICATION_PROTOCOL, VALIDATOR_HTTP_PORT_WAIT_DISABLED),
-	VALIDATOR_METRICS_PORT_ID: shared_utils.new_port_spec(VALIDATOR_METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL, shared_utils.HTTP_APPLICATION_PROTOCOL),
+	VALIDATOR_HTTP_PORT_ID:		shared_utils.new_port_spec(VALIDATOR_HTTP_PORT_NUM, shared_utils.TCP_PROTOCOL, shared_utils.NOT_PROVIDED_APPLICATION_PROTOCOL, VALIDATOR_HTTP_PORT_WAIT_DISABLED),
+	VALIDATOR_METRICS_PORT_ID:	shared_utils.new_port_spec(VALIDATOR_METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL, shared_utils.HTTP_APPLICATION_PROTOCOL),
 }
 
 LIGHTHOUSE_LOG_LEVELS = {
@@ -136,6 +135,7 @@ def launch(
 		BEACON_HTTP_PORT_NUM,
 		nodes_metrics_info,
 		beacon_node_service_name,
+		validator_node_service_name
 	)
 
 
@@ -160,10 +160,10 @@ def get_beacon_config(
 	#  from the peers it communicates with but when they're set they basically say "override the autodetection and
 	#  use what I specify instead." This requires having a know external IP address and port, which we definitely won't
 	#  have with a network running in Kurtosis.
-	#    "--disable-enr-auto-update",
-	#    "--enr-address=" + externalIpAddress,
-	#    fmt.Sprintf("--enr-udp-port=%v", BEACON_DISCOVERY_PORT_NUM),
-	#    fmt.Sprintf("--enr-tcp-port=%v", beaconDiscoveryPortNum),
+	#	"--disable-enr-auto-update",
+	#	"--enr-address=" + externalIpAddress,
+	#	fmt.Sprintf("--enr-udp-port=%v", BEACON_DISCOVERY_PORT_NUM),
+	#	fmt.Sprintf("--enr-tcp-port=%v", beaconDiscoveryPortNum),
 	cmd = [
 		LIGHTHOUSE_BINARY_COMMAND,
 		"beacon_node",
@@ -246,7 +246,7 @@ def get_validator_config(
 	genesis_config_parent_dirpath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNTPOINT_ON_CLIENTS, shared_utils.path_dir(genesis_data.config_yml_rel_filepath))
 	validator_keys_dirpath = shared_utils.path_join(VALIDATOR_KEYS_MOUNTPOINT_ON_CLIENTS, node_keystore_files.raw_keys_relative_dirpath)
 	validator_secrets_dirpath = shared_utils.path_join(VALIDATOR_KEYS_MOUNTPOINT_ON_CLIENTS, node_keystore_files.raw_secrets_relative_dirpath)
-	
+
 	cmd = [
 		"lighthouse",
 		"validator_client",

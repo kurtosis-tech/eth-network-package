@@ -13,6 +13,7 @@ OUTPUT_DIRPATH_ON_GENERATOR = "/output"
 TRANCHES_DIRANME = "tranches"
 GENESIS_STATE_FILENAME = "genesis.ssz"
 DEPLOY_BLOCK_FILENAME = "deploy_block.txt"
+DEPOSIT_CONTRACT_BLOCK_HASH_FILENAME = "deposit_contract_block_hash.txt"
 DEPOSIT_CONTRACT_FILENAME = "deposit_contract.txt"
 PARSED_BEACON_STATE_FILENAME = "parsedBeaconState.json"
 TRUSTED_SETUP_FILENAME = "trusted_setup.txt"
@@ -50,7 +51,7 @@ def generate_cl_genesis_data(
 		genesis_delay,
 		capella_fork_epoch,
 		deneb_fork_epoch
-        	)
+		)
 
 	genesis_generation_mnemonics_template_and_data = shared_utils.new_template_and_data(genesis_generation_mnemonics_yml_template, template_data)
 	genesis_generation_config_template_and_data = shared_utils.new_template_and_data(genesis_generation_config_yml_template, template_data)
@@ -105,8 +106,8 @@ def generate_cl_genesis_data(
 
 	# Generate files that need dynamic content
 	content_to_write_to_output_filename = {
-		DEPLOY_BLOCK:            DEPLOY_BLOCK_FILENAME,
-		deposit_contract_address: DEPOSIT_CONTRACT_FILENAME,
+		DEPLOY_BLOCK:				DEPLOY_BLOCK_FILENAME,
+		deposit_contract_address: 	DEPOSIT_CONTRACT_FILENAME,
 	}
 	for content, destFilename in content_to_write_to_output_filename.items():
 		destFilepath = shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, destFilename)
@@ -119,7 +120,7 @@ def generate_cl_genesis_data(
 			)
 		]
 		cmd_result = plan.exec(recipe = ExecRecipe( command=cmd), service_name=launcher_service_name)
-		
+
 
 	cl_genesis_generation_cmd = [
 		CL_GENESIS_GENERATION_BINARY_FILEPATH_ON_CONTAINER,
@@ -145,6 +146,19 @@ def generate_cl_genesis_data(
 	parsed_beacon_state_file_generation_str = " ".join(parsed_beacon_state_file_generation)
 
 	plan.exec(recipe = ExecRecipe(command = ["/bin/sh", "-c", parsed_beacon_state_file_generation_str]), service_name = launcher_service_name)
+
+	# Generate the deposit contract block hash file
+	deposit_block_hash_generation_cmd = [
+		"jq",
+		"-r",
+		"'.eth1_data.block_hash'",
+		shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, PARSED_BEACON_STATE_FILENAME),
+		">",
+		shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, DEPOSIT_CONTRACT_BLOCK_HASH_FILENAME),
+	]
+
+	deposit_block_hash_file_generation_str = " ".join(deposit_block_hash_generation_cmd)
+	plan.exec(recipe = ExecRecipe(command = ["/bin/sh", "-c", deposit_block_hash_file_generation_str]), service_name = launcher_service_name)
 
 	shared_utils.download_trusted_setup(plan, launcher_service_name, shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, TRUSTED_SETUP_FILENAME))
 
@@ -185,5 +199,5 @@ def new_cl_genesis_config_template_data(network_id, seconds_per_slot, unix_times
 		"DepositContractAddress": deposit_contract_address,
 		"GenesisDelay": genesis_delay,
 		"CapellaForkEpoch": capella_fork_epoch,
-        "DenebForkEpoch": deneb_fork_epoch
-    	}
+		"DenebForkEpoch": deneb_fork_epoch
+	}
