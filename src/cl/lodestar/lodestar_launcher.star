@@ -22,7 +22,6 @@ DISCOVERY_PORT_NUM			= 9000
 HTTP_PORT_NUM				= 4000
 METRICS_PORT_NUM			= 8008
 
-BEACON_SUFFIX_SERVICE_NAME	= "beacon"
 VALIDATOR_SUFFIX_SERVICE_NAME = "validator"
 
 METRICS_PATH = "/metrics"
@@ -63,7 +62,7 @@ def launch(
 	extra_beacon_params,
 	extra_validator_params):
 
-	beacon_node_service_name = "{0}-{1}".format(service_name, BEACON_SUFFIX_SERVICE_NAME)
+	beacon_node_service_name = "{0}".format(service_name)
 	validator_node_service_name = "{0}-{1}".format(service_name, VALIDATOR_SUFFIX_SERVICE_NAME)
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, LODESTAR_LOG_LEVELS)
