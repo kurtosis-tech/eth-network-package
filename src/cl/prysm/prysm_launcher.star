@@ -30,7 +30,6 @@ HTTP_PORT_NUM				= 3500
 BEACON_MONITORING_PORT_NUM	= 8080
 VALIDATOR_MONITORING_PORT_NUM  = 8081
 
-BEACON_SUFFIX_SERVICE_NAME	= "beacon"
 VALIDATOR_SUFFIX_SERVICE_NAME = "validator"
 
 MIN_PEERS = 1
@@ -85,7 +84,7 @@ def launch(
 		fail("An empty validator image was provided")
 
 
-	beacon_node_service_name = "{0}-{1}".format(service_name, BEACON_SUFFIX_SERVICE_NAME)
+	beacon_node_service_name = "{0}".format(service_name)
 	validator_node_service_name = "{0}-{1}".format(service_name, VALIDATOR_SUFFIX_SERVICE_NAME)
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, PRYSM_LOG_LEVELS)
