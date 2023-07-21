@@ -11,7 +11,7 @@ EXPECTED_NUM_IMAGES			= 2
 #  ---------------------------------- Beacon client -------------------------------------
 CONSENSUS_DATA_DIRPATH_ON_SERVICE_CONTAINER			= "/consensus-data"
 GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER		= "/genesis"
-DEPOSIT_CONTRACT_BLOCK_DIRPATH_ON_SERVICE_CONTAINER = GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER + "/output/deposit_contract_block"
+DEPOSIT_CONTRACT_BLOCK_DIRPATH_ON_SERVICE_CONTAINER = GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER + "/output/deposit_contract_block_hash.txt"
 
 # Port IDs
 TCP_DISCOVERY_PORT_ID		= "tcp-discovery"
