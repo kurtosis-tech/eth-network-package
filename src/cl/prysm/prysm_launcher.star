@@ -227,7 +227,7 @@ def get_beacon_config(
 		"--chain-config-file=" + genesis_config_filepath,
 		"--genesis-state=" + genesis_ssz_filepath,
 		"--execution-endpoint=" + el_client_engine_rpc_url_str,
-		"--rpc-host=0.0.0.0"
+		"--rpc-host=0.0.0.0",
 		"--rpc-port={0}".format(RPC_PORT_NUM),
 		"--grpc-gateway-host=0.0.0.0",
 		"--grpc-gateway-corsdomain=*",
