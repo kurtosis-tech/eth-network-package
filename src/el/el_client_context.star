@@ -7,11 +7,7 @@ def new_el_client_context(
 	ws_port_num,
 	engine_rpc_port_num,
 	jwt_secret,
-	service_name = "",
-	el_min_cpu = "",
-	el_max_cpu = "",
-	el_min_mem = "",
-	el_max_mem = "",):
+	service_name = ""):
 	return struct(
 		service_name = service_name,
 		client_name = client_name,
@@ -21,9 +17,5 @@ def new_el_client_context(
 		rpc_port_num = rpc_port_num,
 		ws_port_num = ws_port_num,
 		engine_rpc_port_num = engine_rpc_port_num,
-		jwt_secret = jwt_secret,
-		el_min_cpu = el_min_cpu,
-		el_max_cpu = el_max_cpu,
-		el_min_mem = el_min_mem,
-		el_max_mem = el_max_mem,
+		jwt_secret = jwt_secret
 	)

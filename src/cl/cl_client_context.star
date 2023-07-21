@@ -5,15 +5,7 @@ def new_cl_client_context(
 	http_port_num,
 	cl_nodes_metrics_info,
 	beacon_service_name,
-	validator_service_name = "",
-	cl_min_cpu = "",
-	cl_max_cpu = "",
-	cl_min_mem = "",
-	cl_max_mem = "",
-	v_min_cpu = "",
-	v_max_cpu = "",
-	v_min_mem = "",
-	v_max_mem = ""):
+	validator_service_name = ""):
 	return struct(
 		client_name = client_name,
 		enr = enr,
@@ -22,12 +14,4 @@ def new_cl_client_context(
 		cl_nodes_metrics_info = cl_nodes_metrics_info,
 		beacon_service_name = beacon_service_name,
 		validator_service_name = validator_service_name,
-		cl_min_cpu = cl_min_cpu,
-		cl_max_cpu = cl_max_cpu,
-		cl_min_mem = cl_min_mem,
-		cl_max_mem = cl_max_mem,
-		v_min_cpu = v_min_cpu,
-		v_max_cpu = v_max_cpu,
-		v_min_mem = v_min_mem,
-		v_max_mem = v_max_mem,
 	)
