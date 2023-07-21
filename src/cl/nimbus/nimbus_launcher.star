@@ -22,10 +22,10 @@ HTTP_PORT_NUM = 4000
 METRICS_PORT_NUM = 8008
 
 # The min/max CPU/memory that the beacon node can use
-BEACON_MIN_CPU = 200
-BEACON_MAX_CPU = 2000
-BEACON_MIN_MEMORY = 512
-BEACON_MAX_MEMORY = 2048
+BEACON_MIN_CPU = 100
+BEACON_MAX_CPU = 1000
+BEACON_MIN_MEMORY = 256
+BEACON_MAX_MEMORY = 1024
 
 
 # Nimbus requires that its data directory already exists (because it expects you to bind-mount it), so we
@@ -76,6 +76,10 @@ def launch(
 	bootnode_context,
 	el_client_context,
 	node_keystore_files,
+	cl_min_cpu,
+	cl_max_cpu,
+	cl_min_memory,
+	cl_max_memory,
 	extra_beacon_params,
 	extra_validator_params):
 

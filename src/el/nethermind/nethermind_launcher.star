@@ -16,8 +16,8 @@ DISCOVERY_PORT_NUM = 30303
 ENGINE_RPC_PORT_NUM = 8551
 
 # The min/max CPU/memory that the execution node can use
-EXECUTION_MIN_CPU = 200
-EXECUTION_MAX_CPU = 2000
+EXECUTION_MIN_CPU = 100
+EXECUTION_MAX_CPU = 1000
 EXECUTION_MIN_MEMORY = 512
 EXECUTION_MAX_MEMORY = 2048
 
@@ -55,6 +55,10 @@ def launch(
 	participant_log_level,
 	global_log_level,
 	existing_el_clients,
+	el_min_cpu,
+	el_max_cpu,
+	el_min_memory,
+	el_max_memory,
 	extra_params):
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, NETHERMIND_LOG_LEVELS)

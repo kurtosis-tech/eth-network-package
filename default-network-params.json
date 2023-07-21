@@ -11,10 +11,6 @@
       "el_extra_params": [],
       "validator_extra_params": [],
       "builder_network_params": null,
-      "min_cpu":					"",
-			"max_cpu":					"",
-			"min_mem":					"",
-			"max_mem":					"",
       "count": 1
     }
   ],

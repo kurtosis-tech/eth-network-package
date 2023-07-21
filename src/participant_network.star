@@ -98,6 +98,10 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 			participant.el_client_log_level,
 			global_log_level,
 			all_el_client_contexts,
+			participant.el_min_cpu,
+			participant.el_max_cpu,
+			participant.el_min_mem,
+			participant.el_max_mem,
 			participant.el_extra_params
 		)
 
@@ -169,8 +173,16 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 				CL_CLIENT_CONTEXT_BOOTNODE,
 				el_client_context,
 				new_cl_node_validator_keystores,
+				participant.bn_min_cpu,
+				participant.bn_max_cpu,
+				participant.bn_min_mem,
+				participant.bn_max_mem,
+				participant.v_min_cpu,
+				participant.v_max_cpu,
+				participant.v_min_mem,
+				participant.v_max_mem,
 				participant.beacon_extra_params,
-				participant.validator_extra_params
+				participant.validator_extra_params,
 			)
 		else:
 			boot_cl_client_ctx = all_cl_client_contexts[0]
@@ -184,8 +196,16 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 				boot_cl_client_ctx,
 				el_client_context,
 				new_cl_node_validator_keystores,
+				participant.bn_min_cpu,
+				participant.bn_max_cpu,
+				participant.bn_min_mem,
+				participant.bn_max_mem,
+				participant.v_min_cpu,
+				participant.v_max_cpu,
+				participant.v_min_mem,
+				participant.v_max_mem,
 				participant.beacon_extra_params,
-				participant.validator_extra_params
+				participant.validator_extra_params,
 			)
 
 		all_cl_client_contexts.append(cl_client_context)

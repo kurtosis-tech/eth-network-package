@@ -27,10 +27,10 @@ HTTP_PORT_NUM				= 3500
 BEACON_MONITORING_PORT_NUM	= 8080
 
 # The min/max CPU/memory that the beacon node can use
-BEACON_MIN_CPU = 200
-BEACON_MAX_CPU = 2000
-BEACON_MIN_MEMORY = 512
-BEACON_MAX_MEMORY = 2048
+BEACON_MIN_CPU = 100
+BEACON_MAX_CPU = 1000
+BEACON_MIN_MEMORY = 256
+BEACON_MAX_MEMORY = 1024
 
 #  ---------------------------------- Validator client -------------------------------------
 VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER	= "/validator-keys"
@@ -46,8 +46,9 @@ VALIDATOR_SUFFIX_SERVICE_NAME = "validator"
 # The min/max CPU/memory that the validator node can use
 VALIDATOR_MIN_CPU = 100
 VALIDATOR_MAX_CPU = 300
-VALIDATOR_MIN_MEMORY = 512
-VALIDATOR_MAX_MEMORY = 1024
+VALIDATOR_MIN_MEMORY = 128
+VALIDATOR_MAX_MEMORY = 256
+
 
 MIN_PEERS = 1
 
@@ -84,6 +85,14 @@ def launch(
 	bootnode_context,
 	el_client_context,
 	node_keystore_files,
+	cl_min_cpu,
+	cl_max_cpu,
+	cl_min_memory,
+	cl_max_memory,
+	v_min_cpu,
+	v_max_cpu,
+	v_min_memory,
+	v_max_memory,
 	extra_beacon_params,
 	extra_validator_params):
 
