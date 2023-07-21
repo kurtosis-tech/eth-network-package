@@ -215,7 +215,7 @@ def get_config(
 		"--rest-port={0}".format(HTTP_PORT_NUM),
 		"--validators-dir=" + VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER,
 		"--secrets-dir=" + VALIDATOR_SECRETS_DIRPATH_ON_SERVICE_CONTAINER,
-		"--suggested-fee-recipient=" ,
+		"--suggested-fee-recipient=" + VALIDATING_REWARDS_ACCOUNT,
 		# There's a bug where if we don't set this flag, the Nimbus nodes won't work:
 		# https://discord.com/channels/641364059387854899/674288681737256970/922890280120750170
 		# https://github.com/status-im/nimbus-eth2/issues/2451
