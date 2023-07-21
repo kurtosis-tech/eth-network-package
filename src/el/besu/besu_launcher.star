@@ -63,8 +63,23 @@ def launch(
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, BESU_LOG_LEVELS)
 
-	config, jwt_secret_json_filepath_on_client = get_config(launcher.network_id, launcher.el_genesis_data,
-									image, existing_el_clients, log_level, extra_params)
+	el_min_cpu = el_min_cpu if el_min_cpu != "" else EXECUTION_MIN_CPU
+	el_max_cpu = el_max_cpu if el_max_cpu != "" else EXECUTION_MAX_CPU
+	el_min_memory = el_min_memory if el_min_memory != "" else EXECUTION_MIN_MEMORY
+	el_max_memory = el_max_memory if el_max_memory != "" else EXECUTION_MAX_MEMORY
+
+	config, jwt_secret_json_filepath_on_client = get_config(
+		launcher.network_id,
+		launcher.el_genesis_data,
+		image,
+		existing_el_clients,
+		log_level,
+		el_min_cpu,
+		el_max_cpu,
+		el_min_memory,
+		el_max_memory,
+		extra_params
+	)
 
 	service = plan.add_service(service_name, config)
 
@@ -85,7 +100,17 @@ def launch(
 	)
 
 
-def get_config(network_id, genesis_data, image, existing_el_clients, log_level, extra_params):
+def get_config(
+	network_id,
+	genesis_data,
+	image,
+	existing_el_clients,
+	log_level,
+	el_min_cpu,
+	el_max_cpu,
+	el_min_memory,
+	el_max_memory,
+	extra_params):
 	if len(existing_el_clients) < 2:
 		fail("Besu node cannot be boot nodes, and due to a bug it requires two nodes to exist beforehand")
 
@@ -140,10 +165,10 @@ def get_config(network_id, genesis_data, image, existing_el_clients, log_level, 
 		},
 		entrypoint = ENTRYPOINT_ARGS,
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
-		min_cpu = EXECUTION_MIN_CPU,
-		max_cpu = EXECUTION_MAX_CPU,
-		min_memory = EXECUTION_MIN_MEMORY,
-		max_memory = EXECUTION_MAX_MEMORY
+		min_cpu = el_min_cpu,
+		max_cpu = el_max_cpu,
+		min_memory = el_min_memory,
+		max_memory = el_max_memory
 	), jwt_secret_json_filepath_on_client
 
 

@@ -113,12 +113,26 @@ def launch(
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, PRYSM_LOG_LEVELS)
 
+	cl_min_cpu = cl_min_cpu if cl_min_cpu != "" else BEACON_MIN_CPU
+	cl_max_cpu = cl_max_cpu if cl_max_cpu != "" else BEACON_MAX_CPU
+	cl_min_memory = cl_min_memory if cl_min_memory != "" else BEACON_MIN_MEMORY
+	cl_max_memory = cl_max_memory if cl_max_memory != "" else BEACON_MAX_MEMORY
+
+	v_min_cpu = v_min_cpu if v_min_cpu != "" else VALIDATOR_MIN_CPU
+	v_max_cpu = v_max_cpu if v_max_cpu != "" else VALIDATOR_MAX_CPU
+	v_min_memory = v_min_memory if v_min_memory != "" else VALIDATOR_MIN_MEMORY
+	v_max_memory = v_max_memory if v_max_memory != "" else VALIDATOR_MAX_MEMORY
+
 	beacon_config = get_beacon_config(
 		launcher.genesis_data,
 		beacon_image,
 		bootnode_context,
 		el_client_context,
 		log_level,
+		cl_min_cpu,
+		cl_max_cpu,
+		cl_min_memory,
+		cl_max_memory,
 		extra_beacon_params,
 	)
 
@@ -138,6 +152,10 @@ def launch(
 		beacon_rpc_endpoint,
 		beacon_http_endpoint,
 		node_keystore_files,
+		v_min_cpu,
+		v_max_cpu,
+		v_min_memory,
+		v_max_memory,
 		extra_validator_params,
 		launcher.prysm_password_relative_filepath,
 		launcher.prysm_password_artifact_uuid
@@ -183,6 +201,10 @@ def get_beacon_config(
 		bootnode_context,
 		el_client_context,
 		log_level,
+		cl_min_cpu,
+		cl_max_cpu,
+		cl_min_memory,
+		cl_max_memory,
 		extra_params,
 	):
 
@@ -236,10 +258,10 @@ def get_beacon_config(
 		},
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		ready_conditions = cl_node_ready_conditions.get_ready_conditions(HTTP_PORT_ID),
-		min_cpu = BEACON_MIN_CPU,
-		max_cpu = BEACON_MAX_CPU,
-		min_memory = BEACON_MIN_MEMORY,
-		max_memory = BEACON_MAX_MEMORY
+		min_cpu = cl_min_cpu,
+		max_cpu = cl_max_cpu,
+		min_memory = cl_min_memory,
+		max_memory = cl_max_memory
 	)
 
 
@@ -251,6 +273,10 @@ def get_validator_config(
 		beacon_rpc_endpoint,
 		beacon_http_endpoint,
 		node_keystore_files,
+		v_min_cpu,
+		v_max_cpu,
+		v_min_memory,
+		v_max_memory,
 		extra_params,
 		prysm_password_relative_filepath,
 		prysm_password_artifact_uuid
@@ -294,10 +320,10 @@ def get_validator_config(
 			PRYSM_PASSWORD_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: prysm_password_artifact_uuid,
 		},
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
-		min_cpu = VALIDATOR_MIN_CPU,
-		max_cpu = VALIDATOR_MAX_CPU,
-		min_memory = VALIDATOR_MIN_MEMORY,
-		max_memory = VALIDATOR_MAX_MEMORY
+		min_cpu = v_min_cpu,
+		max_cpu = v_max_cpu,
+		min_memory = v_min_memory,
+		max_memory = v_max_memory
 	)
 
 

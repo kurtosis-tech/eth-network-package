@@ -92,7 +92,24 @@ def launch(
 
 	extra_params = [param for param in extra_beacon_params] + [param for param in extra_validator_params]
 
-	config = get_config(launcher.cl_genesis_data, image, bootnode_context, el_client_context, log_level, node_keystore_files, extra_params)
+	cl_min_cpu = cl_min_cpu if cl_min_cpu != "" else BEACON_MIN_CPU
+	cl_max_cpu = cl_max_cpu if cl_max_cpu != "" else BEACON_MAX_CPU
+	cl_min_memory = cl_min_memory if cl_min_memory != "" else BEACON_MIN_MEMORY
+	cl_max_memory = cl_max_memory if cl_max_memory != "" else BEACON_MAX_MEMORY
+
+	config = get_config(
+		launcher.cl_genesis_data,
+		image,
+		bootnode_context,
+		el_client_context,
+		log_level,
+		node_keystore_files,
+		cl_min_cpu,
+		cl_max_cpu,
+		cl_min_memory,
+		cl_max_memory,
+		extra_params
+	)
 
 	teku_service = plan.add_service(service_name, config)
 
@@ -129,6 +146,10 @@ def get_config(
 	el_client_ctx,
 	log_level,
 	node_keystore_files,
+	cl_min_cpu,
+	cl_max_cpu,
+	cl_min_memory,
+	cl_max_memory,
 	extra_params):
 
 	el_client_rpc_url_str = "http://{0}:{1}".format(
@@ -215,10 +236,10 @@ def get_config(
 		},
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		ready_conditions = cl_node_ready_conditions.get_ready_conditions(HTTP_PORT_ID),
-		min_cpu = BEACON_MIN_CPU,
-		max_cpu = BEACON_MAX_CPU,
-		min_memory = BEACON_MIN_MEMORY,
-		max_memory = BEACON_MAX_MEMORY
+		min_cpu = cl_min_cpu,
+		max_cpu = cl_max_cpu,
+		min_memory = cl_min_memory,
+		max_memory = cl_max_memory
 	)
 
 

@@ -87,12 +87,24 @@ def launch(
 
 	extra_params = [param for param in extra_beacon_params] + [param for param in extra_validator_params]
 
-	config = get_config(launcher.cl_genesis_data, image, bootnode_context, el_client_context, log_level, node_keystore_files, extra_params)
+	cl_min_cpu = cl_min_cpu if cl_min_cpu != "" else BEACON_MIN_CPU
+	cl_max_cpu = cl_max_cpu if cl_max_cpu != "" else BEACON_MAX_CPU
+	cl_min_memory = cl_min_memory if cl_min_memory != "" else BEACON_MIN_MEMORY
+	cl_max_memory = cl_max_memory if cl_max_memory != "" else BEACON_MAX_MEMORY
 
-	cl_min_cpu = cl_min_cpu if cl_min_cpu != None else BEACON_MIN_CPU
-	cl_max_cpu = cl_max_cpu if cl_max_cpu != None else BEACON_MAX_CPU
-	cl_min_memory = cl_min_memory if cl_min_memory != None else BEACON_MIN_MEMORY
-	cl_max_memory = cl_max_memory if cl_max_memory != None else BEACON_MAX_MEMORY
+	config = get_config(
+		launcher.cl_genesis_data,
+		image,
+		bootnode_context,
+		el_client_context,
+		log_level,
+		node_keystore_files,
+		cl_min_cpu,
+		cl_max_cpu,
+		cl_min_memory,
+		cl_max_memory,
+		extra_params
+	)
 
 	nimbus_service = plan.add_service(service_name, config)
 
