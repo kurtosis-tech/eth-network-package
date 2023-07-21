@@ -6,10 +6,9 @@ cl_node_ready_conditions = import_module("github.com/kurtosis-tech/eth-network-p
 
 package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
 
-CONSENSUS_DATA_DIRPATH_ON_SERVICE_CONTAINER		  = "/consensus-data"
 GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER   = "/genesis"
-VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER = "/validator-keys"
-
+#  ---------------------------------- Beacon client -------------------------------------
+CONSENSUS_DATA_DIRPATH_ON_SERVICE_CONTAINER		  = "/consensus-data"
 # Port IDs
 TCP_DISCOVERY_PORT_ID		= "tcp-discovery"
 UDP_DISCOVERY_PORT_ID		= "udp-discovery"
@@ -28,6 +27,9 @@ BEACON_MAX_CPU = 1000
 BEACON_MIN_MEMORY = 256
 BEACON_MAX_MEMORY = 1024
 
+#  ---------------------------------- Validator client -------------------------------------
+VALIDATING_REWARDS_ACCOUNT	= "0x878705ba3f8Bc32FCf7F4CAa1A35E72AF65CF766"
+VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER = "/validator-keys"
 # The min/max CPU/memory that the validator node can use
 VALIDATOR_MIN_CPU = 100
 VALIDATOR_MAX_CPU = 300
@@ -270,6 +272,7 @@ def get_validator_config(
 		"--beaconNodes=" + beacon_client_http_url,
 		"--keystoresDir=" + validator_keys_dirpath,
 		"--secretsDir=" + validator_secrets_dirpath,
+		"--suggestedFeeRecipient=" + VALIDATING_REWARDS_ACCOUNT,
 		# vvvvvvvvvvvvvvvvvvv PROMETHEUS CONFIG vvvvvvvvvvvvvvvvvvvvv
 		"--metrics",
 		"--metrics.address=0.0.0.0",

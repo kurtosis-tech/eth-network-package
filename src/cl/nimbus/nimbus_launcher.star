@@ -10,6 +10,8 @@ GENESIS_DATA_MOUNTPOINT_ON_CLIENT = "/genesis-data"
 
 VALIDATOR_KEYS_MOUNTPOINT_ON_CLIENT = "/validator-keys"
 
+VALIDATING_REWARDS_ACCOUNT	= "0x878705ba3f8Bc32FCf7F4CAa1A35E72AF65CF766"
+
 # Port IDs
 TCP_DISCOVERY_PORT_ID = "tcp-discovery"
 UDP_DISCOVERY_PORT_ID = "udp-discovery"
@@ -213,6 +215,7 @@ def get_config(
 		"--rest-port={0}".format(HTTP_PORT_NUM),
 		"--validators-dir=" + VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER,
 		"--secrets-dir=" + VALIDATOR_SECRETS_DIRPATH_ON_SERVICE_CONTAINER,
+		"--suggested-fee-recipient=" ,
 		# There's a bug where if we don't set this flag, the Nimbus nodes won't work:
 		# https://discord.com/channels/641364059387854899/674288681737256970/922890280120750170
 		# https://github.com/status-im/nimbus-eth2/issues/2451
