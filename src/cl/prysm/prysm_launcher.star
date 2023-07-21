@@ -85,10 +85,10 @@ def launch(
 	bootnode_context,
 	el_client_context,
 	node_keystore_files,
-	cl_min_cpu,
-	cl_max_cpu,
-	cl_min_memory,
-	cl_max_memory,
+	bn_min_cpu,
+	bn_max_cpu,
+	bn_min_mem,
+	bn_max_mem,
 	v_min_cpu,
 	v_max_cpu,
 	v_min_memory,
@@ -113,10 +113,10 @@ def launch(
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, PRYSM_LOG_LEVELS)
 
-	cl_min_cpu = cl_min_cpu if cl_min_cpu != "" else BEACON_MIN_CPU
-	cl_max_cpu = cl_max_cpu if cl_max_cpu != "" else BEACON_MAX_CPU
-	cl_min_memory = cl_min_memory if cl_min_memory != "" else BEACON_MIN_MEMORY
-	cl_max_memory = cl_max_memory if cl_max_memory != "" else BEACON_MAX_MEMORY
+	bn_min_cpu = bn_min_cpu if bn_min_cpu != "" else BEACON_MIN_CPU
+	bn_max_cpu = bn_max_cpu if bn_max_cpu != "" else BEACON_MAX_CPU
+	bn_min_mem = bn_min_mem if bn_min_mem != "" else BEACON_MIN_MEMORY
+	bn_max_mem = bn_max_mem if bn_max_mem != "" else BEACON_MAX_MEMORY
 
 	v_min_cpu = v_min_cpu if v_min_cpu != "" else VALIDATOR_MIN_CPU
 	v_max_cpu = v_max_cpu if v_max_cpu != "" else VALIDATOR_MAX_CPU
@@ -129,10 +129,10 @@ def launch(
 		bootnode_context,
 		el_client_context,
 		log_level,
-		cl_min_cpu,
-		cl_max_cpu,
-		cl_min_memory,
-		cl_max_memory,
+		bn_min_cpu,
+		bn_max_cpu,
+		bn_min_mem,
+		bn_max_mem,
 		extra_beacon_params,
 	)
 
@@ -201,10 +201,10 @@ def get_beacon_config(
 		bootnode_context,
 		el_client_context,
 		log_level,
-		cl_min_cpu,
-		cl_max_cpu,
-		cl_min_memory,
-		cl_max_memory,
+		bn_min_cpu,
+		bn_max_cpu,
+		bn_min_mem,
+		bn_max_mem,
 		extra_params,
 	):
 
@@ -258,10 +258,10 @@ def get_beacon_config(
 		},
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		ready_conditions = cl_node_ready_conditions.get_ready_conditions(HTTP_PORT_ID),
-		min_cpu = cl_min_cpu,
-		max_cpu = cl_max_cpu,
-		min_memory = cl_min_memory,
-		max_memory = cl_max_memory
+		min_cpu = bn_min_cpu,
+		max_cpu = bn_max_cpu,
+		min_memory = bn_min_mem,
+		max_memory = bn_max_mem
 	)
 
 
