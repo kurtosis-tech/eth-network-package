@@ -7,7 +7,7 @@ package_io = import_module("github.com/kurtosis-tech/eth-network-package/package
 
 # The dirpath of the execution data directory on the client container
 EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/execution-data"
-
+KZG_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/genesis/output/trusted_setup.txt"
 GENESIS_DATA_MOUNT_DIRPATH = "/genesis"
 
 RPC_PORT_NUM = 8545
@@ -123,12 +123,16 @@ def get_config(
 		"--log=" + log_level,
 		"--datadir=" + EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER,
 		"--Init.ChainSpecPath=" + genesis_json_filepath_on_client,
+		"--Init.WebSocketsEnabled=true",
+		"--Init.KzgSetupPath=" + KZG_DATA_DIRPATH_ON_CLIENT_CONTAINER,
 		"--config=none.cfg",
 		"--JsonRpc.Enabled=true",
 		"--JsonRpc.EnabledModules=net,eth,consensus,subscribe,web3,admin",
 		"--JsonRpc.Host=0.0.0.0",
 		"--JsonRpc.Port={0}".format(RPC_PORT_NUM),
 		"--JsonRpc.WebSocketsPort={0}".format(WS_PORT_NUM),
+		"--JsonRpc.EngineHost=0.0.0.0",
+		"--JsonRpc.EnginePort={0}".format(ENGINE_RPC_PORT_NUM),
 		"--Network.ExternalIp={0}".format(PRIVATE_IP_ADDRESS_PLACEHOLDER),
 		"--Network.LocalIp={0}".format(PRIVATE_IP_ADDRESS_PLACEHOLDER),
 		"--Network.DiscoveryPort={0}".format(DISCOVERY_PORT_NUM),
