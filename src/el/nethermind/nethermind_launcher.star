@@ -134,7 +134,6 @@ def get_config(
 		"--JsonRpc.EngineHost=0.0.0.0",
 		"--JsonRpc.EnginePort={0}".format(ENGINE_RPC_PORT_NUM),
 		"--Network.ExternalIp={0}".format(PRIVATE_IP_ADDRESS_PLACEHOLDER),
-		"--Network.LocalIp={0}".format(PRIVATE_IP_ADDRESS_PLACEHOLDER),
 		"--Network.DiscoveryPort={0}".format(DISCOVERY_PORT_NUM),
 		"--Network.P2PPort={0}".format(DISCOVERY_PORT_NUM),
 		"--JsonRpc.JwtSecretFile={0}".format(jwt_secret_json_filepath_on_client),
