@@ -35,7 +35,7 @@ BEACON_MIN_MEMORY = 256
 BEACON_MAX_MEMORY = 1024
 
 #  ---------------------------------- Validator client -------------------------------------
-VALIDATING_REWARDS_ACCOUNT	= "0x0000000000000000000000000000000000000000"
+VALIDATING_REWARDS_ACCOUNT	= "0x878705ba3f8Bc32FCf7F4CAa1A35E72AF65CF766"
 
 VALIDATOR_HTTP_PORT_ID		= "http"
 VALIDATOR_METRICS_PORT_ID	= "metrics"
@@ -314,7 +314,7 @@ def get_validator_config(
 		"--beacon-nodes=" + beacon_client_http_url,
 		#"--enable-doppelganger-protection", // Disabled to not have to wait 2 epochs before validator can start
 		# burn address - If unset, the validator will scream in its logs
-		"--suggested-fee-recipient=0x0000000000000000000000000000000000000000",
+		"--suggested-fee-recipient="+VALIDATING_REWARDS_ACCOUNT,
 		# vvvvvvvvvvvvvvvvvvv PROMETHEUS CONFIG vvvvvvvvvvvvvvvvvvvvv
 		"--metrics",
 		"--metrics-address=0.0.0.0",
