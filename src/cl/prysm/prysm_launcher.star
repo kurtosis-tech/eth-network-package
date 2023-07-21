@@ -227,11 +227,12 @@ def get_beacon_config(
 		"--chain-config-file=" + genesis_config_filepath,
 		"--genesis-state=" + genesis_ssz_filepath,
 		"--execution-endpoint=" + el_client_engine_rpc_url_str,
-		"--rpc-host=" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
+		"--rpc-host=0.0.0.0"
 		"--rpc-port={0}".format(RPC_PORT_NUM),
 		"--grpc-gateway-host=0.0.0.0",
 		"--grpc-gateway-corsdomain=*",
 		"--grpc-gateway-port={0}".format(HTTP_PORT_NUM),
+		"--p2p-host-ip=" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		"--p2p-tcp-port={0}".format(DISCOVERY_TCP_PORT_NUM),
 		"--p2p-udp-port={0}".format(DISCOVERY_UDP_PORT_NUM),
 		"--min-sync-peers={0}".format(MIN_PEERS),
