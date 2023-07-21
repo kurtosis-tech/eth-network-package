@@ -123,8 +123,6 @@ def get_config(
 		"--log=" + log_level,
 		"--datadir=" + EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER,
 		"--Init.ChainSpecPath=" + genesis_json_filepath_on_client,
-		"--Init.WebSocketsEnabled=true",
-		"--Init.DiagnosticMode=None",
 		"--config=none.cfg",
 		"--JsonRpc.Enabled=true",
 		"--JsonRpc.EnabledModules=net,eth,consensus,subscribe,web3,admin",
@@ -136,7 +134,6 @@ def get_config(
 		"--Network.DiscoveryPort={0}".format(DISCOVERY_PORT_NUM),
 		"--Network.P2PPort={0}".format(DISCOVERY_PORT_NUM),
 		"--JsonRpc.JwtSecretFile={0}".format(jwt_secret_json_filepath_on_client),
-		"--JsonRpc.AdditionalRpcUrls=[\"http://0.0.0.0:{0}|http;ws|net;eth;subscribe;engine;web3;client\"]".format(ENGINE_RPC_PORT_NUM),
 		"--Network.OnlyStaticPeers=true",
 		"--Network.StaticPeers={0},{1}".format(
 			bootnode_1.enode,
