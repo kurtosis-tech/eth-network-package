@@ -8,11 +8,9 @@ package_io = import_module("github.com/kurtosis-tech/eth-network-package/package
 
 IMAGE_SEPARATOR_DELIMITER	= ","
 EXPECTED_NUM_IMAGES			= 2
-
+#  ---------------------------------- Beacon client -------------------------------------
 CONSENSUS_DATA_DIRPATH_ON_SERVICE_CONTAINER			= "/consensus-data"
 GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER		= "/genesis"
-VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER	= "/validator-keys"
-PRYSM_PASSWORD_MOUNT_DIRPATH_ON_SERVICE_CONTAINER	= "/prysm-password"
 
 # Port IDs
 TCP_DISCOVERY_PORT_ID		= "tcp-discovery"
@@ -20,7 +18,6 @@ UDP_DISCOVERY_PORT_ID		= "udp-discovery"
 RPC_PORT_ID					= "rpc"
 HTTP_PORT_ID				= "http"
 BEACON_MONITORING_PORT_ID	= "monitoring"
-VALIDATOR_MONITORING_PORT_ID= "monitoring"
 
 # Port nums
 DISCOVERY_TCP_PORT_NUM		= 13000
@@ -28,13 +25,31 @@ DISCOVERY_UDP_PORT_NUM		= 12000
 RPC_PORT_NUM				= 4000
 HTTP_PORT_NUM				= 3500
 BEACON_MONITORING_PORT_NUM	= 8080
+
+# The min/max CPU/memory that the beacon node can use
+BEACON_MIN_CPU = 200
+BEACON_MAX_CPU = 2000
+BEACON_MIN_MEMORY = 512
+BEACON_MAX_MEMORY = 2048
+
+#  ---------------------------------- Validator client -------------------------------------
+VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER	= "/validator-keys"
+PRYSM_PASSWORD_MOUNT_DIRPATH_ON_SERVICE_CONTAINER	= "/prysm-password"
+
+# Port IDs
 VALIDATOR_MONITORING_PORT_NUM  = 8081
-
-VALIDATOR_SUFFIX_SERVICE_NAME = "validator"
-
-MIN_PEERS = 1
+VALIDATOR_MONITORING_PORT_ID= "monitoring"
 
 METRICS_PATH = "/metrics"
+VALIDATOR_SUFFIX_SERVICE_NAME = "validator"
+
+# The min/max CPU/memory that the validator node can use
+VALIDATOR_MIN_CPU = 100
+VALIDATOR_MAX_CPU = 300
+VALIDATOR_MIN_MEMORY = 512
+VALIDATOR_MAX_MEMORY = 1024
+
+MIN_PEERS = 1
 
 PRIVATE_IP_ADDRESS_PLACEHOLDER = "KURTOSIS_IP_ADDR_PLACEHOLDER"
 
@@ -211,7 +226,11 @@ def get_beacon_config(
 			GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: genesis_data.files_artifact_uuid,
 		},
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
-		ready_conditions = cl_node_ready_conditions.get_ready_conditions(HTTP_PORT_ID)
+		ready_conditions = cl_node_ready_conditions.get_ready_conditions(HTTP_PORT_ID),
+		min_cpu = BEACON_MIN_CPU,
+		max_cpu = BEACON_MAX_CPU,
+		min_memory = BEACON_MIN_MEMORY,
+		max_memory = BEACON_MAX_MEMORY
 	)
 
 
@@ -265,7 +284,11 @@ def get_validator_config(
 			VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: node_keystore_files.files_artifact_uuid,
 			PRYSM_PASSWORD_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: prysm_password_artifact_uuid,
 		},
-		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER
+		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
+		min_cpu = VALIDATOR_MIN_CPU,
+		max_cpu = VALIDATOR_MAX_CPU,
+		min_memory = VALIDATOR_MIN_MEMORY,
+		max_memory = VALIDATOR_MAX_MEMORY
 	)
 
 

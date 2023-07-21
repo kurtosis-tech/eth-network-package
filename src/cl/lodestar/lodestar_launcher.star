@@ -22,6 +22,12 @@ DISCOVERY_PORT_NUM			= 9000
 HTTP_PORT_NUM				= 4000
 METRICS_PORT_NUM			= 8008
 
+# The min/max CPU/memory that the beacon node can use
+BEACON_MIN_CPU = 200
+BEACON_MAX_CPU = 2000
+BEACON_MIN_MEMORY = 512
+BEACON_MAX_MEMORY = 2048
+
 VALIDATOR_SUFFIX_SERVICE_NAME = "validator"
 
 METRICS_PATH = "/metrics"
@@ -239,7 +245,11 @@ def get_validator_config(
 			GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: genesis_data.files_artifact_uuid,
 			VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: node_keystore_files.files_artifact_uuid,
 		},
-		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER
+		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
+		min_cpu = BEACON_MIN_CPU,
+		max_cpu = BEACON_MAX_CPU,
+		min_memory = BEACON_MIN_MEMORY,
+		max_memory = BEACON_MAX_MEMORY
 	)
 
 

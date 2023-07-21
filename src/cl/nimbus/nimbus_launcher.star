@@ -21,6 +21,13 @@ DISCOVERY_PORT_NUM = 9000
 HTTP_PORT_NUM = 4000
 METRICS_PORT_NUM = 8008
 
+# The min/max CPU/memory that the beacon node can use
+BEACON_MIN_CPU = 200
+BEACON_MAX_CPU = 2000
+BEACON_MIN_MEMORY = 512
+BEACON_MAX_MEMORY = 2048
+
+
 # Nimbus requires that its data directory already exists (because it expects you to bind-mount it), so we
 #  have to to create it
 CONSENSUS_DATA_DIRPATH_IN_SERVICE_CONTAINER = "$HOME/consensus-data"
@@ -204,7 +211,11 @@ def get_config(
 			VALIDATOR_KEYS_MOUNTPOINT_ON_CLIENT: node_keystore_files.files_artifact_uuid
 		},
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
-		ready_conditions = cl_node_ready_conditions.get_ready_conditions(HTTP_PORT_ID)
+		ready_conditions = cl_node_ready_conditions.get_ready_conditions(HTTP_PORT_ID),
+		min_cpu = BEACON_MIN_CPU,
+		max_cpu = BEACON_MAX_CPU,
+		min_memory = BEACON_MIN_MEMORY,
+		max_memory = BEACON_MAX_MEMORY
 	)
 
 

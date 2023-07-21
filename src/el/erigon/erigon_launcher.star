@@ -15,6 +15,12 @@ WS_PORT_NUM = 8546
 DISCOVERY_PORT_NUM = 30303
 ENGINE_RPC_PORT_NUM = 8550
 
+# The min/max CPU/memory that the execution node can use
+EXECUTION_MIN_CPU = 200
+EXECUTION_MAX_CPU = 2000
+EXECUTION_MIN_MEMORY = 512
+EXECUTION_MAX_MEMORY = 2048
+
 # Port IDs
 RPC_PORT_ID = "rpc"
 WS_PORT_ID = "ws"
@@ -131,7 +137,11 @@ def get_config(network_id, genesis_data, image, existing_el_clients, verbosity_l
 			GENESIS_DATA_MOUNT_DIRPATH: genesis_data.files_artifact_uuid
 		},
 		entrypoint = ENTRYPOINT_ARGS,
-		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER
+		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
+		min_cpu = EXECUTION_MIN_CPU,
+		max_cpu = EXECUTION_MAX_CPU,
+		min_memory = EXECUTION_MIN_MEMORY,
+		max_memory = EXECUTION_MAX_MEMORY
 	), jwt_secret_json_filepath_on_client
 
 

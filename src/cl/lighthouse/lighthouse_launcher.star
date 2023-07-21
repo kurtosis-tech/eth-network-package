@@ -28,6 +28,12 @@ BEACON_DISCOVERY_PORT_NUM	= 9000
 BEACON_HTTP_PORT_NUM		= 4000
 BEACON_METRICS_PORT_NUM		= 5054
 
+# The min/max CPU/memory that the beacon node can use
+BEACON_MIN_CPU = 200
+BEACON_MAX_CPU = 2000
+BEACON_MIN_MEMORY = 512
+BEACON_MAX_MEMORY = 2048
+
 #  ---------------------------------- Validator client -------------------------------------
 VALIDATING_REWARDS_ACCOUNT	= "0x0000000000000000000000000000000000000000"
 
@@ -39,6 +45,12 @@ VALIDATOR_HTTP_PORT_WAIT_DISABLED = None
 
 METRICS_PATH = "/metrics"
 VALIDATOR_SUFFIX_SERVICE_NAME = "validator"
+
+# The min/max CPU/memory that the validator node can use
+VALIDATOR_MIN_CPU = 100
+VALIDATOR_MAX_CPU = 300
+VALIDATOR_MIN_MEMORY = 512
+VALIDATOR_MAX_MEMORY = 1024
 
 PRIVATE_IP_ADDRESS_PLACEHOLDER = "KURTOSIS_IP_ADDR_PLACEHOLDER"
 
@@ -231,10 +243,10 @@ def get_beacon_config(
 		},
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		ready_conditions = ready_conditions,
-		min_cpu = 200,
-		max_cpu = 2000,
-		min_memory = 600,
-		max_memory = 1000,
+		min_cpu = BEACON_MIN_CPU,
+		max_cpu = BEACON_MAX_CPU,
+		min_memory = BEACON_MIN_MEMORY,
+		max_memory = BEACON_MAX_MEMORY
 	)
 
 
@@ -292,6 +304,10 @@ def get_validator_config(
 		env_vars = {
 			RUST_BACKTRACE_ENVVAR_NAME: RUST_FULL_BACKTRACE_KEYWORD
 		},
+		min_cpu = VALIDATOR_MIN_CPU,
+		max_cpu = VALIDATOR_MAX_CPU,
+		min_memory = VALIDATOR_MIN_MEMORY,
+		max_memory = VALIDATOR_MAX_MEMORY
 	)
 
 

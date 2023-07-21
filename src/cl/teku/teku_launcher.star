@@ -31,6 +31,12 @@ DISCOVERY_PORT_NUM	= 9000
 HTTP_PORT_NUM		= 4000
 METRICS_PORT_NUM	= 8008
 
+# The min/max CPU/memory that the beacon node can use
+BEACON_MIN_CPU = 200
+BEACON_MAX_CPU = 2000
+BEACON_MIN_MEMORY = 512
+BEACON_MAX_MEMORY = 2048
+
 # 1) The Teku container runs as the "teku" user
 # 2) Teku requires write access to the validator secrets directory, so it can write a lockfile into it as it uses the keys
 # 3) The module container runs as 'root'
@@ -204,7 +210,11 @@ def get_config(
 			VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER: node_keystore_files.files_artifact_uuid,
 		},
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
-		ready_conditions = cl_node_ready_conditions.get_ready_conditions(HTTP_PORT_ID)
+		ready_conditions = cl_node_ready_conditions.get_ready_conditions(HTTP_PORT_ID),
+		min_cpu = BEACON_MIN_CPU,
+		max_cpu = BEACON_MAX_CPU,
+		min_memory = BEACON_MIN_MEMORY,
+		max_memory = BEACON_MAX_MEMORY
 	)
 
 
