@@ -34,6 +34,9 @@ CL_NODE_STARTUP_TIME = 5 * time.second
 
 CL_CLIENT_CONTEXT_BOOTNODE = None
 
+def zfill_custom(value, width):
+    return ("0" * (width - len(str(value)))) + str(value)
+
 def launch_participant_network(plan, participants, network_params, global_log_level):
 	num_participants = len(participants)
 
@@ -90,9 +93,11 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		el_launcher, launch_method = el_launchers[el_client_type]["launcher"], el_launchers[el_client_type]["launch_method"]
 
 		if len(participants) > 9:
-			el_service_name = "el-{0}-{1}-{2}".format(str(index+1).zfill(2), el_client_type, cl_client_type)
+			index_str = zfill_custom(index+1, 2)
 		else:
-			el_service_name = "el-{0}-{1}-{2}".format(index+1, el_client_type, cl_client_type)
+			index_str = str(index+1)
+
+		el_service_name = "el-{0}-{1}-{2}".format(index_str, el_client_type, cl_client_type)
 
 		el_client_context = launch_method(
 			plan,
@@ -159,9 +164,11 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 
 		cl_launcher, launch_method = cl_launchers[cl_client_type]["launcher"], cl_launchers[cl_client_type]["launch_method"]
 		if len(participants) > 9:
-			cl_service_name = "cl-{0}-{1}-{2}".format(str(index+1).zfill(2), cl_client_type, el_client_type)
+			index_str = zfill_custom(index+1, 2)
 		else:
-			cl_service_name = "cl-{0}-{1}-{2}".format(index+1, cl_client_type, el_client_type)
+			index_str = str(index+1)
+
+		cl_service_name = "cl-{0}-{1}-{2}".format(index_str, cl_client_type, el_client_type)
 
 		new_cl_node_validator_keystores = preregistered_validator_keys_for_nodes[index]
 
