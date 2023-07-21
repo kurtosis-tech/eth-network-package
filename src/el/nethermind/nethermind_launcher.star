@@ -125,6 +125,7 @@ def get_config(
 		"--Init.ChainSpecPath=" + genesis_json_filepath_on_client,
 		"--Init.WebSocketsEnabled=true",
 		"--Init.DiagnosticMode=None",
+		"- --config=none.cfg",
 		"--JsonRpc.Enabled=true",
 		"--JsonRpc.EnabledModules=net,eth,consensus,subscribe,web3,admin",
 		"--JsonRpc.Host=0.0.0.0",
