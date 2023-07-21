@@ -70,16 +70,6 @@ def parse_input(input_args):
 		validator_extra_params = participant.get("validator_extra_params", [])
 		participant["validator_extra_params"] = validator_extra_params
 
-
-		# Loop through the different resources and set them to the default if they are empty
-		for key in ['el_min_cpu', 'el_max_cpu', 'el_min_mem', 'el_max_mem', 'bn_min_cpu', 'bn_max_cpu', 'bn_min_mem', 'bn_max_mem', 'v_min_cpu', 'v_max_cpu', 'v_min_mem', 'v_max_mem']:
-			value = participant[key]
-			if value == "":
-				default_value = DEFAULT_RESOURCE_USAGE[key]
-				if default_value == "":
-					fail("{0} is empty and we don't have a default for it").format(key)
-				participant[key] = default_value
-
 	if result["network_params"]["network_id"].strip() == "":
 		fail("network_id is empty or spaces it needs to be of non zero length")
 
