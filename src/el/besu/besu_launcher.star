@@ -6,6 +6,7 @@ package_io = import_module("github.com/kurtosis-tech/eth-network-package/package
 
 # The dirpath of the execution data directory on the client container
 EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/opt/besu/execution-data"
+KZG_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/genesis/output/trusted_setup.txt"
 
 GENESIS_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/opt/besu/genesis"
 
@@ -145,6 +146,7 @@ def get_config(
 		"--engine-rpc-port={0}".format(ENGINE_HTTP_RPC_PORT_NUM),
 		"--sync-mode=FULL",
 		"--data-storage-format=BONSAI",
+		"--kzg-trusted-setup=" + KZG_DATA_DIRPATH_ON_CLIENT_CONTAINER
 	]
 
 	if len(existing_el_clients) > 0:
