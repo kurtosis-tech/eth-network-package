@@ -11,7 +11,7 @@ EXPECTED_NUM_IMAGES			= 2
 #  ---------------------------------- Beacon client -------------------------------------
 CONSENSUS_DATA_DIRPATH_ON_SERVICE_CONTAINER			= "/consensus-data"
 GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER		= "/genesis"
-DEPOSIT_CONTRACT_BLOCK_DIRPATH_ON_SERVICE_CONTAINER = GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER + "/output/deposit_contract_block_hash.txt"
+
 
 # Port IDs
 TCP_DISCOVERY_PORT_ID		= "tcp-discovery"
@@ -231,7 +231,6 @@ def get_beacon_config(
 		"--rpc-port={0}".format(RPC_PORT_NUM),
 		"--grpc-gateway-host=0.0.0.0",
 		"--grpc-gateway-corsdomain=*",
-		"--contract-deployment-block=" + DEPOSIT_CONTRACT_BLOCK_DIRPATH_ON_SERVICE_CONTAINER,
 		"--grpc-gateway-port={0}".format(HTTP_PORT_NUM),
 		"--p2p-tcp-port={0}".format(DISCOVERY_TCP_PORT_NUM),
 		"--p2p-udp-port={0}".format(DISCOVERY_UDP_PORT_NUM),
