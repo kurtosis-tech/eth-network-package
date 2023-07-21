@@ -6,7 +6,7 @@ package_io = import_module("github.com/kurtosis-tech/eth-network-package/package
 
 # The dirpath of the execution data directory on the client container
 EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/opt/besu/execution-data"
-KZG_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/genesis/output/trusted_setup.txt"
+KZG_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/opt/besu/genesis/output/trusted_setup.txt"
 
 GENESIS_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/opt/besu/genesis"
 
