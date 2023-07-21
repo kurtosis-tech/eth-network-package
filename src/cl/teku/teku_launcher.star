@@ -32,9 +32,9 @@ HTTP_PORT_NUM		= 4000
 METRICS_PORT_NUM	= 8008
 
 # The min/max CPU/memory that the beacon node can use
-BEACON_MIN_CPU = 100
+BEACON_MIN_CPU = 50
 BEACON_MAX_CPU = 1000
-BEACON_MIN_MEMORY = 256
+BEACON_MIN_MEMORY = 512
 BEACON_MAX_MEMORY = 1024
 
 # 1) The Teku container runs as the "teku" user
