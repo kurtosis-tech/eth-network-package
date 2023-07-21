@@ -11,6 +11,7 @@ EXPECTED_NUM_IMAGES			= 2
 #  ---------------------------------- Beacon client -------------------------------------
 CONSENSUS_DATA_DIRPATH_ON_SERVICE_CONTAINER			= "/consensus-data"
 GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER		= "/genesis"
+DEPOSIT_CONTRACT_BLOCK_DIRPATH_ON_SERVICE_CONTAINER = GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER + "/output/deposit_contract_block"
 
 # Port IDs
 TCP_DISCOVERY_PORT_ID		= "tcp-discovery"
@@ -33,6 +34,8 @@ BEACON_MIN_MEMORY = 256
 BEACON_MAX_MEMORY = 1024
 
 #  ---------------------------------- Validator client -------------------------------------
+VALIDATING_REWARDS_ACCOUNT = "0x878705ba3f8Bc32FCf7F4CAa1A35E72AF65CF766"
+
 VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER	= "/validator-keys"
 PRYSM_PASSWORD_MOUNT_DIRPATH_ON_SERVICE_CONTAINER	= "/prysm-password"
 
@@ -227,6 +230,8 @@ def get_beacon_config(
 		"--rpc-host=" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		"--rpc-port={0}".format(RPC_PORT_NUM),
 		"--grpc-gateway-host=0.0.0.0",
+		"--grpc-gateway-corsdomain=*",
+		"--contract-deployment-block=" + DEPOSIT_CONTRACT_BLOCK_DIRPATH_ON_SERVICE_CONTAINER,
 		"--grpc-gateway-port={0}".format(HTTP_PORT_NUM),
 		"--p2p-tcp-port={0}".format(DISCOVERY_TCP_PORT_NUM),
 		"--p2p-udp-port={0}".format(DISCOVERY_UDP_PORT_NUM),
@@ -297,6 +302,7 @@ def get_validator_config(
 		"--datadir=" + consensus_data_dirpath,
 		"--monitoring-port={0}".format(VALIDATOR_MONITORING_PORT_NUM),
 		"--verbosity=" + log_level,
+		"--suggested-fee-recipient=" + VALIDATING_REWARDS_ACCOUNT,
 		# TODO(old) SOMETHING ABOUT JWT
 		# vvvvvvvvvvvvvvvvvvv METRICS CONFIG vvvvvvvvvvvvvvvvvvvvv
 		"--disable-monitoring=false",
