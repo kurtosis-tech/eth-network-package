@@ -98,6 +98,7 @@ def launch(
 	bn_min_cpu_int = int(bn_min_cpu) if bn_min_cpu != "" else 0
 	bn_max_cpu_int = int(bn_max_cpu) if bn_max_cpu != "" else 0
 	bn_min_mem_int = int(bn_min_mem) if bn_min_mem != "" else 0
+	bn_max_mem_int = int(bn_max_mem) if bn_max_mem != "" else 0
 
 	# Set the min/max CPU/memory for the beacon node to be the max of the beacon node and validator node values
 	bn_min_cpu = v_min_cpu_int if (v_min_cpu_int != 0) and (v_min_cpu_int > bn_min_cpu_int) else bn_min_cpu_int if bn_min_cpu_int != 0 else BEACON_MIN_CPU
