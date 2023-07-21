@@ -86,6 +86,27 @@ these and other parameters are configurable through a json file Read more about 
       //  ]
       "builder_network_params": null,
 
+      // Execution node minimum and maximum CPU (millicpu) and memory (MB) limits
+      // Defaults are configured per client
+      "el_min_cpu": "",
+      "el_max_cpu": "",
+      "el_min_mem": "",
+      "el_max_mem": "",
+
+      // Beacon node minimum and maximum CPU (millicpu) and memory (MB) limits
+      // Defaults are configured per client
+      "bn_min_cpu": "",
+      "bn_max_cpu": "",
+      "bn_min_mem": "",
+      "bn_max_mem": "",
+
+      // Validator node minimum and maximum CPU (millicpu) and memory (MB) limits
+      // Defaults are configured per client
+      "v_min_cpu": "",
+      "v_max_cpu": "",
+      "v_min_mem": "",
+      "v_max_mem": "",
+
       // The number of times this participant should be repeated
       // defaults to 1(i.e no repetition). This is optional.
       "count": 1
