@@ -13,24 +13,6 @@ DEFAULT_CL_IMAGES = {
 	"lodestar":		"chainsafe/lodestar:latest",
 }
 
-DEFAULT_RESOURCE_USAGE = {
-	# Execution layer defaults
-	"el_min_cpu":	100,
-	"el_max_cpu":	1000,
-	"el_min_mem":	512,
-	"el_max_mem":	2048,
-	# Beacon node defaults
-	"bn_min_cpu":	100,
-	"bn_max_cpu":	1000,
-	"bn_min_mem":	256,
-	"bn_max_mem":	1024,
-	# Validator defaults
-	"v_min_cpu":	100,
-	"v_max_cpu":	300,
-	"v_min_mem":	128,
-	"v_max_mem":	256,
-}
-
 BESU_NODE_NAME = "besu"
 NETHERMIND_NODE_NAME = "nethermind"
 NIMBUS_NODE_NAME = "nimbus"
