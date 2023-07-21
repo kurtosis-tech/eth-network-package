@@ -117,6 +117,10 @@ def launch(
 		bootnode_context,
 		el_client_context,
 		log_level,
+		cl_min_cpu,
+		cl_max_cpu,
+		cl_min_memory,
+		cl_max_memory,
 		extra_beacon_params,
 	)
 
@@ -133,6 +137,10 @@ def launch(
 		log_level,
 		beacon_http_url,
 		node_keystore_files,
+		v_min_cpu,
+		v_max_cpu,
+		v_min_memory,
+		v_max_memory,
 		extra_validator_params,
 	)
 
@@ -175,6 +183,10 @@ def get_beacon_config(
 	boot_cl_client_ctx,
 	el_client_ctx,
 	log_level,
+	cl_min_cpu,
+	cl_max_cpu,
+	cl_min_memory,
+	cl_max_memory,
 	extra_params):
 
 	el_client_engine_rpc_url_str = "http://{0}:{1}".format(
@@ -274,6 +286,10 @@ def get_validator_config(
 	log_level,
 	beacon_client_http_url,
 	node_keystore_files,
+	v_min_cpu,
+	v_max_cpu,
+	v_min_memory,
+	v_max_memory,
 	extra_params):
 
 	# For some reason, Lighthouse takes in the parent directory of the config file (rather than the path to the config file itself)
