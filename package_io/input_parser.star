@@ -95,7 +95,7 @@ def parse_input(input_args):
 			if value == "":
 				default_value = DEFAULT_RESOURCE_USAGE[key]
 				if default_value == "":
-					fail(f"{key} is empty and we don't have a default for it")
+					fail("{0} is empty and we don't have a default for it").format(key)
 				participant[key] = default_value
 
 	if result["network_params"]["network_id"].strip() == "":
