@@ -90,7 +90,7 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		el_launcher, launch_method = el_launchers[el_client_type]["launcher"], el_launchers[el_client_type]["launch_method"]
 
 		if len(participants) > 9:
-			el_service_name = "el-%02d-%s-%s".format(index+1, el_client_type, cl_client_type)
+			el_service_name = "el-{0}-{1}-{2}".format((index+1).zfill(2), el_client_type, cl_client_type)
 		else:
 			el_service_name = "el-{0}-{1}-{2}".format(index+1, el_client_type, cl_client_type)
 
@@ -159,7 +159,7 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 
 		cl_launcher, launch_method = cl_launchers[cl_client_type]["launcher"], cl_launchers[cl_client_type]["launch_method"]
 		if len(participants) > 9:
-			cl_service_name = "cl-%02d-%s-%s".format(index+1, cl_client_type, el_client_type)
+			cl_service_name = "cl-{0}-{1}-{2}".format((index+1).zfill(2), cl_client_type, el_client_type)
 		else:
 			cl_service_name = "cl-{0}-{1}-{2}".format(index+1, cl_client_type, el_client_type)
 
