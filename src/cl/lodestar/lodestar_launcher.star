@@ -32,7 +32,7 @@ BEACON_MAX_MEMORY = 1024
 VALIDATOR_MIN_CPU = 100
 VALIDATOR_MAX_CPU = 300
 VALIDATOR_MIN_MEMORY = 128
-VALIDATOR_MAX_MEMORY = 256
+VALIDATOR_MAX_MEMORY = 512
 
 VALIDATOR_SUFFIX_SERVICE_NAME = "validator"
 
@@ -86,6 +86,17 @@ def launch(
 	validator_node_service_name = "{0}-{1}".format(service_name, VALIDATOR_SUFFIX_SERVICE_NAME)
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, LODESTAR_LOG_LEVELS)
+
+	cl_min_cpu = cl_min_cpu if cl_min_cpu != None else BEACON_MIN_CPU
+	cl_max_cpu = cl_max_cpu if cl_max_cpu != None else BEACON_MAX_CPU
+	cl_min_memory = cl_min_memory if cl_min_memory != None else BEACON_MIN_MEMORY
+	cl_max_memory = cl_max_memory if cl_max_memory != None else BEACON_MAX_MEMORY
+
+	v_min_cpu = v_min_cpu if v_min_cpu != None else VALIDATOR_MIN_CPU
+	v_max_cpu = v_max_cpu if v_max_cpu != None else VALIDATOR_MAX_CPU
+	v_min_memory = v_min_memory if v_min_memory != None else VALIDATOR_MIN_MEMORY
+	v_max_memory = v_max_memory if v_max_memory != None else VALIDATOR_MAX_MEMORY
+
 
 	# Launch Beacon node
 	beacon_config = get_beacon_config(
@@ -212,7 +223,11 @@ def get_beacon_config(
 			GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: genesis_data.files_artifact_uuid
 		},
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
-		ready_conditions = cl_node_ready_conditions.get_ready_conditions(HTTP_PORT_ID)
+		ready_conditions = cl_node_ready_conditions.get_ready_conditions(HTTP_PORT_ID),
+		min_cpu = cl_min_cpu,
+		max_cpu = cl_max_cpu,
+		min_memory = cl_min_memory,
+		max_memory = cl_max_memory
 	)
 
 
@@ -260,10 +275,10 @@ def get_validator_config(
 			VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: node_keystore_files.files_artifact_uuid,
 		},
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
-		min_cpu = VALIDATOR_MIN_CPU,
-		max_cpu = VALIDATOR_MAX_CPU,
-		min_memory = VALIDATOR_MIN_MEMORY,
-		max_memory = VALIDATOR_MAX_MEMORY
+		min_cpu = v_min_cpu,
+		max_cpu = v_max_cpu,
+		min_memory = v_min_memory,
+		max_memory = v_max_memory
 	)
 
 
