@@ -230,7 +230,11 @@ def get_beacon_config(
 			RUST_BACKTRACE_ENVVAR_NAME: RUST_FULL_BACKTRACE_KEYWORD
 		},
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
-		ready_conditions = ready_conditions
+		ready_conditions = ready_conditions,
+		min_cpu = 200,
+		max_cpu = 2000,
+		min_memory = 600,
+		max_memory = 1000,
 	)
 
 

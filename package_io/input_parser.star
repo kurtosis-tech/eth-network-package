@@ -13,6 +13,13 @@ DEFAULT_CL_IMAGES = {
 	"lodestar":		"chainsafe/lodestar:latest",
 }
 
+DEFAULT_RESOURCE_USAGE = {
+	"min_cpu":	100,
+	"max_cpu":	1000,
+	"min_mem":	512,
+	"max_mem":	2048
+}
+
 BESU_NODE_NAME = "besu"
 NETHERMIND_NODE_NAME = "nethermind"
 NIMBUS_NODE_NAME = "nimbus"
@@ -70,6 +77,34 @@ def parse_input(input_args):
 		validator_extra_params = participant.get("validator_extra_params", [])
 		participant["validator_extra_params"] = validator_extra_params
 
+		min_cpu = participant["min_cpu"]
+		if min_cpu == "":
+			default_min_cpu = DEFAULT_RESOURCE_USAGE["min_cpu"]
+			if default_min_cpu == "":
+				fail("{0} is empty and we don't have a default for it").format(min_cpu)
+			participant["min_cpu"] = default_min_cpu
+
+		max_cpu = participant["max_cpu"]
+		if max_cpu == "":
+			default_max_cpu = DEFAULT_RESOURCE_USAGE["max_cpu"]
+			if default_max_cpu == "":
+				fail("{0} is empty and we don't have a default for it").format(max_cpu)
+			participant["max_cpu"] = default_max_cpu
+
+		min_mem = participant["min_mem"]
+		if min_mem == "":
+			default_min_mem = DEFAULT_RESOURCE_USAGE["min_mem"]
+			if default_min_mem == "":
+				fail("{0} is empty and we don't have a default for it").format(min_mem)
+			participant["min_mem"] = default_min_mem
+
+		max_mem = participant["max_mem"]
+		if max_mem == "":
+			default_max_mem = DEFAULT_RESOURCE_USAGE["max_mem"]
+			if default_max_mem == "":
+				fail("{0} is empty and we don't have a default for it").format(max_mem)
+			participant["max_mem"] = default_max_mem
+
 	if result["network_params"]["network_id"].strip() == "":
 		fail("network_id is empty or spaces it needs to be of non zero length")
 
@@ -114,7 +149,12 @@ def parse_input(input_args):
 			beacon_extra_params=participant["beacon_extra_params"],
 			el_extra_params=participant["el_extra_params"],
 			validator_extra_params=participant["validator_extra_params"],
-			builder_network_params=participant["builder_network_params"]
+			builder_network_params=participant["builder_network_params"],
+			min_cpu=participant["min_cpu"],
+			max_cpu=participant["max_cpu"],
+			min_mem=participant["min_mem"],
+			max_mem=participant["max_mem"],
+			count=participant["count"]
 		) for participant in result["participants"]],
 		network_params=struct(
 			preregistered_validator_keys_mnemonic=result["network_params"]["preregistered_validator_keys_mnemonic"],
@@ -181,5 +221,9 @@ def default_participant():
 			"el_extra_params":			[],
 			"validator_extra_params": 	[],
 			"builder_network_params": 	None,
+			"min_cpu":					"",
+			"max_cpu":					"",
+			"min_mem":					"",
+			"max_mem":					"",
 			"count": 					1
 	}
