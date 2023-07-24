@@ -10,8 +10,7 @@ EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/home/erigon/execution-data"
 
 GENESIS_DATA_MOUNT_DIRPATH = "/genesis"
 
-RPC_PORT_NUM = 8545
-WS_PORT_NUM = 8545
+WS_RPC_PORT_NUM = 8545
 DISCOVERY_PORT_NUM = 30303
 ENGINE_RPC_PORT_NUM = 8551
 
@@ -22,8 +21,7 @@ EXECUTION_MIN_MEMORY = 512
 EXECUTION_MAX_MEMORY = 2048
 
 # Port IDs
-RPC_PORT_ID = "rpc"
-WS_PORT_ID = "ws"
+WS_RPC_PORT_ID = "ws-rpc"
 TCP_DISCOVERY_PORT_ID = "tcp-discovery"
 UDP_DISCOVERY_PORT_ID = "udp-discovery"
 ENGINE_RPC_PORT_ID = "engine-rpc"
@@ -32,8 +30,7 @@ ENGINE_RPC_PORT_ID = "engine-rpc"
 PRIVATE_IP_ADDRESS_PLACEHOLDER = "KURTOSIS_IP_ADDR_PLACEHOLDER"
 
 USED_PORTS = {
-	RPC_PORT_ID: shared_utils.new_port_spec(RPC_PORT_NUM, shared_utils.TCP_PROTOCOL),
-	WS_PORT_ID: shared_utils.new_port_spec(WS_PORT_NUM, shared_utils.TCP_PROTOCOL),
+	WS_RPC_PORT_ID: shared_utils.new_port_spec(WS_RPC_PORT_NUM, shared_utils.TCP_PROTOCOL),
 	TCP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.TCP_PROTOCOL),
 	UDP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.UDP_PROTOCOL),
 }
@@ -84,7 +81,7 @@ def launch(
 
 	service = plan.add_service(service_name, config)
 
-	enode, enr = el_admin_node_info.get_enode_enr_for_node(plan, service_name, RPC_PORT_ID)
+	enode, enr = el_admin_node_info.get_enode_enr_for_node(plan, service_name, WS_RPC_PORT_ID)
 
 	jwt_secret = shared_utils.read_file_from_service(plan, service_name, jwt_secret_json_filepath_on_client)
 
@@ -93,8 +90,8 @@ def launch(
 		enr,
 		enode,
 		service.ip_address,
-		RPC_PORT_NUM,
-		WS_PORT_NUM,
+		WS_RPC_PORT_NUM,
+		WS_RPC_PORT_NUM,
 		ENGINE_RPC_PORT_NUM,
 		jwt_secret,
 		service_name
@@ -144,7 +141,7 @@ def get_config(
 		"--http",
 		"--http.addr=0.0.0.0",
 		"--http.corsdomain=*",
-		"--http.port={0}".format(RPC_PORT_NUM),
+		"--http.port={0}".format(WS_RPC_PORT_NUM),
 		"--authrpc.jwtsecret={0}".format(jwt_secret_json_filepath_on_client),
 		"--authrpc.addr=0.0.0.0",
 		"--authrpc.port={0}".format(ENGINE_RPC_PORT_NUM),
