@@ -20,19 +20,12 @@ UDP_DISCOVERY_PORT_ID = "udp-discovery"
 ENGINE_RPC_PORT_ID	= "engine-rpc"
 METRICS_PORT_ID = "metrics"
 
-# TODO(old) Scale this dynamically based on CPUs available and Geth nodes mining
-NUM_MINING_THREADS = 1
-
 GENESIS_DATA_MOUNT_DIRPATH = "/genesis"
 
 PREFUNDED_KEYS_MOUNT_DIRPATH = "/prefunded-keys"
 
 # The dirpath of the execution data directory on the client container
 EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/execution-data"
-KEYSTORE_DIRPATH_ON_CLIENT_CONTAINER	= EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER + "/keystore"
-
-GETH_ACCOUNT_PASSWORD	= "password"		#  Password that the Geth accounts will be locked with
-GETH_ACCOUNT_PASSWORDS_FILE = "/tmp/password.txt" #  Importing an account to
 
 PRIVATE_IP_ADDRESS_PLACEHOLDER = "KURTOSIS_IP_ADDR_PLACEHOLDER"
 
@@ -91,7 +84,7 @@ def launch(
 		service_name,
 	)
 
-def get_config(network_id, genesis_data, prefunded_geth_keys_artifact_uuid, prefunded_account_info, image, existing_el_clients, verbosity_level, extra_params):
+def get_config(network_id, genesis_data, prefunded_eth_keys_artifact_uuid, prefunded_account_info, image, existing_el_clients, verbosity_level, extra_params):
 
 	genesis_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH, genesis_data.geth_genesis_json_relative_filepath)
 	jwt_secret_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH, genesis_data.jwt_secret_relative_filepath)
@@ -108,26 +101,10 @@ def get_config(network_id, genesis_data, prefunded_geth_keys_artifact_uuid, pref
 		genesis_json_filepath_on_client,
 	)
 
-	# We need to put the keys into the right spot
-	copy_keys_into_keystore_cmd_str = "cp -r {0}/* {1}/".format(
-		PREFUNDED_KEYS_MOUNT_DIRPATH,
-		KEYSTORE_DIRPATH_ON_CLIENT_CONTAINER,
-	)
-
-	create_passwords_file_cmd_str = '{' + ' for i in $(seq 1 {0}); do echo "{1}" >> {2}; done; '.format(
-		len(prefunded_account_info),
-		GETH_ACCOUNT_PASSWORD,
-		GETH_ACCOUNT_PASSWORDS_FILE,
-	) + '}'
-
 	launch_node_cmd = [
 		"reth",
         "node",
 		"--verbosity=" + verbosity_level,
-        # NOT FOUND
-		"--unlock=" + accounts_to_unlock_str,
-        # NOT FOUND
-		"--password=" + GETH_ACCOUNT_PASSWORDS_FILE,
 		"--datadir=" + EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER,
 		"--networkid=" + network_id,
 		"--http",
@@ -142,19 +119,10 @@ def get_config(network_id, genesis_data, prefunded_geth_keys_artifact_uuid, pref
 		"--ws.port={0}".format(WS_PORT_NUM),
 		"--ws.api=engine,net,eth",
 		"--ws.origins=*",
-        # NOT FOUND
-		"--allow-insecure-unlock",
 		"--nat=extip:" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		"--verbosity=" + verbosity_level,
 		"--authrpc.port={0}".format(ENGINE_RPC_PORT_NUM),
 		"--authrpc.addr=0.0.0.0",
-        # NOT FOUND
-		"--authrpc.vhosts=*",
-		"--authrpc.jwtsecret={0}".format(jwt_secret_json_filepath_on_client),
-        # NOT FOUND
-		"--syncmode=full",
-        # NOT FOUND
-		"--rpc.allow-unprotected-txs",
         "--metrics=0.0.0.0:{0}".format(METRICS_PORT_NUM)
 	]
 
@@ -176,8 +144,6 @@ def get_config(network_id, genesis_data, prefunded_geth_keys_artifact_uuid, pref
 
 	subcommand_strs = [
 		init_datadir_cmd_str,
-		copy_keys_into_keystore_cmd_str,
-		create_passwords_file_cmd_str,
 		launch_node_cmd_str,
 	]
 	command_str = " && ".join(subcommand_strs)
@@ -188,17 +154,17 @@ def get_config(network_id, genesis_data, prefunded_geth_keys_artifact_uuid, pref
 		cmd = [command_str],
 		files = {
 			GENESIS_DATA_MOUNT_DIRPATH: genesis_data.files_artifact_uuid,
-			PREFUNDED_KEYS_MOUNT_DIRPATH: prefunded_geth_keys_artifact_uuid
+			PREFUNDED_KEYS_MOUNT_DIRPATH: prefunded_eth_keys_artifact_uuid
 		},
 		entrypoint = ENTRYPOINT_ARGS,
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER
 	), jwt_secret_json_filepath_on_client
 
 
-def new_reth_launcher(network_id, el_genesis_data, prefunded_geth_keys_artifact_uuid, prefunded_account_info):
+def new_reth_launcher(network_id, el_genesis_data, prefunded_eth_keys_artifact_uuid, prefunded_account_info):
 	return struct(
 		network_id = network_id,
 		el_genesis_data = el_genesis_data,
 		prefunded_account_info = prefunded_account_info,
-		prefunded_geth_keys_artifact_uuid = prefunded_geth_keys_artifact_uuid,
+		prefunded_eth_keys_artifact_uuid = prefunded_eth_keys_artifact_uuid,
 	)

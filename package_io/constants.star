@@ -2,7 +2,8 @@ EL_CLIENT_TYPE = struct(
 	geth="geth",
 	erigon="erigon",
 	nethermind="nethermind",
-	besu="besu"
+	besu="besu",
+	reth="reth"
 )
 
 CL_CLIENT_TYPE = struct(
