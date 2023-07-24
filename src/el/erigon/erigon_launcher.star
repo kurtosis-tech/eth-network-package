@@ -141,7 +141,7 @@ def get_config(
 		"--allow-insecure-unlock",
 		"--nat=extip:" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		"--nodiscover",
-		"--staticpeers={0}".format(boot_node.enode),
+		"--staticpeers={0}".format(boot_node_1.enode),
 		"--http",
 		"--http.addr=0.0.0.0",
 		"--http.corsdomain=*",
