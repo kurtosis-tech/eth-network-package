@@ -57,16 +57,16 @@ def launch(
 	existing_el_clients,
 	el_min_cpu,
 	el_max_cpu,
-	el_min_memory,
-	el_max_memory,
+	el_min_mem,
+	el_max_mem,
 	extra_params):
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, NETHERMIND_LOG_LEVELS)
 
 	el_min_cpu = el_min_cpu if int(el_min_cpu) > 0 else EXECUTION_MIN_CPU
 	el_max_cpu = el_max_cpu if int(el_max_cpu) > 0 else EXECUTION_MAX_CPU
-	el_min_memory = el_min_memory if int(el_min_memory) > 0 else EXECUTION_MIN_MEMORY
-	el_max_memory = el_max_memory if int(el_max_memory) > 0 else EXECUTION_MAX_MEMORY
+	el_min_mem = el_min_mem if int(el_min_mem) > 0 else EXECUTION_MIN_MEMORY
+	el_max_mem = el_max_mem if int(el_max_mem) > 0 else EXECUTION_MAX_MEMORY
 
 	config, jwt_secret_json_filepath_on_client = get_config(
 		launcher.el_genesis_data,
@@ -75,8 +75,8 @@ def launch(
 		log_level,
 		el_min_cpu,
 		el_max_cpu,
-		el_min_memory,
-		el_max_memory,
+		el_min_mem,
+		el_max_mem,
 		extra_params
 	)
 
@@ -107,8 +107,8 @@ def get_config(
 	log_level,
 	el_min_cpu,
 	el_max_cpu,
-	el_min_memory,
-	el_max_memory,
+	el_min_mem,
+	el_max_mem,
 	extra_params):
 	if len(existing_el_clients) < 2:
 		fail("Nethermind node cannot be boot nodes, and due to a bug it requires two nodes to exist beforehand")
@@ -158,8 +158,8 @@ def get_config(
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		min_cpu = el_min_cpu,
 		max_cpu = el_max_cpu,
-		min_memory = el_min_memory,
-		max_memory = el_max_memory
+		min_memory = el_min_mem,
+		max_memory = el_max_mem
 	), jwt_secret_json_filepath_on_client
 
 

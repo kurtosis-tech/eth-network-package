@@ -94,8 +94,8 @@ def launch(
 	bn_max_mem,
 	v_min_cpu,
 	v_max_cpu,
-	v_min_memory,
-	v_max_memory,
+	v_min_mem,
+	v_max_mem,
 	extra_beacon_params,
 	extra_validator_params):
 
@@ -123,8 +123,8 @@ def launch(
 
 	v_min_cpu = int(v_min_cpu) if int(v_min_cpu) > 0 else VALIDATOR_MIN_CPU
 	v_max_cpu = int(v_max_cpu) if int(v_max_cpu) > 0 else VALIDATOR_MAX_CPU
-	v_min_memory = int(v_min_memory) if int(v_min_memory) > 0 else VALIDATOR_MIN_MEMORY
-	v_max_memory = int(v_max_memory) if int(v_max_memory) > 0 else VALIDATOR_MAX_MEMORY
+	v_min_mem = int(v_min_mem) if int(v_min_mem) > 0 else VALIDATOR_MIN_MEMORY
+	v_max_mem = int(v_max_mem) if int(v_max_mem) > 0 else VALIDATOR_MAX_MEMORY
 
 	beacon_config = get_beacon_config(
 		launcher.genesis_data,
@@ -157,8 +157,8 @@ def launch(
 		node_keystore_files,
 		v_min_cpu,
 		v_max_cpu,
-		v_min_memory,
-		v_max_memory,
+		v_min_mem,
+		v_max_mem,
 		extra_validator_params,
 		launcher.prysm_password_relative_filepath,
 		launcher.prysm_password_artifact_uuid
@@ -280,8 +280,8 @@ def get_validator_config(
 		node_keystore_files,
 		v_min_cpu,
 		v_max_cpu,
-		v_min_memory,
-		v_max_memory,
+		v_min_mem,
+		v_max_mem,
 		extra_params,
 		prysm_password_relative_filepath,
 		prysm_password_artifact_uuid
@@ -328,8 +328,8 @@ def get_validator_config(
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		min_cpu = v_min_cpu,
 		max_cpu = v_max_cpu,
-		min_memory = v_min_memory,
-		max_memory = v_max_memory
+		min_memory = v_min_mem,
+		max_memory = v_max_mem
 	)
 
 

@@ -71,8 +71,8 @@ def launch(
 	existing_el_clients,
 	el_min_cpu,
 	el_max_cpu,
-	el_min_memory,
-	el_max_memory,
+	el_min_mem,
+	el_max_mem,
 	extra_params):
 
 
@@ -80,8 +80,8 @@ def launch(
 
 	el_min_cpu = el_min_cpu if int(el_min_cpu) > 0 else EXECUTION_MIN_CPU
 	el_max_cpu = el_max_cpu if int(el_max_cpu) > 0 else EXECUTION_MAX_CPU
-	el_min_memory = el_min_memory if int(el_min_memory) > 0 else EXECUTION_MIN_MEMORY
-	el_max_memory = el_max_memory if int(el_max_memory) > 0 else EXECUTION_MAX_MEMORY
+	el_min_mem = el_min_mem if int(el_min_mem) > 0 else EXECUTION_MIN_MEMORY
+	el_max_mem = el_max_mem if int(el_max_mem) > 0 else EXECUTION_MAX_MEMORY
 
 	config, jwt_secret_json_filepath_on_client = get_config(
 		launcher.network_id,
@@ -93,8 +93,8 @@ def launch(
 		log_level,
 		el_min_cpu,
 		el_max_cpu,
-		el_min_memory,
-		el_max_memory,
+		el_min_mem,
+		el_max_mem,
 		extra_params
 	)
 
@@ -126,8 +126,8 @@ def get_config(
 	verbosity_level,
 	el_min_cpu,
 	el_max_cpu,
-	el_min_memory,
-	el_max_memory,
+	el_min_mem,
+	el_max_mem,
 	extra_params):
 
 	genesis_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH, genesis_data.geth_genesis_json_relative_filepath)
@@ -223,8 +223,8 @@ def get_config(
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		min_cpu = el_min_cpu,
 		max_cpu = el_max_cpu,
-		min_memory = el_min_memory,
-		max_memory = el_max_memory
+		min_memory = el_min_mem,
+		max_memory = el_max_mem
 	), jwt_secret_json_filepath_on_client
 
 

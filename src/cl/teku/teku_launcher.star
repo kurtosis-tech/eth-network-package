@@ -96,6 +96,11 @@ def launch(
 
 	extra_params = [param for param in extra_beacon_params] + [param for param in extra_validator_params]
 
+	bn_min_cpu = int(bn_min_cpu) if int(bn_min_cpu) > 0 else BEACON_MIN_CPU
+	bn_max_cpu = int(bn_max_cpu) if int(bn_max_cpu) > 0 else BEACON_MAX_CPU
+	bn_min_mem = int(bn_min_mem) if int(bn_min_mem) > 0 else BEACON_MIN_MEMORY
+	bn_max_mem = int(bn_max_mem) if int(bn_max_mem) > 0 else BEACON_MAX_MEMORY
+
 	# Set the min/max CPU/memory for the beacon node to be the max of the beacon node and validator node values, unless this is defined, it will use the default beacon values
 	bn_min_cpu = int(v_min_cpu) if (int(v_min_cpu) > bn_min_cpu) else bn_min_cpu
 	bn_max_cpu = int(v_max_cpu) if (int(v_max_cpu) > bn_max_cpu) else bn_max_cpu
