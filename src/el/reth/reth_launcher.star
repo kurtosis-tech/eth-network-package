@@ -63,7 +63,7 @@ def launch(
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, VERBOSITY_LEVELS)
 
-	config, jwt_secret_json_filepath_on_client = get_config(launcher.network_id, launcher.el_genesis_data, launcher.prefunded_geth_keys_artifact_uuid,
+	config, jwt_secret_json_filepath_on_client = get_config(launcher.network_id, launcher.el_genesis_data, launcher.prefunded_eth_keys_artifact_uuid,
 									launcher.prefunded_account_info, image, existing_el_clients, log_level, extra_params)
 
 	service = plan.add_service(service_name, config)
@@ -96,31 +96,28 @@ def get_config(network_id, genesis_data, prefunded_eth_keys_artifact_uuid, prefu
 
 	accounts_to_unlock_str = ",".join(account_addresses_to_unlock)
 
-	init_datadir_cmd_str = "reth init --datadir={0} {1}".format(
+	init_datadir_cmd_str = "reth init --datadir={0}".format(
 		EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER,
-		genesis_json_filepath_on_client,
 	)
 
 	launch_node_cmd = [
 		"reth",
         "node",
-		"--verbosity=" + verbosity_level,
+		"-{0}".format(verbosity_level),
 		"--datadir=" + EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER,
-		"--networkid=" + network_id,
 		"--http",
         "--http.port={0}".format(RPC_PORT_NUM),
 		"--http.addr=0.0.0.0",
 		"--http.corsdomain=*",
 		# WARNING: The admin info endpoint is enabled so that we can easily get ENR/enode, which means
 		#  that users should NOT store private information in these Kurtosis nodes!
-		"--http.api=admin,engine,net,eth",
+		"--http.api=admin,net,eth",
 		"--ws",
 		"--ws.addr=0.0.0.0",
 		"--ws.port={0}".format(WS_PORT_NUM),
-		"--ws.api=engine,net,eth",
+		"--ws.api=net,eth",
 		"--ws.origins=*",
 		"--nat=extip:" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
-		"--verbosity=" + verbosity_level,
 		"--authrpc.port={0}".format(ENGINE_RPC_PORT_NUM),
 		"--authrpc.addr=0.0.0.0",
         "--metrics=0.0.0.0:{0}".format(METRICS_PORT_NUM)

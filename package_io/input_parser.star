@@ -4,7 +4,7 @@ DEFAULT_EL_IMAGES = {
 	"nethermind":	"nethermind/nethermind:latest",
 	"besu":			"hyperledger/besu:develop",
 	# TODO change this when an official image gets published
-	"reth": "h4ck3rk3y"
+	"reth": "h4ck3rk3y/reth"
 }
 
 DEFAULT_CL_IMAGES = {
