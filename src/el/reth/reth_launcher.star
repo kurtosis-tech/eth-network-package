@@ -96,8 +96,9 @@ def get_config(network_id, genesis_data, prefunded_eth_keys_artifact_uuid, prefu
 
 	accounts_to_unlock_str = ",".join(account_addresses_to_unlock)
 
-	init_datadir_cmd_str = "reth init --datadir={0}".format(
+	init_datadir_cmd_str = "reth init --datadir={0} --chain={1}".format(
 		EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER,
+        genesis_json_filepath_on_client,
 	)
 
 	launch_node_cmd = [
@@ -105,6 +106,7 @@ def get_config(network_id, genesis_data, prefunded_eth_keys_artifact_uuid, prefu
         "node",
 		"-{0}".format(verbosity_level),
 		"--datadir=" + EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER,
+		"--chain=" + genesis_json_filepath_on_client,
 		"--http",
         "--http.port={0}".format(RPC_PORT_NUM),
 		"--http.addr=0.0.0.0",
