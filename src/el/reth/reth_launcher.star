@@ -35,7 +35,7 @@ USED_PORTS = {
 	TCP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.TCP_PROTOCOL),
 	UDP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.UDP_PROTOCOL),
 	ENGINE_RPC_PORT_ID: shared_utils.new_port_spec(ENGINE_RPC_PORT_NUM, shared_utils.TCP_PROTOCOL),
-    METRICS_PORT_ID: shared_utils.new_port_spec(METRICS_PORT_ID, shared_utils.TCP_PROTOCOL)
+    METRICS_PORT_ID: shared_utils.new_port_spec(METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL)
 }
 
 ENTRYPOINT_ARGS = ["sh", "-c"]
@@ -108,7 +108,7 @@ def get_config(network_id, genesis_data, prefunded_eth_keys_artifact_uuid, prefu
 		"--datadir=" + EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER,
 		"--networkid=" + network_id,
 		"--http",
-        "--http.port={0}".format(RPC_PORT_NUM)
+        "--http.port={0}".format(RPC_PORT_NUM),
 		"--http.addr=0.0.0.0",
 		"--http.corsdomain=*",
 		# WARNING: The admin info endpoint is enabled so that we can easily get ENR/enode, which means
