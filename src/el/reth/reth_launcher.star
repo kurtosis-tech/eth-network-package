@@ -63,8 +63,8 @@ def launch(
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, VERBOSITY_LEVELS)
 
-	config, jwt_secret_json_filepath_on_client = get_config(launcher.network_id, launcher.el_genesis_data, launcher.prefunded_eth_keys_artifact_uuid,
-									launcher.prefunded_account_info, image, existing_el_clients, log_level, extra_params)
+	config, jwt_secret_json_filepath_on_client = get_config(launcher.el_genesis_data,
+									image, existing_el_clients, log_level, extra_params)
 
 	service = plan.add_service(service_name, config)
 
@@ -84,17 +84,10 @@ def launch(
 		service_name,
 	)
 
-def get_config(network_id, genesis_data, prefunded_eth_keys_artifact_uuid, prefunded_account_info, image, existing_el_clients, verbosity_level, extra_params):
+def get_config(genesis_data, image, existing_el_clients, verbosity_level, extra_params):
 
 	genesis_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH, genesis_data.geth_genesis_json_relative_filepath)
 	jwt_secret_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH, genesis_data.jwt_secret_relative_filepath)
-
-	account_addresses_to_unlock = []
-	for prefunded_account in prefunded_account_info:
-		account_addresses_to_unlock.append(prefunded_account.address)
-
-
-	accounts_to_unlock_str = ",".join(account_addresses_to_unlock)
 
 	init_datadir_cmd_str = "reth init --datadir={0} --chain={1}".format(
 		EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER,
@@ -154,17 +147,13 @@ def get_config(network_id, genesis_data, prefunded_eth_keys_artifact_uuid, prefu
 		cmd = [command_str],
 		files = {
 			GENESIS_DATA_MOUNT_DIRPATH: genesis_data.files_artifact_uuid,
-			PREFUNDED_KEYS_MOUNT_DIRPATH: prefunded_eth_keys_artifact_uuid
 		},
 		entrypoint = ENTRYPOINT_ARGS,
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER
 	), jwt_secret_json_filepath_on_client
 
 
-def new_reth_launcher(network_id, el_genesis_data, prefunded_eth_keys_artifact_uuid, prefunded_account_info):
+def new_reth_launcher(el_genesis_data):
 	return struct(
-		network_id = network_id,
 		el_genesis_data = el_genesis_data,
-		prefunded_account_info = prefunded_account_info,
-		prefunded_eth_keys_artifact_uuid = prefunded_eth_keys_artifact_uuid,
 	)
