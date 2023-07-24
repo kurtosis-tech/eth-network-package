@@ -61,10 +61,10 @@ def launch(
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, ERIGON_LOG_LEVELS)
 
-	el_min_cpu = el_min_cpu if el_min_cpu != "" else EXECUTION_MIN_CPU
-	el_max_cpu = el_max_cpu if el_max_cpu != "" else EXECUTION_MAX_CPU
-	el_min_memory = el_min_memory if el_min_memory != "" else EXECUTION_MIN_MEMORY
-	el_max_memory = el_max_memory if el_max_memory != "" else EXECUTION_MAX_MEMORY
+	el_min_cpu = el_min_cpu if int(el_min_cpu) > 0 else EXECUTION_MIN_CPU
+	el_max_cpu = el_max_cpu if int(el_max_cpu) > 0 else EXECUTION_MAX_CPU
+	el_min_memory = el_min_memory if int(el_min_memory) > 0 else EXECUTION_MIN_MEMORY
+	el_max_memory = el_max_memory if int(el_max_memory) > 0 else EXECUTION_MAX_MEMORY
 
 	config, jwt_secret_json_filepath_on_client = get_config(
 		launcher.network_id,

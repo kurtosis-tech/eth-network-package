@@ -100,15 +100,15 @@ def launch(
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, LIGHTHOUSE_LOG_LEVELS)
 
-	bn_min_cpu = bn_min_cpu if bn_min_cpu != "" else BEACON_MIN_CPU
-	bn_max_cpu = bn_max_cpu if bn_max_cpu != "" else BEACON_MAX_CPU
-	bn_min_mem = bn_min_mem if bn_min_mem != "" else BEACON_MIN_MEMORY
-	bn_max_mem = bn_max_mem if bn_max_mem != "" else BEACON_MAX_MEMORY
+	bn_min_cpu = int(bn_min_cpu) if int(bn_min_cpu) > 0 else BEACON_MIN_CPU
+	bn_max_cpu = int(bn_max_cpu) if int(bn_max_cpu) > 0 else BEACON_MAX_CPU
+	bn_min_mem = int(bn_min_mem) if int(bn_min_mem) > 0 else BEACON_MIN_MEMORY
+	bn_max_mem = int(bn_max_mem) if int(bn_max_mem) > 0 else BEACON_MAX_MEMORY
 
-	v_min_cpu = v_min_cpu if v_min_cpu != "" else VALIDATOR_MIN_CPU
-	v_max_cpu = v_max_cpu if v_max_cpu != "" else VALIDATOR_MAX_CPU
-	v_min_memory = v_min_memory if v_min_memory != "" else VALIDATOR_MIN_MEMORY
-	v_max_memory = v_max_memory if v_max_memory != "" else VALIDATOR_MAX_MEMORY
+	v_min_cpu = int(v_min_cpu) if int(v_min_cpu) > 0 else VALIDATOR_MIN_CPU
+	v_max_cpu = int(v_max_cpu) if int(v_max_cpu) > 0 else VALIDATOR_MAX_CPU
+	v_min_memory = int(v_min_memory) if int(v_min_memory) > 0 else VALIDATOR_MIN_MEMORY
+	v_max_memory = int(v_max_memory) if int(v_max_memory) > 0 else VALIDATOR_MAX_MEMORY
 
 	# Launch Beacon node
 	beacon_config = get_beacon_config(

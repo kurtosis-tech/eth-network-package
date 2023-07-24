@@ -93,20 +93,17 @@ def launch(
 
 	extra_params = [param for param in extra_beacon_params] + [param for param in extra_validator_params]
 
-	v_min_cpu_int = int(v_min_cpu) if v_min_cpu != "" else 0
-	v_max_cpu_int = int(v_max_cpu) if v_max_cpu != "" else 0
-	v_min_mem_int = int(v_min_mem) if v_min_mem != "" else 0
-	v_max_mem_int = int(v_max_mem) if v_max_mem != "" else 0
-	bn_min_cpu_int = int(bn_min_cpu) if bn_min_cpu != "" else 0
-	bn_max_cpu_int = int(bn_max_cpu) if bn_max_cpu != "" else 0
-	bn_min_mem_int = int(bn_min_mem) if bn_min_mem != "" else 0
-	bn_max_mem_int = int(bn_max_mem) if bn_max_mem != "" else 0
 
-	# Set the min/max CPU/memory for the beacon node to be the max of the beacon node and validator node values
-	bn_min_cpu = v_min_cpu_int if (v_min_cpu_int != 0) and (v_min_cpu_int > bn_min_cpu_int) else bn_min_cpu_int if bn_min_cpu_int != 0 else BEACON_MIN_CPU
-	bn_max_cpu = v_max_cpu_int if (v_max_cpu_int != 0) and (v_max_cpu_int > bn_max_cpu_int) else bn_max_cpu_int if bn_max_cpu_int != 0 else BEACON_MAX_CPU
-	bn_min_mem = v_min_mem_int if (v_min_mem_int != 0) and (v_min_mem_int > bn_min_mem_int) else bn_min_mem_int if bn_min_mem_int != 0 else BEACON_MIN_MEMORY
-	bn_max_mem = v_max_mem_int if (v_max_mem_int != 0) and (v_max_mem_int > bn_max_mem_int) else bn_max_mem_int if bn_max_mem_int != 0 else BEACON_MAX_MEMORY
+	bn_min_cpu = int(bn_min_cpu) if int(bn_min_cpu) > 0 else BEACON_MIN_CPU
+	bn_max_cpu = int(bn_max_cpu) if int(bn_max_cpu) > 0 else BEACON_MAX_CPU
+	bn_min_mem = int(bn_min_mem) if int(bn_min_mem) > 0 else BEACON_MIN_MEMORY
+	bn_max_mem = int(bn_max_mem) if int(bn_max_mem) > 0 else BEACON_MAX_MEMORY
+
+	# Set the min/max CPU/memory for the beacon node to be the max of the beacon node and validator node values, unless this is defined, it will use the default beacon values
+	bn_min_cpu = int(v_min_cpu) if (int(v_min_cpu) > bn_min_cpu) else bn_min_cpu
+	bn_max_cpu = int(v_max_cpu) if (int(v_max_cpu) > bn_max_cpu) else bn_max_cpu
+	bn_min_mem = int(v_min_mem) if (int(v_min_mem) > bn_min_mem) else bn_min_mem
+	bn_max_mem = int(v_max_mem) if (int(v_max_mem) > bn_max_mem) else bn_max_mem
 
 	config = get_config(
 		launcher.cl_genesis_data,
