@@ -150,6 +150,7 @@ def get_config(
 		"--authrpc.addr=0.0.0.0",
 		"--authrpc.port={0}".format(ENGINE_RPC_PORT_NUM),
 		"--authrpc.vhosts=*",
+		"--db.size.limit=15GB" # default values will throw label=chaindata path=/home/erigon/execution-data/chaindata mdbx_setup_dxb:15946 filesize mismatch (expect 208896b/51p, have 2147483648b/524288p) error
 	]
 
 	if len(existing_el_clients) > 0:
