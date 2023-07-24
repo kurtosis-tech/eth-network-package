@@ -149,7 +149,7 @@ def launch(
 def get_config(
 	genesis_data,
 	image,
-	boot_cl_client_ctx,
+	bootnode_context,
 	el_client_ctx,
 	log_level,
 	node_keystore_files,
@@ -227,12 +227,12 @@ def get_config(
 		"--metrics-port={0}".format(METRICS_PORT_NUM),
 		# ^^^^^^^^^^^^^^^^^^^ METRICS CONFIG ^^^^^^^^^^^^^^^^^^^^^
 	]
-	if boot_cl_client_ctx == None:
-		# Copied from https://.com/status-im/nimbus-eth2/blob/67ab477a27e358d605e99bffeb67f98d18218eca/scripts/launch_local_testnet.sh#L417
+	if bootnode_context == None:
+		# Copied from https://github.com/status-im/nimbus-eth2/blob/67ab477a27e358d605e99bffeb67f98d18218eca/scripts/launch_local_testnet.sh#L417
 		# See explanation there
 		cmd.append("--subscribe-all-subnets")
 	else:
-		cmd.append("--bootstrap-node="+boot_cl_client_ctx.enr)
+		cmd.append("--bootstrap-node="+bootnode_context.enr)
 
 	if len(extra_params) > 0:
 		cmd.extend([param for param in extra_params])
