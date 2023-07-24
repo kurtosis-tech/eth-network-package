@@ -11,7 +11,7 @@ EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/home/erigon/execution-data"
 GENESIS_DATA_MOUNT_DIRPATH = "/genesis"
 
 RPC_PORT_NUM = 8545
-WS_PORT_NUM = 8546
+WS_PORT_NUM = 8545
 DISCOVERY_PORT_NUM = 30303
 ENGINE_RPC_PORT_NUM = 8551
 
@@ -127,7 +127,6 @@ def get_config(
 		fail("Erigon needs at least one node to exist, which it treats as the bootnode")
 
 	boot_node_1 = existing_el_clients[0]
-	boot_node_2 = existing_el_clients[1]
 
 	launch_node_cmd = [
 		"erigon",
@@ -137,6 +136,7 @@ def get_config(
 		"--networkid=" + network_id,
 		"--http.api=eth,erigon,engine,web3,net,debug,trace,txpool,admin",
 		"--http.vhosts=*",
+		"--ws",
 		"--allow-insecure-unlock",
 		"--nat=extip:" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		"--nodiscover",
@@ -149,11 +149,10 @@ def get_config(
 		"--authrpc.addr=0.0.0.0",
 		"--authrpc.port={0}".format(ENGINE_RPC_PORT_NUM),
 		"--authrpc.vhosts=*",
-		"--db.size.limit=15GB" # default values will throw label=chaindata path=/home/erigon/execution-data/chaindata mdbx_setup_dxb:15946 filesize mismatch (expect 208896b/51p, have 2147483648b/524288p) error
 	]
 
 	if len(existing_el_clients) > 0:
-		launch_node_cmd.append("--bootnodes={0},{1}".format(boot_node_1.enode, boot_node_2.enode))
+		launch_node_cmd.append("--bootnodes={0},{1}".format(boot_node_1.enode))
 
 
 	if len(extra_params) > 0:
