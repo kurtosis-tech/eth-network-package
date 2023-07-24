@@ -152,7 +152,7 @@ def get_config(
 	]
 
 	if len(existing_el_clients) > 0:
-		launch_node_cmd.append("--bootnodes={0},{1}".format(boot_node_1.enode))
+		launch_node_cmd.append("--bootnodes={0}".format(boot_node_1.enode))
 
 
 	if len(extra_params) > 0:
