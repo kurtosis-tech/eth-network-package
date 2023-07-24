@@ -2,7 +2,9 @@ DEFAULT_EL_IMAGES = {
 	"geth":			"ethereum/client-go:latest",
 	"erigon":		"thorax/erigon:devel",
 	"nethermind":	"nethermind/nethermind:latest",
-	"besu":			"hyperledger/besu:develop"
+	"besu":			"hyperledger/besu:develop",
+	# TODO change this when an official image gets published
+	"reth": "h4ck3rk3y"
 }
 
 DEFAULT_CL_IMAGES = {
