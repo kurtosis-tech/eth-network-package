@@ -68,13 +68,13 @@ def launch(
 
 	service = plan.add_service(service_name, config)
 
-	enode, enr = el_admin_node_info.get_enode_enr_for_node(plan, service_name, RPC_PORT_ID)
+	enode = el_admin_node_info.get_enode_for_node(plan, service_name, RPC_PORT_ID)
 
 	jwt_secret = shared_utils.read_file_from_service(plan, service_name, jwt_secret_json_filepath_on_client)
 
 	return el_client_context.new_el_client_context(
 		"reth",
-		enr,
+		"", # reth has no enr
 		enode,
 		service.ip_address,
 		RPC_PORT_NUM,
@@ -119,6 +119,7 @@ def get_config(network_id, genesis_data, prefunded_eth_keys_artifact_uuid, prefu
 		"--ws.origins=*",
 		"--nat=extip:" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		"--authrpc.port={0}".format(ENGINE_RPC_PORT_NUM),
+        "--authrpc.jwtsecret={0}".format(jwt_secret_json_filepath_on_client),
 		"--authrpc.addr=0.0.0.0",
         "--metrics=0.0.0.0:{0}".format(METRICS_PORT_NUM)
 	]
