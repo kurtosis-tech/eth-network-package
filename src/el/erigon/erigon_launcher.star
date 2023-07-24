@@ -137,7 +137,6 @@ def get_config(
 		"--networkid=" + network_id,
 		"--http.api=eth,erigon,engine,web3,net,debug,trace,txpool,admin",
 		"--http.vhosts=*",
-		"--ws",
 		"--allow-insecure-unlock",
 		"--nat=extip:" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		"--nodiscover",
