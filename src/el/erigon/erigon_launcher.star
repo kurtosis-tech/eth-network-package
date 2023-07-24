@@ -13,7 +13,7 @@ GENESIS_DATA_MOUNT_DIRPATH = "/genesis"
 RPC_PORT_NUM = 8545
 WS_PORT_NUM = 8546
 DISCOVERY_PORT_NUM = 30303
-ENGINE_RPC_PORT_NUM = 8550
+ENGINE_RPC_PORT_NUM = 8551
 
 # The min/max CPU/memory that the execution node can use
 EXECUTION_MIN_CPU = 100
@@ -132,19 +132,25 @@ def get_config(
 		"erigon",
 		"--log.console.verbosity=" + verbosity_level,
 		"--datadir=" + EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER,
+		"--port={0}".format(DISCOVERY_PORT_NUM),
 		"--networkid=" + network_id,
-		"--http",
-		"--http.addr=0.0.0.0",
-		"--http.corsdomain=*",
 		# WARNING: The admin info endpoint is enabled so that we can easily get ENR/enode, which means
 		#  that users should NOT store private information in these Kurtosis nodes!
 		"--http.api=admin,engine,net,eth",
 		"--ws",
 		"--allow-insecure-unlock",
 		"--nat=extip:" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
-		"--authrpc.jwtsecret={0}".format(jwt_secret_json_filepath_on_client),
 		"--nodiscover",
 		"--staticpeers={0}".format(boot_node.enode),
+		"--http",
+		"--http.addr=0.0.0.0",
+		"--http.corsdomain=*",
+		"--http.port={0}".format(RPC_PORT_NUM),
+		"--authrpc.jwtsecret={0}".format(jwt_secret_json_filepath_on_client),
+		"--authrpc.addr=0.0.0.0",
+		"--authrpc.port={0}".format(ENGINE_RPC_PORT_NUM),
+		"--authrpc.vhosts=*",
+
 	]
 
 	if len(extra_params) > 0:
