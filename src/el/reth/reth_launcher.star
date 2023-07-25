@@ -12,6 +12,12 @@ DISCOVERY_PORT_NUM	= 30303
 ENGINE_RPC_PORT_NUM = 8551
 METRICS_PORT_NUM = 9001
 
+# The min/max CPU/memory that the execution node can use
+EXECUTION_MIN_CPU = 100
+EXECUTION_MAX_CPU = 1000
+EXECUTION_MIN_MEMORY = 256
+EXECUTION_MAX_MEMORY = 1024
+
 # Port IDs
 RPC_PORT_ID			= "rpc"
 WS_PORT_ID			= "ws"
@@ -58,13 +64,32 @@ def launch(
 	global_log_level,
 	# If empty then the node will be launched as a bootnode
 	existing_el_clients,
+	el_min_cpu,
+	el_max_cpu,
+	el_min_mem,
+	el_max_mem,
 	extra_params):
 
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, VERBOSITY_LEVELS)
 
-	config, jwt_secret_json_filepath_on_client = get_config(launcher.el_genesis_data,
-									image, existing_el_clients, log_level, extra_params)
+	el_min_cpu = el_min_cpu if int(el_min_cpu) > 0 else EXECUTION_MIN_CPU
+	el_max_cpu = el_max_cpu if int(el_max_cpu) > 0 else EXECUTION_MAX_CPU
+	el_min_mem = el_min_mem if int(el_min_mem) > 0 else EXECUTION_MIN_MEMORY
+	el_max_mem = el_max_mem if int(el_max_mem) > 0 else EXECUTION_MAX_MEMORY
+
+
+	config, jwt_secret_json_filepath_on_client = get_config(
+		launcher.el_genesis_data,
+		image,
+		existing_el_clients,
+		log_level,
+		el_min_cpu,
+		el_max_cpu,
+		el_min_mem,
+		el_max_mem,
+		extra_params
+	)
 
 	service = plan.add_service(service_name, config)
 
@@ -84,7 +109,16 @@ def launch(
 		service_name,
 	)
 
-def get_config(genesis_data, image, existing_el_clients, verbosity_level, extra_params):
+def get_config(
+	genesis_data,
+	image,
+	existing_el_clients,
+	verbosity_level,
+	el_min_cpu,
+	el_max_cpu,
+	el_min_mem,
+	el_max_mem,
+	extra_params):
 
 	genesis_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH, genesis_data.geth_genesis_json_relative_filepath)
 	jwt_secret_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH, genesis_data.jwt_secret_relative_filepath)
@@ -148,7 +182,11 @@ def get_config(genesis_data, image, existing_el_clients, verbosity_level, extra_
 			GENESIS_DATA_MOUNT_DIRPATH: genesis_data.files_artifact_uuid,
 		},
 		entrypoint = ENTRYPOINT_ARGS,
-		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER
+		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
+		min_cpu = el_min_cpu,
+		max_cpu = el_max_cpu,
+		min_memory = el_min_mem,
+		max_memory = el_max_mem
 	), jwt_secret_json_filepath_on_client
 
 
