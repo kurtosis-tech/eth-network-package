@@ -20,8 +20,3 @@ GLOBAL_CLIENT_LOG_LEVEL = struct(
 	debug="debug",
 	trace="trace",
 )
-
-GLOBAL_INDEX_ZFILL = {
-	"participants": [1, 10, 100, 1000, 10000],
-	"zfill": [1, 2, 3, 4, 5]
-}

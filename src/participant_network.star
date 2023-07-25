@@ -34,6 +34,17 @@ CL_NODE_STARTUP_TIME = 5 * time.second
 
 CL_CLIENT_CONTEXT_BOOTNODE = None
 
+GLOBAL_INDEX_ZFILL = {
+	"zfill_values": [(1,1), (2,10), (3,100), (4,1000), (5,10000)]
+}
+
+def zfill_calculator(participants):
+	for zf, par in GLOBAL_INDEX_ZFILL['zfill_values']:
+		if len(participants) < par:
+			zfill = zf-1
+			return zfill
+			break
+
 def zfill_custom(value, width):
     return ("0" * (width - len(str(value)))) + str(value)
 
@@ -92,13 +103,8 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 
 		el_launcher, launch_method = el_launchers[el_client_type]["launcher"], el_launchers[el_client_type]["launch_method"]
 
-		for par, zf in zip(package_io.GLOBAL_INDEX_ZFILL['participants'], package_io.GLOBAL_INDEX_ZFILL['zfill']):
-			if len(participants) < par:
-				zfill = zf-1
-				break
-
 		# Zero-pad the index using the calculated zfill value
-		index_str = zfill_custom(index+1, zfill)
+		index_str = zfill_custom(index+1, zfill_calculator(participants))
 
 		el_service_name = "el-{0}-{1}-{2}".format(index_str, el_client_type, cl_client_type)
 
@@ -167,13 +173,7 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 
 		cl_launcher, launch_method = cl_launchers[cl_client_type]["launcher"], cl_launchers[cl_client_type]["launch_method"]
 
-		for th, zf in zip(package_io.GLOBAL_INDEX_ZFILL['participants'], package_io.GLOBAL_INDEX_ZFILL['zfill']):
-			if len(participants) < th:
-				zfill = zf-1
-				break
-
-		# Zero-pad the index using the calculated zfill value
-		index_str = zfill_custom(index+1, zfill)
+		index_str = zfill_custom(index+1, zfill_calculator(participants))
 
 		cl_service_name = "cl-{0}-{1}-{2}".format(index_str, cl_client_type, el_client_type)
 
