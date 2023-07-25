@@ -28,8 +28,6 @@ BEACON_MIN_MEMORY = 256
 BEACON_MAX_MEMORY = 1024
 
 #  ---------------------------------- Validator client -------------------------------------
-VALIDATING_REWARDS_ACCOUNT	= package_io.VALIDATING_REWARDS_ACCOUNT
-
 VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER = "/validator-keys"
 # The min/max CPU/memory that the validator node can use
 VALIDATOR_MIN_CPU = 50
@@ -273,7 +271,7 @@ def get_validator_config(
 		"--beaconNodes=" + beacon_client_http_url,
 		"--keystoresDir=" + validator_keys_dirpath,
 		"--secretsDir=" + validator_secrets_dirpath,
-		"--suggestedFeeRecipient=" + VALIDATING_REWARDS_ACCOUNT,
+		"--suggestedFeeRecipient=" + package_io.VALIDATING_REWARDS_ACCOUNT,
 		# vvvvvvvvvvvvvvvvvvv PROMETHEUS CONFIG vvvvvvvvvvvvvvvvvvvvv
 		"--metrics",
 		"--metrics.address=0.0.0.0",

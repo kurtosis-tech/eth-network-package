@@ -17,9 +17,6 @@ CONSENSUS_DATA_DIRPATH_ON_SERVICE_CONTAINER = "/opt/teku/consensus-data"
 #  into the Teku user's home directory to get around it
 VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER = "/validator-keys"
 
-# TODO(old) Get rid of this being hardcoded; should be shared
-VALIDATING_REWARDS_ACCOUNT	= package_io.VALIDATING_REWARDS_ACCOUNT
-
 # Port IDs
 TCP_DISCOVERY_PORT_ID	= "tcp-discovery"
 UDP_DISCOVERY_PORT_ID	= "udp-discovery"
@@ -216,7 +213,7 @@ def get_config(
 		),
 		"--ee-jwt-secret-file={0}".format(jwt_secret_filepath),
 		"--ee-endpoint=" + el_client_engine_rpc_url_str,
-		"--validators-proposer-default-fee-recipient=" + VALIDATING_REWARDS_ACCOUNT,
+		"--validators-proposer-default-fee-recipient=" + package_io.VALIDATING_REWARDS_ACCOUNT,
 		# vvvvvvvvvvvvvvvvvvv METRICS CONFIG vvvvvvvvvvvvvvvvvvvvv
 		"--metrics-enabled",
 		"--metrics-interface=0.0.0.0",

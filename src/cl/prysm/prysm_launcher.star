@@ -34,8 +34,6 @@ BEACON_MIN_MEMORY = 256
 BEACON_MAX_MEMORY = 1024
 
 #  ---------------------------------- Validator client -------------------------------------
-VALIDATING_REWARDS_ACCOUNT	= package_io.VALIDATING_REWARDS_ACCOUNT
-
 VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER	= "/validator-keys"
 PRYSM_PASSWORD_MOUNT_DIRPATH_ON_SERVICE_CONTAINER	= "/prysm-password"
 
@@ -302,7 +300,7 @@ def get_validator_config(
 		"--datadir=" + consensus_data_dirpath,
 		"--monitoring-port={0}".format(VALIDATOR_MONITORING_PORT_NUM),
 		"--verbosity=" + log_level,
-		"--suggested-fee-recipient=" + VALIDATING_REWARDS_ACCOUNT,
+		"--suggested-fee-recipient=" + package_io.VALIDATING_REWARDS_ACCOUNT,
 		# TODO(old) SOMETHING ABOUT JWT
 		# vvvvvvvvvvvvvvvvvvv METRICS CONFIG vvvvvvvvvvvvvvvvvvvvv
 		"--disable-monitoring=false",

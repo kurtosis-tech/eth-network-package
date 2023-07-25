@@ -35,8 +35,6 @@ BEACON_MIN_MEMORY = 256
 BEACON_MAX_MEMORY = 1024
 
 #  ---------------------------------- Validator client -------------------------------------
-VALIDATING_REWARDS_ACCOUNT	= package_io.VALIDATING_REWARDS_ACCOUNT
-
 VALIDATOR_HTTP_PORT_ID		= "http"
 VALIDATOR_METRICS_PORT_ID	= "metrics"
 VALIDATOR_HTTP_PORT_NUM		= 5042
@@ -230,7 +228,7 @@ def get_beacon_config(
 		"--disable-packet-filter",
 		"--execution-endpoints=" + el_client_engine_rpc_url_str,
 		"--jwt-secrets=" + jwt_secret_filepath,
-		"--suggested-fee-recipient=" + VALIDATING_REWARDS_ACCOUNT,
+		"--suggested-fee-recipient=" + package_io.VALIDATING_REWARDS_ACCOUNT,
 		# Set per Paris' recommendation to reduce noise in the logs
 		"--subscribe-all-subnets",
 		# vvvvvvvvvvvvvvvvvvv METRICS CONFIG vvvvvvvvvvvvvvvvvvvvv
@@ -314,7 +312,7 @@ def get_validator_config(
 		"--beacon-nodes=" + beacon_client_http_url,
 		#"--enable-doppelganger-protection", // Disabled to not have to wait 2 epochs before validator can start
 		# burn address - If unset, the validator will scream in its logs
-		"--suggested-fee-recipient="+VALIDATING_REWARDS_ACCOUNT,
+		"--suggested-fee-recipient="+package_io.VALIDATING_REWARDS_ACCOUNT,
 		# vvvvvvvvvvvvvvvvvvv PROMETHEUS CONFIG vvvvvvvvvvvvvvvvvvvvv
 		"--metrics",
 		"--metrics-address=0.0.0.0",
