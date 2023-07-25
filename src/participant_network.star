@@ -92,9 +92,15 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 
 		el_launcher, launch_method = el_launchers[el_client_type]["launcher"], el_launchers[el_client_type]["launch_method"]
 
-		zfill = next((zf for th, zf in zip(GLOBAL_INDEX_ZFILL['participants'], GLOBAL_INDEX_ZFILL['zfill']) if len(participants) < th), GLOBAL_INDEX_ZFILL['zfill'][-1])
+		# Find the correct zfill value based on the participants count
+		zfill = GLOBAL_INDEX_ZFILL['zfill'][-1]
+		for th, zf in zip(GLOBAL_INDEX_ZFILL['participants'], GLOBAL_INDEX_ZFILL['zfill']):
+			if len(participants) < th:
+				zfill = zf
+				break
 
-		index_str = str(index+1).zfill_custom(zfill)
+		# Zero-pad the index using the calculated zfill value
+		index_str = str(index + 1).zfill_custom(zfill)
 
 		el_service_name = "el-{0}-{1}-{2}".format(index_str, el_client_type, cl_client_type)
 
@@ -163,9 +169,15 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 
 		cl_launcher, launch_method = cl_launchers[cl_client_type]["launcher"], cl_launchers[cl_client_type]["launch_method"]
 
-		zfill = next((zf for th, zf in zip(GLOBAL_INDEX_ZFILL['participants'], GLOBAL_INDEX_ZFILL['zfill']) if len(participants) < th), GLOBAL_INDEX_ZFILL['zfill'][-1])
+		# Find the correct zfill value based on the participants count
+		zfill = GLOBAL_INDEX_ZFILL['zfill'][-1]
+		for th, zf in zip(GLOBAL_INDEX_ZFILL['participants'], GLOBAL_INDEX_ZFILL['zfill']):
+			if len(participants) < th:
+				zfill = zf
+				break
 
-		index_str = str(index+1).zfill_custom(zfill)
+		# Zero-pad the index using the calculated zfill value
+		index_str = str(index + 1).zfill_custom(zfill)
 
 		cl_service_name = "cl-{0}-{1}-{2}".format(index_str, cl_client_type, el_client_type)
 
