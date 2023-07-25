@@ -93,8 +93,8 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		el_launcher, launch_method = el_launchers[el_client_type]["launcher"], el_launchers[el_client_type]["launch_method"]
 
 		# Find the correct zfill value based on the participants count
-		zfill = GLOBAL_INDEX_ZFILL['zfill'][-1]
-		for th, zf in zip(GLOBAL_INDEX_ZFILL['participants'], GLOBAL_INDEX_ZFILL['zfill']):
+		zfill = package_io.GLOBAL_INDEX_ZFILL['zfill'][-1]
+		for th, zf in zip(package_io.GLOBAL_INDEX_ZFILL['participants'], package_io.GLOBAL_INDEX_ZFILL['zfill']):
 			if len(participants) < th:
 				zfill = zf
 				break
@@ -170,8 +170,8 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		cl_launcher, launch_method = cl_launchers[cl_client_type]["launcher"], cl_launchers[cl_client_type]["launch_method"]
 
 		# Find the correct zfill value based on the participants count
-		zfill = GLOBAL_INDEX_ZFILL['zfill'][-1]
-		for th, zf in zip(GLOBAL_INDEX_ZFILL['participants'], GLOBAL_INDEX_ZFILL['zfill']):
+		zfill = package_io.GLOBAL_INDEX_ZFILL['zfill'][-1]
+		for th, zf in zip(package_io.GLOBAL_INDEX_ZFILL['participants'], package_io.GLOBAL_INDEX_ZFILL['zfill']):
 			if len(participants) < th:
 				zfill = zf
 				break
