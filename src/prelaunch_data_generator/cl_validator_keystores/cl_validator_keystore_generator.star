@@ -72,7 +72,7 @@ def generate_cl_validator_keystores(
 	# Store outputs into files artifacts
 	keystore_files = []
 	for idx, output_dirpath in enumerate(all_output_dirpaths):
-		artifact_name = plan.store_service_files(service_name, output_dirpath, name = "validator-keystore-" + str(idx))
+		artifact_name = plan.store_service_files(service_name, output_dirpath, name = "validator-keystore-" + str(idx+1))
 
 		# This is necessary because the way Kurtosis currently implements artifact-storing is
 		base_dirname_in_artifact = shared_utils.path_base(output_dirpath)
