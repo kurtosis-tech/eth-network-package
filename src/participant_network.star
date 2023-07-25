@@ -92,10 +92,9 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 
 		el_launcher, launch_method = el_launchers[el_client_type]["launcher"], el_launchers[el_client_type]["launch_method"]
 
-		if len(participants) > 9:
-			index_str = zfill_custom(index+1, 2)
-		else:
-			index_str = str(index+1)
+		zfill = next((zf for th, zf in zip(GLOBAL_INDEX_ZFILL['participants'], GLOBAL_INDEX_ZFILL['zfill']) if len(participants) < th), GLOBAL_INDEX_ZFILL['zfill'][-1])
+
+		index_str = str(index+1).zfill_custom(zfill)
 
 		el_service_name = "el-{0}-{1}-{2}".format(index_str, el_client_type, cl_client_type)
 
@@ -163,10 +162,10 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 			fail("Unsupported launcher '{0}', need one of '{1}'".format(cl_client_type, ",".join([cl.name for cl in cl_launchers.keys()])))
 
 		cl_launcher, launch_method = cl_launchers[cl_client_type]["launcher"], cl_launchers[cl_client_type]["launch_method"]
-		if len(participants) > 9:
-			index_str = zfill_custom(index+1, 2)
-		else:
-			index_str = str(index+1)
+
+		zfill = next((zf for th, zf in zip(GLOBAL_INDEX_ZFILL['participants'], GLOBAL_INDEX_ZFILL['zfill']) if len(participants) < th), GLOBAL_INDEX_ZFILL['zfill'][-1])
+
+		index_str = str(index+1).zfill_custom(zfill)
 
 		cl_service_name = "cl-{0}-{1}-{2}".format(index_str, cl_client_type, el_client_type)
 
