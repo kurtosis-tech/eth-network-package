@@ -123,10 +123,9 @@ def get_config(genesis_data, image, existing_el_clients, verbosity_level, extra_
 	if len(existing_el_clients) > 0:
 		bootnode_context = existing_el_clients[0]
 		bootnode_enode = bootnode_context.enode
-
-	launch_node_cmd.append(
-		'--bootnodes="{0}"'.format(bootnode_enode),
-	)
+		launch_node_cmd.append(
+			'--bootnodes="{0}"'.format(bootnode_enode),
+		)
 
 	if len(extra_params) > 0:
 		# this is a repeated<proto type>, we convert it into Starlark
