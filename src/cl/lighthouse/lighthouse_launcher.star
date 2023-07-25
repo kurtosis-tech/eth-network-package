@@ -28,9 +28,13 @@ BEACON_DISCOVERY_PORT_NUM	= 9000
 BEACON_HTTP_PORT_NUM		= 4000
 BEACON_METRICS_PORT_NUM		= 5054
 
-#  ---------------------------------- Validator client -------------------------------------
-VALIDATING_REWARDS_ACCOUNT	= "0x0000000000000000000000000000000000000000"
+# The min/max CPU/memory that the beacon node can use
+BEACON_MIN_CPU = 50
+BEACON_MAX_CPU = 1000
+BEACON_MIN_MEMORY = 256
+BEACON_MAX_MEMORY = 1024
 
+#  ---------------------------------- Validator client -------------------------------------
 VALIDATOR_HTTP_PORT_ID		= "http"
 VALIDATOR_METRICS_PORT_ID	= "metrics"
 VALIDATOR_HTTP_PORT_NUM		= 5042
@@ -39,6 +43,12 @@ VALIDATOR_HTTP_PORT_WAIT_DISABLED = None
 
 METRICS_PATH = "/metrics"
 VALIDATOR_SUFFIX_SERVICE_NAME = "validator"
+
+# The min/max CPU/memory that the validator node can use
+VALIDATOR_MIN_CPU = 50
+VALIDATOR_MAX_CPU = 300
+VALIDATOR_MIN_MEMORY = 128
+VALIDATOR_MAX_MEMORY = 512
 
 PRIVATE_IP_ADDRESS_PLACEHOLDER = "KURTOSIS_IP_ADDR_PLACEHOLDER"
 
@@ -72,6 +82,14 @@ def launch(
 	bootnode_context,
 	el_client_context,
 	node_keystore_files,
+	bn_min_cpu,
+	bn_max_cpu,
+	bn_min_mem,
+	bn_max_mem,
+	v_min_cpu,
+	v_max_cpu,
+	v_min_mem,
+	v_max_mem,
 	extra_beacon_params,
 	extra_validator_params):
 
@@ -80,6 +98,16 @@ def launch(
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, LIGHTHOUSE_LOG_LEVELS)
 
+	bn_min_cpu = int(bn_min_cpu) if int(bn_min_cpu) > 0 else BEACON_MIN_CPU
+	bn_max_cpu = int(bn_max_cpu) if int(bn_max_cpu) > 0 else BEACON_MAX_CPU
+	bn_min_mem = int(bn_min_mem) if int(bn_min_mem) > 0 else BEACON_MIN_MEMORY
+	bn_max_mem = int(bn_max_mem) if int(bn_max_mem) > 0 else BEACON_MAX_MEMORY
+
+	v_min_cpu = int(v_min_cpu) if int(v_min_cpu) > 0 else VALIDATOR_MIN_CPU
+	v_max_cpu = int(v_max_cpu) if int(v_max_cpu) > 0 else VALIDATOR_MAX_CPU
+	v_min_mem = int(v_min_mem) if int(v_min_mem) > 0 else VALIDATOR_MIN_MEMORY
+	v_max_mem = int(v_max_mem) if int(v_max_mem) > 0 else VALIDATOR_MAX_MEMORY
+
 	# Launch Beacon node
 	beacon_config = get_beacon_config(
 		launcher.genesis_data,
@@ -87,6 +115,10 @@ def launch(
 		bootnode_context,
 		el_client_context,
 		log_level,
+		bn_min_cpu,
+		bn_max_cpu,
+		bn_min_mem,
+		bn_max_mem,
 		extra_beacon_params,
 	)
 
@@ -103,6 +135,10 @@ def launch(
 		log_level,
 		beacon_http_url,
 		node_keystore_files,
+		v_min_cpu,
+		v_max_cpu,
+		v_min_mem,
+		v_max_mem,
 		extra_validator_params,
 	)
 
@@ -145,6 +181,10 @@ def get_beacon_config(
 	boot_cl_client_ctx,
 	el_client_ctx,
 	log_level,
+	bn_min_cpu,
+	bn_max_cpu,
+	bn_min_mem,
+	bn_max_mem,
 	extra_params):
 
 	el_client_engine_rpc_url_str = "http://{0}:{1}".format(
@@ -188,7 +228,7 @@ def get_beacon_config(
 		"--disable-packet-filter",
 		"--execution-endpoints=" + el_client_engine_rpc_url_str,
 		"--jwt-secrets=" + jwt_secret_filepath,
-		"--suggested-fee-recipient=" + VALIDATING_REWARDS_ACCOUNT,
+		"--suggested-fee-recipient=" + package_io.VALIDATING_REWARDS_ACCOUNT,
 		# Set per Paris' recommendation to reduce noise in the logs
 		"--subscribe-all-subnets",
 		# vvvvvvvvvvvvvvvvvvv METRICS CONFIG vvvvvvvvvvvvvvvvvvvvv
@@ -230,7 +270,11 @@ def get_beacon_config(
 			RUST_BACKTRACE_ENVVAR_NAME: RUST_FULL_BACKTRACE_KEYWORD
 		},
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
-		ready_conditions = ready_conditions
+		ready_conditions = ready_conditions,
+		min_cpu = bn_min_cpu,
+		max_cpu = bn_max_cpu,
+		min_memory = bn_min_mem,
+		max_memory = bn_max_mem
 	)
 
 
@@ -240,6 +284,10 @@ def get_validator_config(
 	log_level,
 	beacon_client_http_url,
 	node_keystore_files,
+	v_min_cpu,
+	v_max_cpu,
+	v_min_mem,
+	v_max_mem,
 	extra_params):
 
 	# For some reason, Lighthouse takes in the parent directory of the config file (rather than the path to the config file itself)
@@ -264,7 +312,7 @@ def get_validator_config(
 		"--beacon-nodes=" + beacon_client_http_url,
 		#"--enable-doppelganger-protection", // Disabled to not have to wait 2 epochs before validator can start
 		# burn address - If unset, the validator will scream in its logs
-		"--suggested-fee-recipient=0x0000000000000000000000000000000000000000",
+		"--suggested-fee-recipient="+package_io.VALIDATING_REWARDS_ACCOUNT,
 		# vvvvvvvvvvvvvvvvvvv PROMETHEUS CONFIG vvvvvvvvvvvvvvvvvvvvv
 		"--metrics",
 		"--metrics-address=0.0.0.0",
@@ -288,6 +336,10 @@ def get_validator_config(
 		env_vars = {
 			RUST_BACKTRACE_ENVVAR_NAME: RUST_FULL_BACKTRACE_KEYWORD
 		},
+		min_cpu = v_min_cpu,
+		max_cpu = v_max_cpu,
+		min_memory = v_min_mem,
+		max_memory = v_max_mem
 	)
 
 

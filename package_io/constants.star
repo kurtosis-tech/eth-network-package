@@ -2,7 +2,8 @@ EL_CLIENT_TYPE = struct(
 	geth="geth",
 	erigon="erigon",
 	nethermind="nethermind",
-	besu="besu"
+	besu="besu",
+	reth="reth"
 )
 
 CL_CLIENT_TYPE = struct(
@@ -20,3 +21,5 @@ GLOBAL_CLIENT_LOG_LEVEL = struct(
 	debug="debug",
 	trace="trace",
 )
+
+VALIDATING_REWARDS_ACCOUNT = "0x878705ba3f8Bc32FCf7F4CAa1A35E72AF65CF766"

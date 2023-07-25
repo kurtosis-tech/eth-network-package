@@ -21,6 +21,13 @@ DISCOVERY_PORT_NUM = 9000
 HTTP_PORT_NUM = 4000
 METRICS_PORT_NUM = 8008
 
+# The min/max CPU/memory that the beacon node can use
+BEACON_MIN_CPU = 50
+BEACON_MAX_CPU = 1000
+BEACON_MIN_MEMORY = 128
+BEACON_MAX_MEMORY = 1024
+
+
 # Nimbus requires that its data directory already exists (because it expects you to bind-mount it), so we
 #  have to to create it
 CONSENSUS_DATA_DIRPATH_IN_SERVICE_CONTAINER = "$HOME/consensus-data"
@@ -69,6 +76,14 @@ def launch(
 	bootnode_context,
 	el_client_context,
 	node_keystore_files,
+	bn_min_cpu,
+	bn_max_cpu,
+	bn_min_mem,
+	bn_max_mem,
+	v_min_cpu,
+	v_max_cpu,
+	v_min_mem,
+	v_max_mem,
 	extra_beacon_params,
 	extra_validator_params):
 
@@ -76,7 +91,30 @@ def launch(
 
 	extra_params = [param for param in extra_beacon_params] + [param for param in extra_validator_params]
 
-	config = get_config(launcher.cl_genesis_data, image, bootnode_context, el_client_context, log_level, node_keystore_files, extra_params)
+	bn_min_cpu = int(bn_min_cpu) if int(bn_min_cpu) > 0 else BEACON_MIN_CPU
+	bn_max_cpu = int(bn_max_cpu) if int(bn_max_cpu) > 0 else BEACON_MAX_CPU
+	bn_min_mem = int(bn_min_mem) if int(bn_min_mem) > 0 else BEACON_MIN_MEMORY
+	bn_max_mem = int(bn_max_mem) if int(bn_max_mem) > 0 else BEACON_MAX_MEMORY
+
+	# Set the min/max CPU/memory for the beacon node to be the max of the beacon node and validator node values, unless this is defined, it will use the default beacon values
+	bn_min_cpu = int(v_min_cpu) if (int(v_min_cpu) > bn_min_cpu) else bn_min_cpu
+	bn_max_cpu = int(v_max_cpu) if (int(v_max_cpu) > bn_max_cpu) else bn_max_cpu
+	bn_min_mem = int(v_min_mem) if (int(v_min_mem) > bn_min_mem) else bn_min_mem
+	bn_max_mem = int(v_max_mem) if (int(v_max_mem) > bn_max_mem) else bn_max_mem
+
+	config = get_config(
+		launcher.cl_genesis_data,
+		image,
+		bootnode_context,
+		el_client_context,
+		log_level,
+		node_keystore_files,
+		bn_min_cpu,
+		bn_max_cpu,
+		bn_min_mem,
+		bn_max_mem,
+		extra_params
+	)
 
 	nimbus_service = plan.add_service(service_name, config)
 
@@ -109,10 +147,14 @@ def launch(
 def get_config(
 	genesis_data,
 	image,
-	boot_cl_client_ctx,
+	bootnode_context,
 	el_client_ctx,
 	log_level,
 	node_keystore_files,
+	bn_min_cpu,
+	bn_max_cpu,
+	bn_min_mem,
+	bn_max_mem,
 	extra_params):
 
 	el_client_engine_rpc_url_str = "http://{0}:{1}".format(
@@ -167,6 +209,7 @@ def get_config(
 		"--rest-port={0}".format(HTTP_PORT_NUM),
 		"--validators-dir=" + VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER,
 		"--secrets-dir=" + VALIDATOR_SECRETS_DIRPATH_ON_SERVICE_CONTAINER,
+		"--suggested-fee-recipient=" + package_io.VALIDATING_REWARDS_ACCOUNT,
 		# There's a bug where if we don't set this flag, the Nimbus nodes won't work:
 		# https://discord.com/channels/641364059387854899/674288681737256970/922890280120750170
 		# https://github.com/status-im/nimbus-eth2/issues/2451
@@ -182,12 +225,12 @@ def get_config(
 		"--metrics-port={0}".format(METRICS_PORT_NUM),
 		# ^^^^^^^^^^^^^^^^^^^ METRICS CONFIG ^^^^^^^^^^^^^^^^^^^^^
 	]
-	if boot_cl_client_ctx == None:
-		# Copied from https://.com/status-im/nimbus-eth2/blob/67ab477a27e358d605e99bffeb67f98d18218eca/scripts/launch_local_testnet.sh#L417
+	if bootnode_context == None:
+		# Copied from https://github.com/status-im/nimbus-eth2/blob/67ab477a27e358d605e99bffeb67f98d18218eca/scripts/launch_local_testnet.sh#L417
 		# See explanation there
 		cmd.append("--subscribe-all-subnets")
 	else:
-		cmd.append("--bootstrap-node="+boot_cl_client_ctx.enr)
+		cmd.append("--bootstrap-node="+bootnode_context.enr)
 
 	if len(extra_params) > 0:
 		cmd.extend([param for param in extra_params])
@@ -204,7 +247,11 @@ def get_config(
 			VALIDATOR_KEYS_MOUNTPOINT_ON_CLIENT: node_keystore_files.files_artifact_uuid
 		},
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
-		ready_conditions = cl_node_ready_conditions.get_ready_conditions(HTTP_PORT_ID)
+		ready_conditions = cl_node_ready_conditions.get_ready_conditions(HTTP_PORT_ID),
+		min_cpu = bn_min_cpu,
+		max_cpu = bn_max_cpu,
+		min_memory = bn_min_mem,
+		max_memory = bn_max_mem
 	)
 
 

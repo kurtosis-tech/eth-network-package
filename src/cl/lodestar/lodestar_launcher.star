@@ -6,10 +6,9 @@ cl_node_ready_conditions = import_module("github.com/kurtosis-tech/eth-network-p
 
 package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
 
-CONSENSUS_DATA_DIRPATH_ON_SERVICE_CONTAINER		  = "/consensus-data"
 GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER   = "/genesis"
-VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER = "/validator-keys"
-
+#  ---------------------------------- Beacon client -------------------------------------
+CONSENSUS_DATA_DIRPATH_ON_SERVICE_CONTAINER		  = "/consensus-data"
 # Port IDs
 TCP_DISCOVERY_PORT_ID		= "tcp-discovery"
 UDP_DISCOVERY_PORT_ID		= "udp-discovery"
@@ -21,6 +20,20 @@ VALIDATOR_METRICS_PORT_ID	= "validator-metrics"
 DISCOVERY_PORT_NUM			= 9000
 HTTP_PORT_NUM				= 4000
 METRICS_PORT_NUM			= 8008
+
+# The min/max CPU/memory that the beacon node can use
+BEACON_MIN_CPU = 50
+BEACON_MAX_CPU = 1000
+BEACON_MIN_MEMORY = 256
+BEACON_MAX_MEMORY = 1024
+
+#  ---------------------------------- Validator client -------------------------------------
+VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER = "/validator-keys"
+# The min/max CPU/memory that the validator node can use
+VALIDATOR_MIN_CPU = 50
+VALIDATOR_MAX_CPU = 300
+VALIDATOR_MIN_MEMORY = 128
+VALIDATOR_MAX_MEMORY = 512
 
 VALIDATOR_SUFFIX_SERVICE_NAME = "validator"
 
@@ -59,6 +72,14 @@ def launch(
 	bootnode_context,
 	el_client_context,
 	node_keystore_files,
+	bn_min_cpu,
+	bn_max_cpu,
+	bn_min_mem,
+	bn_max_mem,
+	v_min_cpu,
+	v_max_cpu,
+	v_min_mem,
+	v_max_mem,
 	extra_beacon_params,
 	extra_validator_params):
 
@@ -67,6 +88,17 @@ def launch(
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, LODESTAR_LOG_LEVELS)
 
+	bn_min_cpu = int(bn_min_cpu) if int(bn_min_cpu) > 0 else BEACON_MIN_CPU
+	bn_max_cpu = int(bn_max_cpu) if int(bn_max_cpu) > 0 else BEACON_MAX_CPU
+	bn_min_mem = int(bn_min_mem) if int(bn_min_mem) > 0 else BEACON_MIN_MEMORY
+	bn_max_mem = int(bn_max_mem) if int(bn_max_mem) > 0 else BEACON_MAX_MEMORY
+
+	v_min_cpu = int(v_min_cpu) if int(v_min_cpu) > 0 else VALIDATOR_MIN_CPU
+	v_max_cpu = int(v_max_cpu) if int(v_max_cpu) > 0 else VALIDATOR_MAX_CPU
+	v_min_mem = int(v_min_mem) if int(v_min_mem) > 0 else VALIDATOR_MIN_MEMORY
+	v_max_mem = int(v_max_mem) if int(v_max_mem) > 0 else VALIDATOR_MAX_MEMORY
+
+
 	# Launch Beacon node
 	beacon_config = get_beacon_config(
 		launcher.cl_genesis_data,
@@ -74,6 +106,10 @@ def launch(
 		bootnode_context,
 		el_client_context,
 		log_level,
+		bn_min_cpu,
+		bn_max_cpu,
+		bn_min_mem,
+		bn_max_mem,
 		extra_beacon_params,
 	)
 
@@ -92,6 +128,10 @@ def launch(
 		log_level,
 		beacon_http_url,
 		node_keystore_files,
+		v_min_cpu,
+		v_max_cpu,
+		v_min_mem,
+		v_max_mem,
 		extra_validator_params,
 	)
 
@@ -131,6 +171,10 @@ def get_beacon_config(
 	boot_cl_client_ctx,
 	el_client_ctx,
 	log_level,
+	bn_min_cpu,
+	bn_max_cpu,
+	bn_min_mem,
+	bn_max_mem,
 	extra_params):
 
 	el_client_rpc_url_str = "http://{0}:{1}".format(
@@ -192,7 +236,11 @@ def get_beacon_config(
 			GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: genesis_data.files_artifact_uuid
 		},
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
-		ready_conditions = cl_node_ready_conditions.get_ready_conditions(HTTP_PORT_ID)
+		ready_conditions = cl_node_ready_conditions.get_ready_conditions(HTTP_PORT_ID),
+		min_cpu = bn_min_cpu,
+		max_cpu = bn_max_cpu,
+		min_memory = bn_min_mem,
+		max_memory = bn_max_mem
 	)
 
 
@@ -203,6 +251,10 @@ def get_validator_config(
 	log_level,
 	beacon_client_http_url,
 	node_keystore_files,
+	v_min_cpu,
+	v_max_cpu,
+	v_min_mem,
+	v_max_mem,
 	extra_params):
 
 	root_dirpath = shared_utils.path_join(CONSENSUS_DATA_DIRPATH_ON_SERVICE_CONTAINER, service_name)
@@ -219,6 +271,7 @@ def get_validator_config(
 		"--beaconNodes=" + beacon_client_http_url,
 		"--keystoresDir=" + validator_keys_dirpath,
 		"--secretsDir=" + validator_secrets_dirpath,
+		"--suggestedFeeRecipient=" + package_io.VALIDATING_REWARDS_ACCOUNT,
 		# vvvvvvvvvvvvvvvvvvv PROMETHEUS CONFIG vvvvvvvvvvvvvvvvvvvvv
 		"--metrics",
 		"--metrics.address=0.0.0.0",
@@ -239,7 +292,11 @@ def get_validator_config(
 			GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: genesis_data.files_artifact_uuid,
 			VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: node_keystore_files.files_artifact_uuid,
 		},
-		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER
+		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
+		min_cpu = v_min_cpu,
+		max_cpu = v_max_cpu,
+		min_memory = v_min_mem,
+		max_memory = v_max_mem
 	)
 
 

@@ -8,6 +8,7 @@ geth = import_module("github.com/kurtosis-tech/eth-network-package/src/el/geth/g
 besu = import_module("github.com/kurtosis-tech/eth-network-package/src/el/besu/besu_launcher.star")
 erigon = import_module("github.com/kurtosis-tech/eth-network-package/src/el/erigon/erigon_launcher.star")
 nethermind = import_module("github.com/kurtosis-tech/eth-network-package/src/el/nethermind/nethermind_launcher.star")
+reth = import_module("github.com/kurtosis-tech/eth-network-package/src/el/reth/reth_launcher.star")
 
 
 lighthouse = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/lighthouse/lighthouse_launcher.star")
@@ -33,6 +34,10 @@ CL_GENESIS_DATA_GENERATION_TIME = 5 * time.second
 CL_NODE_STARTUP_TIME = 5 * time.second
 
 CL_CLIENT_CONTEXT_BOOTNODE = None
+
+GLOBAL_INDEX_ZFILL = {
+	"zfill_values": [(1,1), (2,10), (3,100), (4,1000), (5,10000)]
+}
 
 def launch_participant_network(plan, participants, network_params, global_log_level):
 	num_participants = len(participants)
@@ -75,6 +80,7 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		package_io.EL_CLIENT_TYPE.besu : {"launcher": besu.new_besu_launcher(network_params.network_id, el_genesis_data), "launch_method": besu.launch},
 		package_io.EL_CLIENT_TYPE.erigon : {"launcher": erigon.new_erigon_launcher(network_params.network_id, el_genesis_data), "launch_method": erigon.launch},
 		package_io.EL_CLIENT_TYPE.nethermind : {"launcher": nethermind.new_nethermind_launcher(el_genesis_data), "launch_method": nethermind.launch},
+		package_io.EL_CLIENT_TYPE.reth : {"launcher": reth.new_reth_launcher(el_genesis_data), "launch_method": reth.launch},
 	}
 
 	all_el_client_contexts = []
@@ -87,7 +93,11 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 			fail("Unsupported launcher '{0}', need one of '{1}'".format(el_client_type, ",".join([el.name for el in el_launchers.keys()])))
 
 		el_launcher, launch_method = el_launchers[el_client_type]["launcher"], el_launchers[el_client_type]["launch_method"]
-		el_service_name = "{0}-{1}-{2}".format(index+1, el_client_type, cl_client_type)
+
+		# Zero-pad the index using the calculated zfill value
+		index_str = zfill_custom(index+1, zfill_calculator(participants))
+
+		el_service_name = "el-{0}-{1}-{2}".format(index_str, el_client_type, cl_client_type)
 
 		el_client_context = launch_method(
 			plan,
@@ -97,6 +107,10 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 			participant.el_client_log_level,
 			global_log_level,
 			all_el_client_contexts,
+			participant.el_min_cpu,
+			participant.el_max_cpu,
+			participant.el_min_mem,
+			participant.el_max_mem,
 			participant.el_extra_params
 		)
 
@@ -148,7 +162,10 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 			fail("Unsupported launcher '{0}', need one of '{1}'".format(cl_client_type, ",".join([cl.name for cl in cl_launchers.keys()])))
 
 		cl_launcher, launch_method = cl_launchers[cl_client_type]["launcher"], cl_launchers[cl_client_type]["launch_method"]
-		cl_service_name = "{0}-{1}-{2}".format(index+1, cl_client_type, el_client_type)
+
+		index_str = zfill_custom(index+1, zfill_calculator(participants))
+
+		cl_service_name = "cl-{0}-{1}-{2}".format(index_str, cl_client_type, el_client_type)
 
 		new_cl_node_validator_keystores = preregistered_validator_keys_for_nodes[index]
 
@@ -167,8 +184,16 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 				CL_CLIENT_CONTEXT_BOOTNODE,
 				el_client_context,
 				new_cl_node_validator_keystores,
+				participant.bn_min_cpu,
+				participant.bn_max_cpu,
+				participant.bn_min_mem,
+				participant.bn_max_mem,
+				participant.v_min_cpu,
+				participant.v_max_cpu,
+				participant.v_min_mem,
+				participant.v_max_mem,
 				participant.beacon_extra_params,
-				participant.validator_extra_params
+				participant.validator_extra_params,
 			)
 		else:
 			boot_cl_client_ctx = all_cl_client_contexts[0]
@@ -182,8 +207,16 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 				boot_cl_client_ctx,
 				el_client_context,
 				new_cl_node_validator_keystores,
+				participant.bn_min_cpu,
+				participant.bn_max_cpu,
+				participant.bn_min_mem,
+				participant.bn_max_mem,
+				participant.v_min_cpu,
+				participant.v_max_cpu,
+				participant.v_min_mem,
+				participant.v_max_mem,
 				participant.beacon_extra_params,
-				participant.validator_extra_params
+				participant.validator_extra_params,
 			)
 
 		all_cl_client_contexts.append(cl_client_context)
@@ -205,3 +238,13 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 
 
 	return all_participants, final_genesis_timestamp
+
+def zfill_calculator(participants):
+	for zf, par in GLOBAL_INDEX_ZFILL['zfill_values']:
+		if len(participants) < par:
+			zfill = zf-1
+			return zfill
+			break
+
+def zfill_custom(value, width):
+    return ("0" * (width - len(str(value)))) + str(value)

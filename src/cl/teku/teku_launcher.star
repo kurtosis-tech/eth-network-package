@@ -17,9 +17,6 @@ CONSENSUS_DATA_DIRPATH_ON_SERVICE_CONTAINER = "/opt/teku/consensus-data"
 #  into the Teku user's home directory to get around it
 VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER = "/validator-keys"
 
-# TODO(old) Get rid of this being hardcoded; should be shared
-VALIDATING_REWARDS_ACCOUNT = "0x0000000000000000000000000000000000000000"
-
 # Port IDs
 TCP_DISCOVERY_PORT_ID	= "tcp-discovery"
 UDP_DISCOVERY_PORT_ID	= "udp-discovery"
@@ -30,6 +27,12 @@ METRICS_PORT_ID			= "metrics"
 DISCOVERY_PORT_NUM	= 9000
 HTTP_PORT_NUM		= 4000
 METRICS_PORT_NUM	= 8008
+
+# The min/max CPU/memory that the beacon node can use
+BEACON_MIN_CPU = 50
+BEACON_MAX_CPU = 1000
+BEACON_MIN_MEMORY = 512
+BEACON_MAX_MEMORY = 1024
 
 # 1) The Teku container runs as the "teku" user
 # 2) Teku requires write access to the validator secrets directory, so it can write a lockfile into it as it uses the keys
@@ -75,6 +78,14 @@ def launch(
 	bootnode_context,
 	el_client_context,
 	node_keystore_files,
+	bn_min_cpu,
+	bn_max_cpu,
+	bn_min_mem,
+	bn_max_mem,
+	v_min_cpu,
+	v_max_cpu,
+	v_min_mem,
+	v_max_mem,
 	extra_beacon_params,
 	extra_validator_params):
 
@@ -82,7 +93,30 @@ def launch(
 
 	extra_params = [param for param in extra_beacon_params] + [param for param in extra_validator_params]
 
-	config = get_config(launcher.cl_genesis_data, image, bootnode_context, el_client_context, log_level, node_keystore_files, extra_params)
+	bn_min_cpu = int(bn_min_cpu) if int(bn_min_cpu) > 0 else BEACON_MIN_CPU
+	bn_max_cpu = int(bn_max_cpu) if int(bn_max_cpu) > 0 else BEACON_MAX_CPU
+	bn_min_mem = int(bn_min_mem) if int(bn_min_mem) > 0 else BEACON_MIN_MEMORY
+	bn_max_mem = int(bn_max_mem) if int(bn_max_mem) > 0 else BEACON_MAX_MEMORY
+
+	# Set the min/max CPU/memory for the beacon node to be the max of the beacon node and validator node values, unless this is defined, it will use the default beacon values
+	bn_min_cpu = int(v_min_cpu) if (int(v_min_cpu) > bn_min_cpu) else bn_min_cpu
+	bn_max_cpu = int(v_max_cpu) if (int(v_max_cpu) > bn_max_cpu) else bn_max_cpu
+	bn_min_mem = int(v_min_mem) if (int(v_min_mem) > bn_min_mem) else bn_min_mem
+	bn_max_mem = int(v_max_mem) if (int(v_max_mem) > bn_max_mem) else bn_max_mem
+
+	config = get_config(
+		launcher.cl_genesis_data,
+		image,
+		bootnode_context,
+		el_client_context,
+		log_level,
+		node_keystore_files,
+		bn_min_cpu,
+		bn_max_cpu,
+		bn_min_mem,
+		bn_max_mem,
+		extra_params
+	)
 
 	teku_service = plan.add_service(service_name, config)
 
@@ -119,6 +153,10 @@ def get_config(
 	el_client_ctx,
 	log_level,
 	node_keystore_files,
+	bn_min_cpu,
+	bn_max_cpu,
+	bn_min_mem,
+	bn_max_mem,
 	extra_params):
 
 	el_client_rpc_url_str = "http://{0}:{1}".format(
@@ -175,7 +213,7 @@ def get_config(
 		),
 		"--ee-jwt-secret-file={0}".format(jwt_secret_filepath),
 		"--ee-endpoint=" + el_client_engine_rpc_url_str,
-		"--validators-proposer-default-fee-recipient=" + VALIDATING_REWARDS_ACCOUNT,
+		"--validators-proposer-default-fee-recipient=" + package_io.VALIDATING_REWARDS_ACCOUNT,
 		# vvvvvvvvvvvvvvvvvvv METRICS CONFIG vvvvvvvvvvvvvvvvvvvvv
 		"--metrics-enabled",
 		"--metrics-interface=0.0.0.0",
@@ -204,7 +242,11 @@ def get_config(
 			VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER: node_keystore_files.files_artifact_uuid,
 		},
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
-		ready_conditions = cl_node_ready_conditions.get_ready_conditions(HTTP_PORT_ID)
+		ready_conditions = cl_node_ready_conditions.get_ready_conditions(HTTP_PORT_ID),
+		min_cpu = bn_min_cpu,
+		max_cpu = bn_max_cpu,
+		min_memory = bn_min_mem,
+		max_memory = bn_max_mem
 	)
 
 
