@@ -38,16 +38,6 @@ GLOBAL_INDEX_ZFILL = {
 	"zfill_values": [(1,1), (2,10), (3,100), (4,1000), (5,10000)]
 }
 
-def zfill_calculator(participants):
-	for zf, par in GLOBAL_INDEX_ZFILL['zfill_values']:
-		if len(participants) < par:
-			zfill = zf-1
-			return zfill
-			break
-
-def zfill_custom(value, width):
-    return ("0" * (width - len(str(value)))) + str(value)
-
 def launch_participant_network(plan, participants, network_params, global_log_level):
 	num_participants = len(participants)
 
@@ -248,3 +238,13 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 
 
 	return all_participants, final_genesis_timestamp
+
+def zfill_calculator(participants):
+	for zf, par in GLOBAL_INDEX_ZFILL['zfill_values']:
+		if len(participants) < par:
+			zfill = zf-1
+			return zfill
+			break
+
+def zfill_custom(value, width):
+    return ("0" * (width - len(str(value)))) + str(value)

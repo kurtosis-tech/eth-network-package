@@ -28,7 +28,8 @@ BEACON_MIN_MEMORY = 256
 BEACON_MAX_MEMORY = 1024
 
 #  ---------------------------------- Validator client -------------------------------------
-VALIDATING_REWARDS_ACCOUNT	= "0x878705ba3f8Bc32FCf7F4CAa1A35E72AF65CF766"
+VALIDATING_REWARDS_ACCOUNT	= package_io.VALIDATING_REWARDS_ACCOUNT
+
 VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER = "/validator-keys"
 # The min/max CPU/memory that the validator node can use
 VALIDATOR_MIN_CPU = 50
