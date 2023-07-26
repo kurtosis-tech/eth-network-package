@@ -76,7 +76,7 @@ def generate_cl_validator_keystores(
 		padded_idx = zfill_custom(idx+1, len(str(len(participants))))
 		keystore_start_index = idx * num_validators_per_node
 		keystore_stop_index = (idx+1) * num_validators_per_node - 1
-		artifact_name = "cl-{0}-{1}-{2}-{3}-{4}".format(
+		artifact_name = "{0}-{1}-{2}-{3}-{4}".format(
 			padded_idx,
 			participant.cl_client_type, 
 			participant.el_client_type, 
