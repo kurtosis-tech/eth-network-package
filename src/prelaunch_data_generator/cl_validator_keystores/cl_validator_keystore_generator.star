@@ -31,7 +31,7 @@ TEKU_SECRETS_DIRNAME = "teku-secrets"
 def generate_cl_validator_keystores(
 	plan,
 	mnemonic,
-	num_nodes,
+	participants,
 	num_validators_per_node):
 
 	service_name = prelaunch_data_generator_launcher.launch_prelaunch_data_generator(
@@ -45,8 +45,8 @@ def generate_cl_validator_keystores(
 	start_index = 0
 	stop_index = num_validators_per_node
 
-	for i in range(num_nodes):
-		output_dirpath = NODE_KEYSTORES_OUTPUT_DIRPATH_FORMAT_STR.format(i)
+	for idx, participant in enumerate(participants):
+		output_dirpath = NODE_KEYSTORES_OUTPUT_DIRPATH_FORMAT_STR.format(idx)
 
 		generate_keystores_cmd = "{0} keystores --insecure --prysm-pass {1} --out-loc {2} --source-mnemonic \"{3}\" --source-min {4} --source-max {5}".format(
 			KEYSTORES_GENERATION_TOOL_NAME,
@@ -60,9 +60,8 @@ def generate_cl_validator_keystores(
 		all_sub_command_strs.append(generate_keystores_cmd)
 		all_output_dirpaths.append(output_dirpath)
 
-		start_index = stop_index
-		stop_index = stop_index + num_validators_per_node
-
+		start_index = idx * num_validators_per_node
+		stop_index = (idx+1) * num_validators_per_node - 1
 
 	command_str = " && ".join(all_sub_command_strs)
 
@@ -71,8 +70,20 @@ def generate_cl_validator_keystores(
 
 	# Store outputs into files artifacts
 	keystore_files = []
-	for idx, output_dirpath in enumerate(all_output_dirpaths):
-		artifact_name = plan.store_service_files(service_name, output_dirpath, name = "validator-keystore-" + str(idx+1))
+	for idx, participant in enumerate(participants):
+		output_dirpath = all_output_dirpaths[idx]
+
+		padded_idx = zfill_custom(idx+1, len(str(len(participants))))
+		keystore_start_index = idx * num_validators_per_node
+		keystore_stop_index = (idx+1) * num_validators_per_node - 1
+		artifact_name = "cl-{0}-{1}-{2}-{3}-{4}".format(
+			padded_idx,
+			participant.cl_client_type, 
+			participant.el_client_type, 
+			keystore_start_index, 
+			keystore_stop_index,
+		)
+		artifact_name = plan.store_service_files(service_name, output_dirpath, name=artifact_name)
 
 		# This is necessary because the way Kurtosis currently implements artifact-storing is
 		base_dirname_in_artifact = shared_utils.path_base(output_dirpath)
@@ -111,3 +122,6 @@ def generate_cl_validator_keystores(
 	# we cleanup as the data generation is done
 	plan.remove_service(service_name)
 	return result
+
+def zfill_custom(value, width):
+    return ("0" * (width - len(str(value)))) + str(value)
