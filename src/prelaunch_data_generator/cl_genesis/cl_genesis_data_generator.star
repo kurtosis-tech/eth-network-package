@@ -69,6 +69,7 @@ def generate_cl_genesis_data(
 			CONFIG_DIRPATH_ON_GENERATOR: genesis_generation_config_artifact_name,
 			EL_GENESIS_DIRPATH_ON_GENERATOR: el_genesis_data.files_artifact_uuid,
 		},
+		"cl-genesis-data",
 	)
 
 	all_dirpaths_to_create_on_generator = [
