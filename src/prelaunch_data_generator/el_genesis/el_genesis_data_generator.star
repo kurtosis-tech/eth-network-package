@@ -62,6 +62,7 @@ def generate_el_genesis_data(
 		{
 			CONFIG_DIRPATH_ON_GENERATOR: genesis_generation_config_artifact_name,
 		},
+		"el-genesis-data"
 	)
 
 
