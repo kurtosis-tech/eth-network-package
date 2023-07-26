@@ -37,6 +37,7 @@ def generate_cl_validator_keystores(
 	service_name = prelaunch_data_generator_launcher.launch_prelaunch_data_generator(
 		plan,
 		{},
+		"cl-validator-keystore",
 	)
 
 	all_output_dirpaths = []
