@@ -208,7 +208,7 @@ def get_config(
 		"--enr-auto-update=false",
 		"--rest",
 		"--rest-address=0.0.0.0",
-		"--rest_allow-origin=*",
+		"--rest-allow-origin=*",
 		"--rest-port={0}".format(HTTP_PORT_NUM),
 		"--validators-dir=" + VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER,
 		"--secrets-dir=" + VALIDATOR_SECRETS_DIRPATH_ON_SERVICE_CONTAINER,
