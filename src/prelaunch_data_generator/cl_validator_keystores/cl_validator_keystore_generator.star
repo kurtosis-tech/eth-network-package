@@ -43,11 +43,11 @@ def generate_cl_validator_keystores(
 	all_output_dirpaths = []
 	all_sub_command_strs = []
 
-	start_index = 0
-	stop_index = num_validators_per_node
-
 	for idx, participant in enumerate(participants):
 		output_dirpath = NODE_KEYSTORES_OUTPUT_DIRPATH_FORMAT_STR.format(idx)
+
+		start_index = idx * num_validators_per_node
+		stop_index = (idx+1) * num_validators_per_node - 1
 
 		generate_keystores_cmd = "{0} keystores --insecure --prysm-pass {1} --out-loc {2} --source-mnemonic \"{3}\" --source-min {4} --source-max {5}".format(
 			KEYSTORES_GENERATION_TOOL_NAME,
@@ -60,9 +60,6 @@ def generate_cl_validator_keystores(
 
 		all_sub_command_strs.append(generate_keystores_cmd)
 		all_output_dirpaths.append(output_dirpath)
-
-		start_index = idx * num_validators_per_node
-		stop_index = (idx+1) * num_validators_per_node - 1
 
 	command_str = " && ".join(all_sub_command_strs)
 
@@ -79,9 +76,9 @@ def generate_cl_validator_keystores(
 		keystore_stop_index = (idx+1) * num_validators_per_node - 1
 		artifact_name = "{0}-{1}-{2}-{3}-{4}".format(
 			padded_idx,
-			participant.cl_client_type, 
-			participant.el_client_type, 
-			keystore_start_index, 
+			participant.cl_client_type,
+			participant.el_client_type,
+			keystore_start_index,
 			keystore_stop_index,
 		)
 		artifact_name = plan.store_service_files(service_name, output_dirpath, name=artifact_name)
