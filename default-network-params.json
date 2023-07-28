@@ -2,27 +2,72 @@
   "participants": [
     {
       "el_client_type": "geth",
-      "el_client_image": "",
-      "el_client_log_level": "",
+      "el_client_image": "ethpandaops/geth:master",
+      "cl_client_type": "teku",
+      "cl_client_image": "consensys/teku:develop",
+      "bn_max_cpu": 3000,
+      "bn_max_mem": 4096,
+      "count": 10
+    },
+    {
+      "el_client_type": "geth",
+      "el_client_image": "ethpandaops/geth:master",
       "cl_client_type": "lighthouse",
-      "cl_client_image": "",
-      "cl_client_log_level": "",
-      "beacon_extra_params": [],
-      "el_extra_params": [],
-      "validator_extra_params": [],
-      "builder_network_params": null,
-      "count": 1
+      "cl_client_image": "sigp/lighthouse:latest",
+      "bn_max_cpu": 3000,
+      "bn_max_mem": 4096,
+      "v_max_cpu": 3000,
+      "v_max_mem": 2048,
+      "count": 10
+    },
+    {
+      "el_client_type": "geth",
+      "el_client_image": "ethpandaops/geth:master",
+      "cl_client_type": "lodestar",
+      "cl_client_image": "chainsafe/lodestar:latest",
+      "bn_max_cpu": 3000,
+      "bn_max_mem": 4096,
+      "v_max_cpu": 3000,
+      "v_max_mem": 2048,
+      "count": 10
+    },
+    {
+      "el_client_type": "geth",
+      "el_client_image": "ethpandaops/geth:master",
+      "cl_client_type": "prysm",
+      "cl_client_image": "prysmaticlabs/prysm-beacon-chain:latest,prysmaticlabs/prysm-validator:latest",
+      "beacon_extra_params": ["--grpc-max-msg-size=18388608"],
+      "validator_extra_params": ["--grpc-max-msg-size=18388608"],
+      "bn_max_cpu": 3000,
+      "bn_max_mem": 4096,
+      "v_max_cpu": 3000,
+      "v_max_mem": 2048,
+      "count": 10
+    },
+    {
+      "el_client_type": "geth",
+      "el_client_image": "ethpandaops/geth:master",
+      "cl_client_type": "nimbus",
+      "cl_client_image": "statusim/nimbus-eth2:amd64-latest",
+      "v_max_cpu": 3000,
+      "v_max_mem": 2048,
+      "count": 10
     }
   ],
   "network_params": {
-    "preregistered_validator_keys_mnemonic": "giant issue aisle success illegal bike spike question tent bar rely arctic volcano long crawl hungry vocal artwork sniff fantasy very lucky have athlete",
-    "num_validator_keys_per_node": 64,
     "network_id": "3151908",
     "deposit_contract_address": "0x4242424242424242424242424242424242424242",
     "seconds_per_slot": 12,
-    "genesis_delay": 120,
-    "capella_fork_epoch": 5,
-    "deneb_fork_epoch": 500
+    "slots_per_epoch": 32,
+    "genesis_delay": 1800,
+    "capella_fork_epoch": 2,
+    "deneb_fork_epoch": 1000,
+    "num_validator_keys_per_node": 10000,
+    "preregistered_validator_keys_mnemonic": "giant issue aisle success illegal bike spike question tent bar rely arctic volcano long crawl hungry vocal artwork sniff fantasy very lucky have athlete"
   },
+  "launch_additional_services": true,
+  "wait_for_finalization": false,
+  "wait_for_verifications": false,
+  "verifications_epoch_limit": 5,
   "global_client_log_level": "info"
 }
