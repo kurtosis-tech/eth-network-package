@@ -8,50 +8,6 @@
       "bn_max_cpu": 3000,
       "bn_max_mem": 4096,
       "count": 10
-    },
-    {
-      "el_client_type": "geth",
-      "el_client_image": "ethpandaops/geth:master",
-      "cl_client_type": "lighthouse",
-      "cl_client_image": "sigp/lighthouse:latest",
-      "bn_max_cpu": 3000,
-      "bn_max_mem": 4096,
-      "v_max_cpu": 3000,
-      "v_max_mem": 2048,
-      "count": 10
-    },
-    {
-      "el_client_type": "geth",
-      "el_client_image": "ethpandaops/geth:master",
-      "cl_client_type": "lodestar",
-      "cl_client_image": "chainsafe/lodestar:latest",
-      "bn_max_cpu": 3000,
-      "bn_max_mem": 4096,
-      "v_max_cpu": 3000,
-      "v_max_mem": 2048,
-      "count": 10
-    },
-    {
-      "el_client_type": "geth",
-      "el_client_image": "ethpandaops/geth:master",
-      "cl_client_type": "prysm",
-      "cl_client_image": "prysmaticlabs/prysm-beacon-chain:latest,prysmaticlabs/prysm-validator:latest",
-      "beacon_extra_params": ["--grpc-max-msg-size=18388608"],
-      "validator_extra_params": ["--grpc-max-msg-size=18388608"],
-      "bn_max_cpu": 3000,
-      "bn_max_mem": 4096,
-      "v_max_cpu": 3000,
-      "v_max_mem": 2048,
-      "count": 10
-    },
-    {
-      "el_client_type": "geth",
-      "el_client_image": "ethpandaops/geth:master",
-      "cl_client_type": "nimbus",
-      "cl_client_image": "statusim/nimbus-eth2:amd64-latest",
-      "v_max_cpu": 3000,
-      "v_max_mem": 2048,
-      "count": 10
     }
   ],
   "network_params": {
