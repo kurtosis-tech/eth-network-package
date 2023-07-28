@@ -40,7 +40,7 @@ def generate_cl_validator_keystores(
 	service_name = prelaunch_data_generator_launcher.launch_prelaunch_data_generator(
 		plan,
 		{
-			"/tmp/run.py": keystore_generator
+			"/tmp/": keystore_generator
 		},
 		"cl-validator-keystore",
 	)
@@ -51,7 +51,7 @@ def generate_cl_validator_keystores(
 		output_dirpath = NODE_KEYSTORES_OUTPUT_DIRPATH_FORMAT_STR.format(idx)
 		all_output_dirpaths.append(output_dirpath)
 
-	keystore_geneation_command = "python3 /tmp/run.py {0} {1} {2} {3}".format(
+	keystore_geneation_command = "python3 /tmp/keystore_generator.py {0} {1} {2} \"{3}\"".format(
 		num_validators_per_node,
 		len(participants),
 		PRYSM_PASSWORD,

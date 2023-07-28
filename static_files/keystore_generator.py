@@ -32,7 +32,7 @@ if __name__ == "__main__":
             "--out-loc",
             f"/node-{index}-keystores",
             "--source-mnemonic",
-            f"{sys.argv[4]}",
+            f"\"{sys.argv[4]}\"",
             "--source-min",
             f"{start_index}",
             "--source-max",
