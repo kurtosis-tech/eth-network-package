@@ -1,4 +1,4 @@
-import concurrent.futures
+import multiprocessing
 import subprocess
 import sys
 import time
@@ -41,20 +41,12 @@ if __name__ == "__main__":
 
         commands.append(" ".join(command))
 
-    max_concurrent_threads = 10
+    max_concurrent_processes = 10
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=max_concurrent_threads) as executor:
-        futures = {executor.submit(run_command, command): command for command in commands}
-        for future in concurrent.futures.as_completed(futures):
-            command = futures[future]
-            try:
-                future.result()
-            except Exception as e:
-                print(f"Error occurred while executing: {command}\n")
-                print(f"Error details:\n{e}\n")
-                has_error = True
+    with multiprocessing.Pool(processes=max_concurrent_processes) as pool:
+        results = pool.map(run_command, commands)
 
     if has_error:
-        raise Exception("One or more threads encountered an error.")
+        raise Exception("One or more processes encountered an error.")
 
     print(f"ended at {time.localtime()}")
