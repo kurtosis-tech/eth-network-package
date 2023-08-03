@@ -123,13 +123,14 @@ def launch(
 		port_id = HTTP_PORT_ID,
 		extract = {
 			"enr": ".data.enr",
-			"mulitaddr": ".data.discovery_addresses[0]",
+			"multiaddr": ".data.discovery_addresses[0]",
 			"peer_id": ".data.peer_id"
 		}
 	)
 	response = plan.request(recipe = cl_node_identity_recipe, service_name = service_name)
 	node_enr = response["extract.enr"]
-	mulitaddr = response["extract.mulitaddr"]
+	multiaddr = response["extract.multiaddr"]
+	peer_id = response["extract.peer_id"]
 
 	metrics_port = nimbus_service.ports[METRICS_PORT_ID]
 	metrics_url = "{0}:{1}".format(nimbus_service.ip_address, metrics_port.number)
@@ -145,7 +146,8 @@ def launch(
 		HTTP_PORT_NUM,
 		nodes_metrics_info,
 		service_name,
-		mulitaddr = mulitaddr,
+		multiaddr = multiaddr,
+		peer_id = peer_id,
 	)
 
 
@@ -240,6 +242,7 @@ def get_config(
 	else:
 		for ctx in bootnode_contexts:
 			cmd.append("--bootstrap-node="+ctx.enr)
+			cmd.append("--direct-peer="+ctx.multiaddr)
 
 	if len(extra_params) > 0:
 		cmd.extend([param for param in extra_params])

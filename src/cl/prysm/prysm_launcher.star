@@ -170,13 +170,14 @@ def launch(
 		port_id = HTTP_PORT_ID,
 		extract = {
 			"enr": ".data.enr",
-			"mulitaddr": ".data.discovery_addresses[0]",
+			"multiaddr": ".data.discovery_addresses[0]",
 			"peer_id": ".data.peer_id"
 		}
 	)
 	response = plan.request(recipe = beacon_node_identity_recipe, service_name = beacon_node_service_name)
 	beacon_node_enr = response["extract.enr"]
-	beacon_mulitaddr = response["extract.mulitaddr"]
+	beacon_multiaddr = response["extract.multiaddr"]
+	beacon_peer_id = response["extract.peer_id"]
 
 	beacon_metrics_port = beacon_service.ports[BEACON_MONITORING_PORT_ID]
 	beacon_metrics_url = "{0}:{1}".format(beacon_service.ip_address, beacon_metrics_port.number)
@@ -197,7 +198,8 @@ def launch(
 		nodes_metrics_info,
 		beacon_node_service_name,
 		validator_node_service_name,
-		beacon_mulitaddr
+		beacon_multiaddr,
+		beacon_peer_id,
 	)
 
 
@@ -253,7 +255,7 @@ def get_beacon_config(
 
 	if bootnode_contexts != None:
 		for ctx in bootnode_contexts:
-			cmd.append("--peer="+ctx.mulitaddr)
+			cmd.append("--peer="+ctx.multiaddr)
 			cmd.append("--bootstrap-node="+ctx.enr)
 		cmd.append("--p2p-static-id=true")
 
