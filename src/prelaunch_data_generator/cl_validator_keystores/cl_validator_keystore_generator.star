@@ -25,6 +25,113 @@ TEKU_KEYS_DIRNAME	= "teku-keys"
 TEKU_SECRETS_DIRNAME = "teku-secrets"
 
 
+def generate_cl_valdiator_keystores_in_parallel(
+	plan,
+	mnemonic,
+	participants,
+	num_validators_per_node):
+
+	service_names = []
+
+	for idx in range(0, len(participants)):
+		service_name = prelaunch_data_generator_launcher.launch_prelaunch_data_generator(
+			plan,
+			{},
+			"cl-validator-keystore-" + idx,
+		)
+		service_names.append(service_name)
+
+	all_output_dirpaths = []
+	all_generation_commands = []
+
+	for idx, participant in enumerate(participants):
+		output_dirpath = NODE_KEYSTORES_OUTPUT_DIRPATH_FORMAT_STR.format(idx)
+
+		start_index = idx * num_validators_per_node
+		stop_index = (idx+1) * num_validators_per_node
+
+		generate_keystores_cmd = "nohup {0} keystores --insecure --prysm-pass {1} --out-loc {2} --source-mnemonic \"{3}\" --source-min {4} --source-max {5}".format(
+			KEYSTORES_GENERATION_TOOL_NAME,
+			PRYSM_PASSWORD,
+			output_dirpath,
+			mnemonic,
+			start_index,
+			stop_index,
+		)
+		all_generation_commands.append(generate_keystores_cmd)
+		all_output_dirpaths.append(output_dirpath)
+
+
+	# spin up all jobs
+	for idx in range(0, len(participants)):
+		service_name = service_names[idx]
+		generation_command = all_generation_commands[idx]
+		plan.exec(recipe = ExecRecipe(command=["sh", "-c", command_str + " >/dev/null 2>&1 &"]), service_name=service_name)
+
+	# verify that files got created
+	for idx in range(0, len(participants)):
+		service_name = service_names[idx]
+		output_dirpath = all_output_dirpaths[idx]
+		verificaiton_command = ["ls", output_dirpath, "/pubkeys.json"]
+		plan.wait(recipe = ExecRecipe(command=verificaiton_command), service_name=service_name, field="code", assertion="==", target_value=0)
+
+	# Store outputs into files artifacts
+	keystore_files = []
+	for idx, participant in enumerate(participants):
+		service_name = service_names[idx]
+		output_dirpath = all_output_dirpaths[idx]
+
+		padded_idx = zfill_custom(idx+1, len(str(len(participants))))
+		keystore_start_index = idx * num_validators_per_node
+		keystore_stop_index = (idx+1) * num_validators_per_node - 1
+		artifact_name = "{0}-{1}-{2}-{3}-{4}".format(
+			padded_idx,
+			participant.cl_client_type,
+			participant.el_client_type,
+			keystore_start_index,
+			keystore_stop_index,
+		)
+		artifact_name = plan.store_service_files(service_name, output_dirpath, name=artifact_name)
+
+		# This is necessary because the way Kurtosis currently implements artifact-storing is
+		base_dirname_in_artifact = shared_utils.path_base(output_dirpath)
+		to_add = keystore_files_module.new_keystore_files(
+			artifact_name,
+			shared_utils.path_join(base_dirname_in_artifact, RAW_KEYS_DIRNAME),
+			shared_utils.path_join(base_dirname_in_artifact, RAW_SECRETS_DIRNAME),
+			shared_utils.path_join(base_dirname_in_artifact, NIMBUS_KEYS_DIRNAME),
+			shared_utils.path_join(base_dirname_in_artifact, PRYSM_DIRNAME),
+			shared_utils.path_join(base_dirname_in_artifact, TEKU_KEYS_DIRNAME),
+			shared_utils.path_join(base_dirname_in_artifact, TEKU_SECRETS_DIRNAME),
+		)
+
+		keystore_files.append(to_add)
+
+
+	write_prysm_password_file_cmd = [
+		"sh",
+		"-c",
+		"echo '{0}' > {1}".format(
+			PRYSM_PASSWORD,
+			PRYSM_PASSWORD_FILEPATH_ON_GENERATOR,
+		),
+	]
+	write_prysm_password_file_cmd_result = plan.exec(recipe = ExecRecipe(command=write_prysm_password_file_cmd), service_name=service_names[0])
+	plan.assert(write_prysm_password_file_cmd_result["code"], "==", SUCCESSFUL_EXEC_CMD_EXIT_CODE)
+
+	prysm_password_artifact_name = plan.store_service_files(service_name, PRYSM_PASSWORD_FILEPATH_ON_GENERATOR, name = "prysm-password")
+
+	result = keystores_result.new_generate_keystores_result(
+		prysm_password_artifact_name,
+		shared_utils.path_base(PRYSM_PASSWORD_FILEPATH_ON_GENERATOR),
+		keystore_files,
+	)
+
+	# we cleanup as the data generation is done
+	for service_name in service_names:
+		plan.remove_service(service_name)
+	return result
+
 # Generates keystores for the given number of nodes from the given mnemonic, where each keystore contains approximately
 #
 #	num_keys / num_nodes keys
@@ -32,8 +139,7 @@ def generate_cl_validator_keystores(
 	plan,
 	mnemonic,
 	participants,
-	num_validators_per_node,
-	parallel_keystore_generation=False):
+	num_validators_per_node):
 
 	service_name = prelaunch_data_generator_launcher.launch_prelaunch_data_generator(
 		plan,
