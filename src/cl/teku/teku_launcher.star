@@ -125,7 +125,7 @@ def launch(
 		port_id = HTTP_PORT_ID,
 		extract = {
 			"enr": ".data.enr",
-			"peer_id": ".data.peer_id"
+			"peer_id": ".data.discovery_addresses[0]"
 		}
 	)
 	response = plan.request(recipe = node_identity_recipe, service_name = service_name)

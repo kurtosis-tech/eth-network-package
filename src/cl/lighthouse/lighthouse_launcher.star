@@ -150,7 +150,7 @@ def launch(
 		port_id = BEACON_HTTP_PORT_ID,
 		extract = {
 			"enr": ".data.enr",
-			"peer_id": ".data.peer_id",
+			"peer_id": ".data.discovery_addresses[0]",
 		}
 	)
 	response = plan.request(recipe = beacon_node_identity_recipe, service_name = beacon_node_service_name)
