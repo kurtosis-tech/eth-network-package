@@ -124,6 +124,7 @@ def launch(
 		extract = {
 			"enr": ".data.enr",
 			"mulitaddr": ".data.discovery_addresses[0]",
+			"peer_id": ".data.peer_id"
 		}
 	)
 	response = plan.request(recipe = cl_node_identity_recipe, service_name = service_name)
