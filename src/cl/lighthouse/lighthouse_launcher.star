@@ -247,7 +247,7 @@ def get_beacon_config(
 	]
 
 	if boot_cl_client_ctxs != None:
-		cmd.append("--boot-nodes="+",".join([ctx.enr for ctx in boot_cl_client_ctxs]))
+		cmd.append("--boot-nodes="+",".join([ctx.enr for ctx in boot_cl_client_ctxs if ctx.enr != package_io.ENR_TO_SKIP]))
 		cmd.append("--trusted-peers="+",".join([ctx.peer_id for ctx in boot_cl_client_ctxs]))
 
 	if len(extra_params) > 0:

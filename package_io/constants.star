@@ -23,3 +23,7 @@ GLOBAL_CLIENT_LOG_LEVEL = struct(
 )
 
 VALIDATING_REWARDS_ACCOUNT = "0x878705ba3f8Bc32FCf7F4CAa1A35E72AF65CF766"
+
+# TODO - fix this and not have this at all after lodestar generates proper ENRs
+# the current one is invalid as the IP field is missing on decode
+ENR_TO_SKIP = "skip"

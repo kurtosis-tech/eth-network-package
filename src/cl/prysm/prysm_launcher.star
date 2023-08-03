@@ -3,7 +3,6 @@ input_parser = import_module("github.com/kurtosis-tech/eth-network-package/packa
 cl_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_client_context.star")
 cl_node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_metrics_info.star")
 cl_node_ready_conditions = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_ready_conditions.star")
-
 package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
 
 IMAGE_SEPARATOR_DELIMITER	= ","
@@ -256,7 +255,8 @@ def get_beacon_config(
 	if bootnode_contexts != None:
 		for ctx in bootnode_contexts:
 			cmd.append("--peer="+ctx.multiaddr)
-			cmd.append("--bootstrap-node="+ctx.enr)
+			if ctx.enr != package_io.ENR_TO_SKIP:
+				cmd.append("--bootstrap-node="+ctx.enr)
 		cmd.append("--p2p-static-id=true")
 
 	if len(extra_params) > 0:
