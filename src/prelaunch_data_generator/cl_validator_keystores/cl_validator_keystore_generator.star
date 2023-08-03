@@ -134,7 +134,7 @@ def generate_cl_valdiator_keystores_in_parallel(
 		service_name = prelaunch_data_generator_launcher.launch_prelaunch_data_generator(
 			plan,
 			{},
-			"cl-validator-keystore-" + idx,
+			"cl-validator-keystore-" + str(idx),
 		)
 		service_names.append(service_name)
 
@@ -169,8 +169,8 @@ def generate_cl_valdiator_keystores_in_parallel(
 	for idx in range(0, len(participants)):
 		service_name = service_names[idx]
 		output_dirpath = all_output_dirpaths[idx]
-		verificaiton_command = ["ls", output_dirpath, "/pubkeys.json"]
-		plan.wait(recipe = ExecRecipe(command=verificaiton_command), service_name=service_name, field="code", assertion="==", target_value=0)
+		verificaiton_command = ["ls", output_dirpath + "/pubkeys.json"]
+		plan.wait(recipe = ExecRecipe(command=verificaiton_command), service_name=service_name, field="code", assertion="==", target_value=0, timeout="5m", interval="10s")
 
 	# Store outputs into files artifacts
 	keystore_files = []
