@@ -215,6 +215,7 @@ def get_beacon_config(
 		"--rest.address=0.0.0.0",
 		"--rest.namespace=*",
 		"--rest.port={0}".format(HTTP_PORT_NUM),
+		"--nat=" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		"--enr.ip=" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		"--enr.tcp={0}".format(DISCOVERY_PORT_NUM),
 		"--enr.udp={0}".format(DISCOVERY_PORT_NUM),
