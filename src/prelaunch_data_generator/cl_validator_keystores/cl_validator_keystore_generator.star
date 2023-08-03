@@ -32,7 +32,8 @@ def generate_cl_validator_keystores(
 	plan,
 	mnemonic,
 	participants,
-	num_validators_per_node):
+	num_validators_per_node,
+	parallel_keystore_generation=False):
 
 	service_name = prelaunch_data_generator_launcher.launch_prelaunch_data_generator(
 		plan,

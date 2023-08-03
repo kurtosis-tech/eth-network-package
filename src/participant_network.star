@@ -48,6 +48,7 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		network_params.preregistered_validator_keys_mnemonic,
 		participants,
 		network_params.num_validator_keys_per_node,
+		network_params.parallel_keystore_generation,
 	)
 
 	plan.print(json.indent(json.encode(cl_validator_data)))
