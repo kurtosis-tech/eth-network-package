@@ -239,6 +239,7 @@ def get_beacon_config(
 		"--p2p-udp-port={0}".format(DISCOVERY_UDP_PORT_NUM),
 		"--min-sync-peers={0}".format(MIN_PEERS),
 		"--verbosity=" + log_level,
+		"--suggested-fee-recipient=" + package_io.VALIDATING_REWARDS_ACCOUNT,
 		# Set per Pari's recommendation to reduce noise
 		"--subscribe-all-subnets=true",
 		"--jwt-secret={0}".format(jwt_secret_filepath),
