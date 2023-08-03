@@ -83,7 +83,7 @@ def launch(
 	images,
 	participant_log_level,
 	global_log_level,
-	bootnode_context,
+	bootnode_contexts,
 	el_client_context,
 	node_keystore_files,
 	bn_min_cpu,
@@ -127,7 +127,7 @@ def launch(
 	beacon_config = get_beacon_config(
 		launcher.genesis_data,
 		beacon_image,
-		bootnode_context,
+		bootnode_contexts,
 		el_client_context,
 		log_level,
 		bn_min_cpu,
@@ -199,7 +199,7 @@ def launch(
 def get_beacon_config(
 		genesis_data,
 		beacon_image,
-		bootnode_context,
+		bootnode_contexts,
 		el_client_context,
 		log_level,
 		bn_min_cpu,
@@ -246,7 +246,7 @@ def get_beacon_config(
 	]
 
 	if bootnode_context != None:
-		cmd.append("--bootstrap-node="+bootnode_context.enr)
+		cmd.append("--bootstrap-node="+",".join([ctx.enr for ctx in bootnode_contexts]))
 
 	if len(extra_params) > 0:
 		# we do the for loop as otherwise its a proto repeated array

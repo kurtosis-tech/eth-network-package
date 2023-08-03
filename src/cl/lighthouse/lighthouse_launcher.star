@@ -79,7 +79,7 @@ def launch(
 	image,
 	participant_log_level,
 	global_log_level,
-	bootnode_context,
+	bootnode_contexts,
 	el_client_context,
 	node_keystore_files,
 	bn_min_cpu,
@@ -112,7 +112,7 @@ def launch(
 	beacon_config = get_beacon_config(
 		launcher.genesis_data,
 		image,
-		bootnode_context,
+		bootnode_contexts,
 		el_client_context,
 		log_level,
 		bn_min_cpu,
@@ -178,7 +178,7 @@ def launch(
 def get_beacon_config(
 	genesis_data,
 	image,
-	boot_cl_client_ctx,
+	boot_cl_client_ctxs,
 	el_client_ctx,
 	log_level,
 	bn_min_cpu,
@@ -239,8 +239,8 @@ def get_beacon_config(
 		# ^^^^^^^^^^^^^^^^^^^ METRICS CONFIG ^^^^^^^^^^^^^^^^^^^^^
 	]
 
-	if boot_cl_client_ctx != None:
-		cmd.append("--boot-nodes="+boot_cl_client_ctx.enr)
+	if boot_cl_client_ctxs != None:
+		cmd.append("--boot-nodes="+",".join([ctx.enr for ctx in boot_cl_client_ctxs]))
 
 	if len(extra_params) > 0:
 		# this is a repeated<proto type>, we convert it into Starlark

@@ -149,7 +149,7 @@ def launch(
 def get_config(
 	genesis_data,
 	image,
-	boot_cl_client_ctx,
+	bootnode_contexts,
 	el_client_ctx,
 	log_level,
 	node_keystore_files,
@@ -223,8 +223,8 @@ def get_config(
 		# ^^^^^^^^^^^^^^^^^^^ METRICS CONFIG ^^^^^^^^^^^^^^^^^^^^^
 	]
 
-	if boot_cl_client_ctx != None:
-		cmd.append("--p2p-discovery-bootnodes="+boot_cl_client_ctx.enr)
+	if bootnode_contexts != None:
+		cmd.append("--p2p-discovery-bootnodes="+",".join([ctx.enr for ctx in bootnode_contexts]))
 
 	if len(extra_params) > 0:
 		# we do the list comprehension as the default extra_params is a proto repeated string

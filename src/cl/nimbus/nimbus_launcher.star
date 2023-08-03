@@ -73,7 +73,7 @@ def launch(
 	image,
 	participant_log_level,
 	global_log_level,
-	bootnode_context,
+	bootnode_contexts,
 	el_client_context,
 	node_keystore_files,
 	bn_min_cpu,
@@ -105,7 +105,7 @@ def launch(
 	config = get_config(
 		launcher.cl_genesis_data,
 		image,
-		bootnode_context,
+		bootnode_contexts,
 		el_client_context,
 		log_level,
 		node_keystore_files,
@@ -147,7 +147,7 @@ def launch(
 def get_config(
 	genesis_data,
 	image,
-	bootnode_context,
+	bootnode_contexts,
 	el_client_ctx,
 	log_level,
 	node_keystore_files,
@@ -228,12 +228,12 @@ def get_config(
 		"--metrics-port={0}".format(METRICS_PORT_NUM),
 		# ^^^^^^^^^^^^^^^^^^^ METRICS CONFIG ^^^^^^^^^^^^^^^^^^^^^
 	]
-	if bootnode_context == None:
+	if bootnode_contexts == None:
 		# Copied from https://github.com/status-im/nimbus-eth2/blob/67ab477a27e358d605e99bffeb67f98d18218eca/scripts/launch_local_testnet.sh#L417
 		# See explanation there
 		cmd.append("--subscribe-all-subnets")
 	else:
-		cmd.append("--bootstrap-node="+bootnode_context.enr)
+		cmd.append("--bootstrap-node="+",".join([ctx.enr for ctx in bootnode_contexts]))
 
 	if len(extra_params) > 0:
 		cmd.extend([param for param in extra_params])
