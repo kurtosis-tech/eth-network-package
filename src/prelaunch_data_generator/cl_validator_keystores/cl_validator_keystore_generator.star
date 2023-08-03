@@ -166,7 +166,7 @@ def generate_cl_valdiator_keystores_in_parallel(
 	for idx in range(0, len(participants)):
 		service_name = service_names[idx]
 		generation_command = all_generation_commands[idx]
-	plan.exec(recipe = ExecRecipe(command=["sh", "-c", generation_command + " >/dev/null 2>&1 &"]), service_name=service_name)
+		plan.exec(recipe = ExecRecipe(command=["sh", "-c", generation_command + " >/dev/null 2>&1 &"]), service_name=service_name)
 
 	# verify that files got created
 	for idx in range(0, len(participants)):
