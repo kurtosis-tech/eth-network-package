@@ -73,7 +73,7 @@ def launch(
 	image,
 	participant_log_level,
 	global_log_level,
-	bootnode_context,
+	bootnode_contexts,
 	el_client_context,
 	node_keystore_files,
 	bn_min_cpu,
@@ -105,7 +105,7 @@ def launch(
 	config = get_config(
 		launcher.cl_genesis_data,
 		image,
-		bootnode_context,
+		bootnode_contexts,
 		el_client_context,
 		log_level,
 		node_keystore_files,
@@ -122,10 +122,15 @@ def launch(
 		endpoint = "/eth/v1/node/identity",
 		port_id = HTTP_PORT_ID,
 		extract = {
-			"enr": ".data.enr"
+			"enr": ".data.enr",
+			"multiaddr": ".data.discovery_addresses[0]",
+			"peer_id": ".data.peer_id"
 		}
 	)
-	node_enr = plan.request(recipe = cl_node_identity_recipe, service_name = service_name)["extract.enr"]
+	response = plan.request(recipe = cl_node_identity_recipe, service_name = service_name)
+	node_enr = response["extract.enr"]
+	multiaddr = response["extract.multiaddr"]
+	peer_id = response["extract.peer_id"]
 
 	metrics_port = nimbus_service.ports[METRICS_PORT_ID]
 	metrics_url = "{0}:{1}".format(nimbus_service.ip_address, metrics_port.number)
@@ -141,13 +146,15 @@ def launch(
 		HTTP_PORT_NUM,
 		nodes_metrics_info,
 		service_name,
+		multiaddr = multiaddr,
+		peer_id = peer_id,
 	)
 
 
 def get_config(
 	genesis_data,
 	image,
-	bootnode_context,
+	bootnode_contexts,
 	el_client_ctx,
 	log_level,
 	node_keystore_files,
@@ -228,12 +235,15 @@ def get_config(
 		"--metrics-port={0}".format(METRICS_PORT_NUM),
 		# ^^^^^^^^^^^^^^^^^^^ METRICS CONFIG ^^^^^^^^^^^^^^^^^^^^^
 	]
-	if bootnode_context == None:
+	if bootnode_contexts == None:
 		# Copied from https://github.com/status-im/nimbus-eth2/blob/67ab477a27e358d605e99bffeb67f98d18218eca/scripts/launch_local_testnet.sh#L417
 		# See explanation there
 		cmd.append("--subscribe-all-subnets")
 	else:
-		cmd.append("--bootstrap-node="+bootnode_context.enr)
+		for ctx in bootnode_contexts:
+			if ctx.enr != package_io.ENR_TO_SKIP:
+				cmd.append("--bootstrap-node="+ctx.enr)
+			cmd.append("--direct-peer="+ctx.multiaddr)
 
 	if len(extra_params) > 0:
 		cmd.extend([param for param in extra_params])

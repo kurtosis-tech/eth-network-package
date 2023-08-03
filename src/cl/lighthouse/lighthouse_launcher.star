@@ -79,7 +79,7 @@ def launch(
 	image,
 	participant_log_level,
 	global_log_level,
-	bootnode_context,
+	bootnode_contexts,
 	el_client_context,
 	node_keystore_files,
 	bn_min_cpu,
@@ -112,7 +112,7 @@ def launch(
 	beacon_config = get_beacon_config(
 		launcher.genesis_data,
 		image,
-		bootnode_context,
+		bootnode_contexts,
 		el_client_context,
 		log_level,
 		bn_min_cpu,
@@ -149,10 +149,15 @@ def launch(
 		endpoint = "/eth/v1/node/identity",
 		port_id = BEACON_HTTP_PORT_ID,
 		extract = {
-			"enr": ".data.enr"
+			"enr": ".data.enr",
+			"multiaddr": ".data.discovery_addresses[0]",
+			"peer_id": ".data.peer_id"
 		}
 	)
-	beacon_node_enr = plan.request(recipe = beacon_node_identity_recipe, service_name = beacon_node_service_name)["extract.enr"]
+	response = plan.request(recipe = beacon_node_identity_recipe, service_name = beacon_node_service_name)
+	beacon_node_enr = response["extract.enr"]
+	beacon_multiaddr = response["extract.multiaddr"]
+	beacon_peer_id = response["extract.peer_id"]
 
 	beacon_metrics_port = beacon_service.ports[BEACON_METRICS_PORT_ID]
 	beacon_metrics_url = "{0}:{1}".format(beacon_service.ip_address, beacon_metrics_port.number)
@@ -171,14 +176,16 @@ def launch(
 		BEACON_HTTP_PORT_NUM,
 		nodes_metrics_info,
 		beacon_node_service_name,
-		validator_node_service_name
+		validator_node_service_name,
+		beacon_multiaddr,
+		beacon_peer_id
 	)
 
 
 def get_beacon_config(
 	genesis_data,
 	image,
-	boot_cl_client_ctx,
+	boot_cl_client_ctxs,
 	el_client_ctx,
 	log_level,
 	bn_min_cpu,
@@ -239,8 +246,9 @@ def get_beacon_config(
 		# ^^^^^^^^^^^^^^^^^^^ METRICS CONFIG ^^^^^^^^^^^^^^^^^^^^^
 	]
 
-	if boot_cl_client_ctx != None:
-		cmd.append("--boot-nodes="+boot_cl_client_ctx.enr)
+	if boot_cl_client_ctxs != None:
+		cmd.append("--boot-nodes="+",".join([ctx.enr for ctx in boot_cl_client_ctxs if ctx.enr != package_io.ENR_TO_SKIP]))
+		cmd.append("--trusted-peers="+",".join([ctx.peer_id for ctx in boot_cl_client_ctxs]))
 
 	if len(extra_params) > 0:
 		# this is a repeated<proto type>, we convert it into Starlark

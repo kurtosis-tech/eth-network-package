@@ -69,7 +69,7 @@ def launch(
 	image,
 	participant_log_level,
 	global_log_level,
-	bootnode_context,
+	bootnode_contexts,
 	el_client_context,
 	node_keystore_files,
 	bn_min_cpu,
@@ -103,7 +103,7 @@ def launch(
 	beacon_config = get_beacon_config(
 		launcher.cl_genesis_data,
 		image,
-		bootnode_context,
+		bootnode_contexts,
 		el_client_context,
 		log_level,
 		bn_min_cpu,
@@ -143,10 +143,16 @@ def launch(
 		endpoint = "/eth/v1/node/identity",
 		port_id = HTTP_PORT_ID,
 		extract = {
-			"enr": ".data.enr"
+			"enr": ".data.enr",
+			"multiaddr": ".data.p2p_addresses[-1]",
+			"peer_id": ".data.peer_id"
 		}
 	)
-	beacon_node_enr = plan.request(recipe = beacon_node_identity_recipe, service_name = beacon_node_service_name)["extract.enr"]
+	response = plan.request(recipe = beacon_node_identity_recipe, service_name = beacon_node_service_name)
+	# TODO fix this after lodestar generates valid ENR with valid IP
+	beacon_node_enr = package_io.ENR_TO_SKIP
+	beacon_multiaddr = response["extract.multiaddr"]
+	beacon_peer_id = response["extract.peer_id"]
 
 	beacon_metrics_port = beacon_service.ports[METRICS_PORT_ID]
 	beacon_metrics_url = "{0}:{1}".format(beacon_service.ip_address, beacon_metrics_port.number)
@@ -161,14 +167,16 @@ def launch(
 		HTTP_PORT_NUM,
 		nodes_metrics_info,
 		beacon_node_service_name,
-		validator_node_service_name
+		validator_node_service_name,
+		beacon_multiaddr,
+		beacon_peer_id
 	)
 
 
 def get_beacon_config(
 	genesis_data,
 	image,
-	boot_cl_client_ctx,
+	bootnode_contexts,
 	el_client_ctx,
 	log_level,
 	bn_min_cpu,
@@ -208,6 +216,7 @@ def get_beacon_config(
 		"--rest.address=0.0.0.0",
 		"--rest.namespace=*",
 		"--rest.port={0}".format(HTTP_PORT_NUM),
+		"--nat=" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		"--enr.ip=" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		"--enr.tcp={0}".format(DISCOVERY_PORT_NUM),
 		"--enr.udp={0}".format(DISCOVERY_PORT_NUM),
@@ -221,8 +230,8 @@ def get_beacon_config(
 		# ^^^^^^^^^^^^^^^^^^^ METRICS CONFIG ^^^^^^^^^^^^^^^^^^^^^
 	]
 
-	if boot_cl_client_ctx != None :
-		cmd.append("--bootnodes="+boot_cl_client_ctx.enr)
+	if bootnode_contexts != None :
+		cmd.append("--bootnodes="+",".join([ctx.enr for ctx in bootnode_contexts if ctx.enr != package_io.ENR_TO_SKIP]))
 
 	if len(extra_params) > 0:
 		# this is a repeated<proto type>, we convert it into Starlark

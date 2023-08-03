@@ -3,7 +3,6 @@ input_parser = import_module("github.com/kurtosis-tech/eth-network-package/packa
 cl_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_client_context.star")
 cl_node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_metrics_info.star")
 cl_node_ready_conditions = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_ready_conditions.star")
-
 package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
 
 IMAGE_SEPARATOR_DELIMITER	= ","
@@ -83,7 +82,7 @@ def launch(
 	images,
 	participant_log_level,
 	global_log_level,
-	bootnode_context,
+	bootnode_contexts,
 	el_client_context,
 	node_keystore_files,
 	bn_min_cpu,
@@ -127,7 +126,7 @@ def launch(
 	beacon_config = get_beacon_config(
 		launcher.genesis_data,
 		beacon_image,
-		bootnode_context,
+		bootnode_contexts,
 		el_client_context,
 		log_level,
 		bn_min_cpu,
@@ -169,10 +168,15 @@ def launch(
 		endpoint = "/eth/v1/node/identity",
 		port_id = HTTP_PORT_ID,
 		extract = {
-			"enr": ".data.enr"
+			"enr": ".data.enr",
+			"multiaddr": ".data.discovery_addresses[0]",
+			"peer_id": ".data.peer_id"
 		}
 	)
-	beacon_node_enr = plan.request(recipe = beacon_node_identity_recipe, service_name = beacon_node_service_name)["extract.enr"]
+	response = plan.request(recipe = beacon_node_identity_recipe, service_name = beacon_node_service_name)
+	beacon_node_enr = response["extract.enr"]
+	beacon_multiaddr = response["extract.multiaddr"]
+	beacon_peer_id = response["extract.peer_id"]
 
 	beacon_metrics_port = beacon_service.ports[BEACON_MONITORING_PORT_ID]
 	beacon_metrics_url = "{0}:{1}".format(beacon_service.ip_address, beacon_metrics_port.number)
@@ -192,14 +196,16 @@ def launch(
 		HTTP_PORT_NUM,
 		nodes_metrics_info,
 		beacon_node_service_name,
-		validator_node_service_name
+		validator_node_service_name,
+		beacon_multiaddr,
+		beacon_peer_id,
 	)
 
 
 def get_beacon_config(
 		genesis_data,
 		beacon_image,
-		bootnode_context,
+		bootnode_contexts,
 		el_client_context,
 		log_level,
 		bn_min_cpu,
@@ -235,6 +241,7 @@ def get_beacon_config(
 		"--p2p-udp-port={0}".format(DISCOVERY_UDP_PORT_NUM),
 		"--min-sync-peers={0}".format(MIN_PEERS),
 		"--verbosity=" + log_level,
+		"--suggested-fee-recipient=" + package_io.VALIDATING_REWARDS_ACCOUNT,
 		# Set per Pari's recommendation to reduce noise
 		"--subscribe-all-subnets=true",
 		"--jwt-secret={0}".format(jwt_secret_filepath),
@@ -245,8 +252,12 @@ def get_beacon_config(
 		# ^^^^^^^^^^^^^^^^^^^ METRICS CONFIG ^^^^^^^^^^^^^^^^^^^^^
 	]
 
-	if bootnode_context != None:
-		cmd.append("--bootstrap-node="+bootnode_context.enr)
+	if bootnode_contexts != None:
+		for ctx in bootnode_contexts:
+			cmd.append("--peer="+ctx.multiaddr)
+			if ctx.enr != package_io.ENR_TO_SKIP:
+				cmd.append("--bootstrap-node="+ctx.enr)
+		cmd.append("--p2p-static-id=true")
 
 	if len(extra_params) > 0:
 		# we do the for loop as otherwise its a proto repeated array

@@ -198,7 +198,7 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 				participant.validator_extra_params,
 			)
 		else:
-			boot_cl_client_ctx = all_cl_client_contexts[0]
+			boot_cl_client_ctx = all_cl_client_contexts
 			cl_client_context = launch_method(
 				plan,
 				cl_launcher,

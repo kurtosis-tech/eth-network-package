@@ -124,11 +124,15 @@ def launch(
 		endpoint = "/eth/v1/node/identity",
 		port_id = HTTP_PORT_ID,
 		extract = {
-			"enr": ".data.enr"
+			"enr": ".data.enr",
+			"multiaddr": ".data.discovery_addresses[0]",
+			"peer_id": ".data.peer_id"
 		}
 	)
-	node_enr = plan.request(recipe = node_identity_recipe, service_name = service_name)["extract.enr"]
-
+	response = plan.request(recipe = node_identity_recipe, service_name = service_name)
+	node_enr = response["extract.enr"]
+	multiaddr = response["extract.multiaddr"]
+	peer_id = response["extract.peer_id"]
 
 	teku_metrics_port = teku_service.ports[METRICS_PORT_ID]
 	teku_metrics_url = "{0}:{1}".format(teku_service.ip_address, teku_metrics_port.number)
@@ -142,14 +146,16 @@ def launch(
 		teku_service.ip_address,
 		HTTP_PORT_NUM,
 		nodes_metrics_info,
-		service_name
+		service_name,
+		multiaddr = multiaddr,
+		peer_id = peer_id,
 	)
 
 
 def get_config(
 	genesis_data,
 	image,
-	boot_cl_client_ctx,
+	bootnode_contexts,
 	el_client_ctx,
 	log_level,
 	node_keystore_files,
@@ -223,8 +229,9 @@ def get_config(
 		# ^^^^^^^^^^^^^^^^^^^ METRICS CONFIG ^^^^^^^^^^^^^^^^^^^^^
 	]
 
-	if boot_cl_client_ctx != None:
-		cmd.append("--p2p-discovery-bootnodes="+boot_cl_client_ctx.enr)
+	if bootnode_contexts != None:
+		cmd.append("--p2p-discovery-bootnodes="+",".join([ctx.enr for ctx in bootnode_contexts if ctx.enr != package_io.ENR_TO_SKIP]))
+		cmd.append("--p2p-static-peers="+",".join([ctx.multiaddr for ctx in bootnode_contexts]))
 
 	if len(extra_params) > 0:
 		# we do the list comprehension as the default extra_params is a proto repeated string
