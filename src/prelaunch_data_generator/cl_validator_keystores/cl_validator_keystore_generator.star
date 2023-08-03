@@ -220,7 +220,7 @@ def generate_cl_valdiator_keystores_in_parallel(
 	write_prysm_password_file_cmd_result = plan.exec(recipe = ExecRecipe(command=write_prysm_password_file_cmd), service_name=service_names[0])
 	plan.assert(write_prysm_password_file_cmd_result["code"], "==", SUCCESSFUL_EXEC_CMD_EXIT_CODE)
 
-	prysm_password_artifact_name = plan.store_service_files(service_name, PRYSM_PASSWORD_FILEPATH_ON_GENERATOR, name = "prysm-password")
+	prysm_password_artifact_name = plan.store_service_files(service_names[0], PRYSM_PASSWORD_FILEPATH_ON_GENERATOR, name = "prysm-password")
 
 	result = keystores_result.new_generate_keystores_result(
 		prysm_password_artifact_name,
