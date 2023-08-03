@@ -24,7 +24,7 @@ PRYSM_DIRNAME		= "prysm"
 TEKU_KEYS_DIRNAME	= "teku-keys"
 TEKU_SECRETS_DIRNAME = "teku-secrets"
 
-DONE_FILEPATH = "/tmp/done.txt"
+KEYSTORE_GENERATOIN_FINISHED_FILEPATH_FORMAT = "/tmp/keystores_generated-{0}.txt"
 
 
 # Generates keystores for the given number of nodes from the given mnemonic, where each keystore contains approximately
@@ -148,6 +148,7 @@ def generate_cl_valdiator_keystores_in_parallel(
 
 		start_index = idx * num_validators_per_node
 		stop_index = (idx+1) * num_validators_per_node
+		generation_finished_filepath = KEYSTORE_GENERATOIN_FINISHED_FILEPATH_FORMAT.format(idx)
 
 		generate_keystores_cmd = "nohup {0} keystores --insecure --prysm-pass {1} --out-loc {2} --source-mnemonic \"{3}\" --source-min {4} --source-max {5} && touch {6}".format(
 			KEYSTORES_GENERATION_TOOL_NAME,
@@ -156,7 +157,7 @@ def generate_cl_valdiator_keystores_in_parallel(
 			mnemonic,
 			start_index,
 			stop_index,
-			DONE_FILEPATH,
+			generation_finished_filepath,
 		)
 		all_generation_commands.append(generate_keystores_cmd)
 		all_output_dirpaths.append(output_dirpath)
@@ -172,8 +173,8 @@ def generate_cl_valdiator_keystores_in_parallel(
 	for idx in range(0, len(participants)):
 		service_name = service_names[idx]
 		output_dirpath = all_output_dirpaths[idx]
-		# this is the last file that gets created; so we verify that its generated
-		verificaiton_command = ["ls", DONE_FILEPATH]
+		generation_finished_filepath = KEYSTORE_GENERATOIN_FINISHED_FILEPATH_FORMAT.format(idx)
+		verificaiton_command = ["ls", generation_finished_filepath]
 		plan.wait(recipe = ExecRecipe(command=verificaiton_command), service_name=service_name, field="code", assertion="==", target_value=0, timeout="5m", interval="10s")
 
 	# Store outputs into files artifacts
@@ -228,9 +229,7 @@ def generate_cl_valdiator_keystores_in_parallel(
 		keystore_files,
 	)
 
-	# we cleanup as the data generation is done
-	for service_name in service_names:
-		plan.remove_service(service_name)
+	# we don't cleanup the containers as its a costly operation
 	return result
 
 
