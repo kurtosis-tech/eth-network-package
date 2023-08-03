@@ -126,7 +126,7 @@ def launch(
 			"peer_id": ".data.peer_id"
 		}
 	)
-	resonse = plan.request(recipe = cl_node_identity_recipe, service_name = service_name)
+	response = plan.request(recipe = cl_node_identity_recipe, service_name = service_name)
 	node_enr = response["extract.enr"]
 	peer_id = response["extract.peer_id"]
 

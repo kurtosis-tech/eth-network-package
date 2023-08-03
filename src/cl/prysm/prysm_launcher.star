@@ -196,7 +196,7 @@ def launch(
 		nodes_metrics_info,
 		beacon_node_service_name,
 		validator_node_service_name,
-		peer_id
+		beacon_peer_id
 	)
 
 
@@ -252,7 +252,7 @@ def get_beacon_config(
 	if bootnode_contexts != None:
 		cmd.append("--bootstrap-node="+",".join([ctx.enr for ctx in bootnode_contexts]))
 		for ctx in bootnode_contexts:
-			cmd.append("--peer="ctx.peer_id)
+			cmd.append("--peer="+ctx.peer_id)
 		cmd.append("--p2p-static-id=true")
 
 	if len(extra_params) > 0:

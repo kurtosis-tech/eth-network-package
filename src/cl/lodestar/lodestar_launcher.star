@@ -165,7 +165,7 @@ def launch(
 		nodes_metrics_info,
 		beacon_node_service_name,
 		validator_node_service_name,
-		peer_id
+		beacon_peer_id
 	)
 
 
