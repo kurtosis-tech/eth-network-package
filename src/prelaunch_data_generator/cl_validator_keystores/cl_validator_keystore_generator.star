@@ -24,6 +24,8 @@ PRYSM_DIRNAME		= "prysm"
 TEKU_KEYS_DIRNAME	= "teku-keys"
 TEKU_SECRETS_DIRNAME = "teku-secrets"
 
+DONE_FILEPATH = "/tmp/done.txt"
+
 
 # Generates keystores for the given number of nodes from the given mnemonic, where each keystore contains approximately
 #
@@ -147,13 +149,14 @@ def generate_cl_valdiator_keystores_in_parallel(
 		start_index = idx * num_validators_per_node
 		stop_index = (idx+1) * num_validators_per_node
 
-		generate_keystores_cmd = "nohup {0} keystores --insecure --prysm-pass {1} --out-loc {2} --source-mnemonic \"{3}\" --source-min {4} --source-max {5}".format(
+		generate_keystores_cmd = "nohup {0} keystores --insecure --prysm-pass {1} --out-loc {2} --source-mnemonic \"{3}\" --source-min {4} --source-max {5} && touch {6}".format(
 			KEYSTORES_GENERATION_TOOL_NAME,
 			PRYSM_PASSWORD,
 			output_dirpath,
 			mnemonic,
 			start_index,
 			stop_index,
+			DONE_FILEPATH,
 		)
 		all_generation_commands.append(generate_keystores_cmd)
 		all_output_dirpaths.append(output_dirpath)
@@ -169,7 +172,8 @@ def generate_cl_valdiator_keystores_in_parallel(
 	for idx in range(0, len(participants)):
 		service_name = service_names[idx]
 		output_dirpath = all_output_dirpaths[idx]
-		verificaiton_command = ["ls", output_dirpath + "/pubkeys.json"]
+		# this is the last file that gets created; so we verify that its generated
+		verificaiton_command = ["ls", DONE_FILEPATH]
 		plan.wait(recipe = ExecRecipe(command=verificaiton_command), service_name=service_name, field="code", assertion="==", target_value=0, timeout="5m", interval="10s")
 
 	# Store outputs into files artifacts
