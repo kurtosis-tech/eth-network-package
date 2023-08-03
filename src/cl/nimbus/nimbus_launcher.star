@@ -237,7 +237,8 @@ def get_config(
 		# See explanation there
 		cmd.append("--subscribe-all-subnets")
 	else:
-		cmd.append("--bootstrap-node="+",".join([ctx.enr for ctx in bootnode_contexts]))
+		for ctx in bootnode_contexts:
+			cmd.append("--bootstrap-node="=ctx.enr)
 
 	if len(extra_params) > 0:
 		cmd.extend([param for param in extra_params])
