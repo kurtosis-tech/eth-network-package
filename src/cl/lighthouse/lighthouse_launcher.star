@@ -245,7 +245,7 @@ def get_beacon_config(
 
 	if boot_cl_client_ctxs != None:
 		cmd.append("--boot-nodes="+",".join([ctx.enr for ctx in boot_cl_client_ctxs]))
-		cmd.append("--trusted-peers"+",".join([ctx.mulitaddr for ctx in boot_cl_client_ctxs]))
+		cmd.append("--trusted-peers="+",".join([ctx.mulitaddr for ctx in boot_cl_client_ctxs]))
 
 	if len(extra_params) > 0:
 		# this is a repeated<proto type>, we convert it into Starlark
