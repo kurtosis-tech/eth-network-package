@@ -124,10 +124,13 @@ def launch(
 		endpoint = "/eth/v1/node/identity",
 		port_id = HTTP_PORT_ID,
 		extract = {
-			"enr": ".data.enr"
+			"enr": ".data.enr",
+			"peer_id": ".data.peer_id"
 		}
 	)
-	node_enr = plan.request(recipe = node_identity_recipe, service_name = service_name)["extract.enr"]
+	response = plan.request(recipe = node_identity_recipe, service_name = service_name)
+	node_enr = response["extract.enr"]
+	node_peer_id = response["extract.peer_id"]
 
 
 	teku_metrics_port = teku_service.ports[METRICS_PORT_ID]
@@ -142,7 +145,8 @@ def launch(
 		teku_service.ip_address,
 		HTTP_PORT_NUM,
 		nodes_metrics_info,
-		service_name
+		service_name,
+		peer_id = node_peer_id,
 	)
 
 

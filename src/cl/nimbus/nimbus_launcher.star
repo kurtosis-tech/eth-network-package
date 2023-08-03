@@ -122,10 +122,13 @@ def launch(
 		endpoint = "/eth/v1/node/identity",
 		port_id = HTTP_PORT_ID,
 		extract = {
-			"enr": ".data.enr"
+			"enr": ".data.enr",
+			"peer_id": ".data.peer_id"
 		}
 	)
-	node_enr = plan.request(recipe = cl_node_identity_recipe, service_name = service_name)["extract.enr"]
+	resonse = plan.request(recipe = cl_node_identity_recipe, service_name = service_name)
+	node_enr = response["extract.enr"]
+	peer_id = response["extract.peer_id"]
 
 	metrics_port = nimbus_service.ports[METRICS_PORT_ID]
 	metrics_url = "{0}:{1}".format(nimbus_service.ip_address, metrics_port.number)
@@ -141,6 +144,7 @@ def launch(
 		HTTP_PORT_NUM,
 		nodes_metrics_info,
 		service_name,
+		peer_id = peer_id,
 	)
 
 
