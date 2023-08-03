@@ -25,6 +25,103 @@ TEKU_KEYS_DIRNAME	= "teku-keys"
 TEKU_SECRETS_DIRNAME = "teku-secrets"
 
 
+# Generates keystores for the given number of nodes from the given mnemonic, where each keystore contains approximately
+#
+#	num_keys / num_nodes keys
+def generate_cl_validator_keystores(
+	plan,
+	mnemonic,
+	participants,
+	num_validators_per_node):
+
+	service_name = prelaunch_data_generator_launcher.launch_prelaunch_data_generator(
+		plan,
+		{},
+		"cl-validator-keystore",
+	)
+
+	all_output_dirpaths = []
+	all_sub_command_strs = []
+
+	for idx, participant in enumerate(participants):
+		output_dirpath = NODE_KEYSTORES_OUTPUT_DIRPATH_FORMAT_STR.format(idx)
+
+		start_index = idx * num_validators_per_node
+		stop_index = (idx+1) * num_validators_per_node
+
+		generate_keystores_cmd = "{0} keystores --insecure --prysm-pass {1} --out-loc {2} --source-mnemonic \"{3}\" --source-min {4} --source-max {5}".format(
+			KEYSTORES_GENERATION_TOOL_NAME,
+			PRYSM_PASSWORD,
+			output_dirpath,
+			mnemonic,
+			start_index,
+			stop_index,
+		)
+
+		all_sub_command_strs.append(generate_keystores_cmd)
+		all_output_dirpaths.append(output_dirpath)
+
+	command_str = " && ".join(all_sub_command_strs)
+
+	command_result = plan.exec(recipe = ExecRecipe(command=["sh", "-c", command_str]), service_name=service_name)
+	plan.assert(command_result["code"], "==", SUCCESSFUL_EXEC_CMD_EXIT_CODE)
+
+	# Store outputs into files artifacts
+	keystore_files = []
+	for idx, participant in enumerate(participants):
+		output_dirpath = all_output_dirpaths[idx]
+
+		padded_idx = zfill_custom(idx+1, len(str(len(participants))))
+		keystore_start_index = idx * num_validators_per_node
+		keystore_stop_index = (idx+1) * num_validators_per_node - 1
+		artifact_name = "{0}-{1}-{2}-{3}-{4}".format(
+			padded_idx,
+			participant.cl_client_type,
+			participant.el_client_type,
+			keystore_start_index,
+			keystore_stop_index,
+		)
+		artifact_name = plan.store_service_files(service_name, output_dirpath, name=artifact_name)
+
+		# This is necessary because the way Kurtosis currently implements artifact-storing is
+		base_dirname_in_artifact = shared_utils.path_base(output_dirpath)
+		to_add = keystore_files_module.new_keystore_files(
+			artifact_name,
+			shared_utils.path_join(base_dirname_in_artifact, RAW_KEYS_DIRNAME),
+			shared_utils.path_join(base_dirname_in_artifact, RAW_SECRETS_DIRNAME),
+			shared_utils.path_join(base_dirname_in_artifact, NIMBUS_KEYS_DIRNAME),
+			shared_utils.path_join(base_dirname_in_artifact, PRYSM_DIRNAME),
+			shared_utils.path_join(base_dirname_in_artifact, TEKU_KEYS_DIRNAME),
+			shared_utils.path_join(base_dirname_in_artifact, TEKU_SECRETS_DIRNAME),
+		)
+
+		keystore_files.append(to_add)
+
+
+	write_prysm_password_file_cmd = [
+		"sh",
+		"-c",
+		"echo '{0}' > {1}".format(
+			PRYSM_PASSWORD,
+			PRYSM_PASSWORD_FILEPATH_ON_GENERATOR,
+		),
+	]
+	write_prysm_password_file_cmd_result = plan.exec(recipe = ExecRecipe(command=write_prysm_password_file_cmd), service_name=service_name)
+	plan.assert(write_prysm_password_file_cmd_result["code"], "==", SUCCESSFUL_EXEC_CMD_EXIT_CODE)
+
+	prysm_password_artifact_name = plan.store_service_files(service_name, PRYSM_PASSWORD_FILEPATH_ON_GENERATOR, name = "prysm-password")
+
+	result = keystores_result.new_generate_keystores_result(
+		prysm_password_artifact_name,
+		shared_utils.path_base(PRYSM_PASSWORD_FILEPATH_ON_GENERATOR),
+		keystore_files,
+	)
+
+	# we cleanup as the data generation is done
+	plan.remove_service(service_name)
+	return result
+
+# this is like above but runs things in parallel - for large networks that run on k8s or gigantic dockers
 def generate_cl_valdiator_keystores_in_parallel(
 	plan,
 	mnemonic,
@@ -132,101 +229,7 @@ def generate_cl_valdiator_keystores_in_parallel(
 		plan.remove_service(service_name)
 	return result
 
-# Generates keystores for the given number of nodes from the given mnemonic, where each keystore contains approximately
-#
-#	num_keys / num_nodes keys
-def generate_cl_validator_keystores(
-	plan,
-	mnemonic,
-	participants,
-	num_validators_per_node):
 
-	service_name = prelaunch_data_generator_launcher.launch_prelaunch_data_generator(
-		plan,
-		{},
-		"cl-validator-keystore",
-	)
-
-	all_output_dirpaths = []
-	all_sub_command_strs = []
-
-	for idx, participant in enumerate(participants):
-		output_dirpath = NODE_KEYSTORES_OUTPUT_DIRPATH_FORMAT_STR.format(idx)
-
-		start_index = idx * num_validators_per_node
-		stop_index = (idx+1) * num_validators_per_node
-
-		generate_keystores_cmd = "{0} keystores --insecure --prysm-pass {1} --out-loc {2} --source-mnemonic \"{3}\" --source-min {4} --source-max {5}".format(
-			KEYSTORES_GENERATION_TOOL_NAME,
-			PRYSM_PASSWORD,
-			output_dirpath,
-			mnemonic,
-			start_index,
-			stop_index,
-		)
-
-		all_sub_command_strs.append(generate_keystores_cmd)
-		all_output_dirpaths.append(output_dirpath)
-
-	command_str = " && ".join(all_sub_command_strs)
-
-	command_result = plan.exec(recipe = ExecRecipe(command=["sh", "-c", command_str]), service_name=service_name)
-	plan.assert(command_result["code"], "==", SUCCESSFUL_EXEC_CMD_EXIT_CODE)
-
-	# Store outputs into files artifacts
-	keystore_files = []
-	for idx, participant in enumerate(participants):
-		output_dirpath = all_output_dirpaths[idx]
-
-		padded_idx = zfill_custom(idx+1, len(str(len(participants))))
-		keystore_start_index = idx * num_validators_per_node
-		keystore_stop_index = (idx+1) * num_validators_per_node - 1
-		artifact_name = "{0}-{1}-{2}-{3}-{4}".format(
-			padded_idx,
-			participant.cl_client_type,
-			participant.el_client_type,
-			keystore_start_index,
-			keystore_stop_index,
-		)
-		artifact_name = plan.store_service_files(service_name, output_dirpath, name=artifact_name)
-
-		# This is necessary because the way Kurtosis currently implements artifact-storing is
-		base_dirname_in_artifact = shared_utils.path_base(output_dirpath)
-		to_add = keystore_files_module.new_keystore_files(
-			artifact_name,
-			shared_utils.path_join(base_dirname_in_artifact, RAW_KEYS_DIRNAME),
-			shared_utils.path_join(base_dirname_in_artifact, RAW_SECRETS_DIRNAME),
-			shared_utils.path_join(base_dirname_in_artifact, NIMBUS_KEYS_DIRNAME),
-			shared_utils.path_join(base_dirname_in_artifact, PRYSM_DIRNAME),
-			shared_utils.path_join(base_dirname_in_artifact, TEKU_KEYS_DIRNAME),
-			shared_utils.path_join(base_dirname_in_artifact, TEKU_SECRETS_DIRNAME),
-		)
-
-		keystore_files.append(to_add)
-
-
-	write_prysm_password_file_cmd = [
-		"sh",
-		"-c",
-		"echo '{0}' > {1}".format(
-			PRYSM_PASSWORD,
-			PRYSM_PASSWORD_FILEPATH_ON_GENERATOR,
-		),
-	]
-	write_prysm_password_file_cmd_result = plan.exec(recipe = ExecRecipe(command=write_prysm_password_file_cmd), service_name=service_name)
-	plan.assert(write_prysm_password_file_cmd_result["code"], "==", SUCCESSFUL_EXEC_CMD_EXIT_CODE)
-
-	prysm_password_artifact_name = plan.store_service_files(service_name, PRYSM_PASSWORD_FILEPATH_ON_GENERATOR, name = "prysm-password")
-
-	result = keystores_result.new_generate_keystores_result(
-		prysm_password_artifact_name,
-		shared_utils.path_base(PRYSM_PASSWORD_FILEPATH_ON_GENERATOR),
-		keystore_files,
-	)
-
-	# we cleanup as the data generation is done
-	plan.remove_service(service_name)
-	return result
 
 def zfill_custom(value, width):
     return ("0" * (width - len(str(value)))) + str(value)
