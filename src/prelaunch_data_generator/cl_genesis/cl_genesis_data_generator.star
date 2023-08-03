@@ -184,8 +184,7 @@ def generate_cl_genesis_data(
 		genesis_ssz_rel_filepath,
 	)
 
-	# we cleanup as the data generation is done
-	plan.remove_service(launcher_service_name)
+	# TODO remove the container when the job is done
 	return result
 
 
