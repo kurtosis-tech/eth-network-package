@@ -123,12 +123,12 @@ def launch(
 		port_id = HTTP_PORT_ID,
 		extract = {
 			"enr": ".data.enr",
-			"peer_id": ".data.discovery_addresses[0]",
+			"mulitaddr": ".data.discovery_addresses[0]",
 		}
 	)
 	response = plan.request(recipe = cl_node_identity_recipe, service_name = service_name)
 	node_enr = response["extract.enr"]
-	peer_id = response["extract.peer_id"]
+	mulitaddr = response["extract.mulitaddr"]
 
 	metrics_port = nimbus_service.ports[METRICS_PORT_ID]
 	metrics_url = "{0}:{1}".format(nimbus_service.ip_address, metrics_port.number)
@@ -144,7 +144,7 @@ def launch(
 		HTTP_PORT_NUM,
 		nodes_metrics_info,
 		service_name,
-		peer_id = peer_id,
+		mulitaddr = mulitaddr,
 	)
 
 

@@ -150,12 +150,12 @@ def launch(
 		port_id = BEACON_HTTP_PORT_ID,
 		extract = {
 			"enr": ".data.enr",
-			"peer_id": ".data.discovery_addresses[0]",
+			"mulitaddr": ".data.discovery_addresses[0]",
 		}
 	)
 	response = plan.request(recipe = beacon_node_identity_recipe, service_name = beacon_node_service_name)
 	beacon_node_enr = response["extract.enr"]
-	beacon_peer_id = response["extract.peer_id"]
+	beacon_mulitaddr = response["extract.mulitaddr"]
 
 	beacon_metrics_port = beacon_service.ports[BEACON_METRICS_PORT_ID]
 	beacon_metrics_url = "{0}:{1}".format(beacon_service.ip_address, beacon_metrics_port.number)
@@ -175,7 +175,7 @@ def launch(
 		nodes_metrics_info,
 		beacon_node_service_name,
 		validator_node_service_name,
-		beacon_peer_id
+		beacon_mulitaddr
 	)
 
 
@@ -245,7 +245,7 @@ def get_beacon_config(
 
 	if boot_cl_client_ctxs != None:
 		cmd.append("--boot-nodes="+",".join([ctx.enr for ctx in boot_cl_client_ctxs]))
-		cmd.append("--trusted-peers"+",".join([ctx.peer_id for ctx in boot_cl_client_ctxs]))
+		cmd.append("--trusted-peers"+",".join([ctx.mulitaddr for ctx in boot_cl_client_ctxs]))
 
 	if len(extra_params) > 0:
 		# this is a repeated<proto type>, we convert it into Starlark

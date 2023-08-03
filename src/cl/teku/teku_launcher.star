@@ -125,12 +125,12 @@ def launch(
 		port_id = HTTP_PORT_ID,
 		extract = {
 			"enr": ".data.enr",
-			"peer_id": ".data.discovery_addresses[0]"
+			"mulitaddr": ".data.discovery_addresses[0]"
 		}
 	)
 	response = plan.request(recipe = node_identity_recipe, service_name = service_name)
 	node_enr = response["extract.enr"]
-	node_peer_id = response["extract.peer_id"]
+	node_mulitaddr = response["extract.mulitaddr"]
 
 
 	teku_metrics_port = teku_service.ports[METRICS_PORT_ID]
@@ -146,7 +146,7 @@ def launch(
 		HTTP_PORT_NUM,
 		nodes_metrics_info,
 		service_name,
-		peer_id = node_peer_id,
+		mulitaddr = node_mulitaddr,
 	)
 
 
@@ -229,7 +229,7 @@ def get_config(
 
 	if bootnode_contexts != None:
 		cmd.append("--p2p-discovery-bootnodes="+",".join([ctx.enr for ctx in bootnode_contexts]))
-		cmd.append("--p2p-static-peers"+",".join([ctx.peer_id for ctx in bootnode_contexts]))
+		cmd.append("--p2p-static-peers"+",".join([ctx.mulitaddr for ctx in bootnode_contexts]))
 
 	if len(extra_params) > 0:
 		# we do the list comprehension as the default extra_params is a proto repeated string

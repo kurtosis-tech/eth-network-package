@@ -6,7 +6,7 @@ def new_cl_client_context(
 	cl_nodes_metrics_info,
 	beacon_service_name,
 	validator_service_name = "",
-	peer_id = ""):
+	mulitaddr = ""):
 	return struct(
 		client_name = client_name,
 		enr = enr,
@@ -15,5 +15,5 @@ def new_cl_client_context(
 		cl_nodes_metrics_info = cl_nodes_metrics_info,
 		beacon_service_name = beacon_service_name,
 		validator_service_name = validator_service_name,
-		peer_id = peer_id,
+		mulitaddr = mulitaddr,
 	)
