@@ -249,8 +249,11 @@ def get_beacon_config(
 		# ^^^^^^^^^^^^^^^^^^^ METRICS CONFIG ^^^^^^^^^^^^^^^^^^^^^
 	]
 
-	if bootnode_context != None:
+	if bootnode_contexts != None:
 		cmd.append("--bootstrap-node="+",".join([ctx.enr for ctx in bootnode_contexts]))
+		for ctx in bootnode_contexts:
+			cmd.append("--peer="ctx.peer_id)
+		cmd.append("--p2p-static-id=true")
 
 	if len(extra_params) > 0:
 		# we do the for loop as otherwise its a proto repeated array
