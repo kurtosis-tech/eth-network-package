@@ -123,6 +123,7 @@ def generate_cl_validator_keystores(
 	plan.remove_service(service_name)
 	return result
 
+
 # this is like above but runs things in parallel - for large networks that run on k8s or gigantic dockers
 def generate_cl_valdiator_keystores_in_parallel(
 	plan,
@@ -130,15 +131,7 @@ def generate_cl_valdiator_keystores_in_parallel(
 	participants,
 	num_validators_per_node):
 
-	service_names = []
-
-	for idx in range(0, len(participants)):
-		service_name = prelaunch_data_generator_launcher.launch_prelaunch_data_generator(
-			plan,
-			{},
-			"cl-validator-keystore-" + str(idx),
-		)
-		service_names.append(service_name)
+	service_names = prelaunch_data_generator_launcher.launch_prelaunch_data_generator_parallel(plan, {}, ["cl-validator-keystore-" + str(idx) for idx in range(0, len(participants)])
 
 	all_output_dirpaths = []
 	all_generation_commands = []
