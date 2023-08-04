@@ -43,12 +43,21 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 	num_participants = len(participants)
 
 	plan.print("Generating cl validator key stores")
-	cl_validator_data = cl_validator_keystores.generate_cl_validator_keystores(
-		plan,
-		network_params.preregistered_validator_keys_mnemonic,
-		participants,
-		network_params.num_validator_keys_per_node,
-	)
+	cl_validator_data = None
+	if not network_params.parallel_keystore_generation:
+		cl_validator_data = cl_validator_keystores.generate_cl_validator_keystores(
+			plan,
+			network_params.preregistered_validator_keys_mnemonic,
+			participants,
+			network_params.num_validator_keys_per_node
+		)
+	else:
+		cl_validator_data = cl_validator_keystores.generate_cl_valdiator_keystores_in_parallel(
+			plan,
+			network_params.preregistered_validator_keys_mnemonic,
+			participants,
+			network_params.num_validator_keys_per_node
+		)
 
 	plan.print(json.indent(json.encode(cl_validator_data)))
 
