@@ -230,7 +230,7 @@ def get_beacon_config(
 	]
 
 	if bootnode_contexts != None :
-		cmd.append("--bootnodes="+",".join([ctx.enr for ctx in bootnode_contexts[package_io.MAX_ENR_ENTRIES]]))
+		cmd.append("--bootnodes="+",".join([ctx.enr for ctx in bootnode_contexts[:package_io.MAX_ENR_ENTRIES]]))
 
 	if len(extra_params) > 0:
 		# this is a repeated<proto type>, we convert it into Starlark
