@@ -136,7 +136,7 @@ def generate_el_genesis_data(
 		genesis_filename_to_relative_filepath_in_artifact[BESU_GENESIS_FILENAME],
 	)
 
-	# TODO remove the container when the job is done
+	# TODO(gyani) remove the container when the job is done - this is a resource leaker
 	return result
 
 
