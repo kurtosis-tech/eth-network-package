@@ -241,8 +241,7 @@ def get_config(
 		cmd.append("--subscribe-all-subnets")
 	else:
 		for ctx in bootnode_contexts:
-			if ctx.enr != package_io.ENR_TO_SKIP:
-				cmd.append("--bootstrap-node="+ctx.enr)
+			cmd.append("--bootstrap-node="+ctx.enr)
 			cmd.append("--direct-peer="+ctx.multiaddr)
 
 	if len(extra_params) > 0:

@@ -230,7 +230,7 @@ def get_config(
 	]
 
 	if bootnode_contexts != None:
-		cmd.append("--p2p-discovery-bootnodes="+",".join([ctx.enr for ctx in bootnode_contexts if ctx.enr != package_io.ENR_TO_SKIP]))
+		cmd.append("--p2p-discovery-bootnodes="+",".join([ctx.enr for ctx in bootnode_contexts]))
 		cmd.append("--p2p-static-peers="+",".join([ctx.multiaddr for ctx in bootnode_contexts]))
 
 	if len(extra_params) > 0:
