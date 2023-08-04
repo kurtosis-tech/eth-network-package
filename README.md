@@ -2,9 +2,9 @@
 
 ![Run of the Ethereum Network Package](/run.gif)
 
-This is a Kurtosis Starlark Package that spins up an Ethereum network.
+This is a Kurtosis Starlark Package that spins up fully configurable, private Ethereum network in minutes. This package works over Docker or Kubernetes and can scale up to any size you need. This package is optimized for testing use cases and comes pre-packaged with Grafana, Prometheus, a transaction spammer, and (soon) MEV infrastructure from the Flashbots suite of products.
 
-### Run
+### How to Run
 
 This assumes you have the [Kurtosis CLI](https://docs.kurtosis.com/cli/) installed and the [Docker daemon](https://docs.kurtosis.com/install#i-install--start-docker) running on your local machine.
 
@@ -200,7 +200,7 @@ kurtosis run github.com/kurtosis-tech/eth-network-package "$(cat ~/eth-network-p
 ### Using this in your own package
 
 Kurtosis Packages can be used within other Kurtosis Packages through [composition](https://docs.kurtosis.com/reference/packages). Assuming you want to spin up an Ethereum network and your own service
-together, you just need to do the following
+together, you just need to do the following:
 
 ```py
 # Import the Ethereum Package
