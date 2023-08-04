@@ -140,12 +140,13 @@ def parse_input(input_args):
 			slots_per_epoch=result["network_params"]["slots_per_epoch"],
 			capella_fork_epoch=result["network_params"]["capella_fork_epoch"],
 			deneb_fork_epoch=result["network_params"]["deneb_fork_epoch"],
-			genesis_delay=result["network_params"]["genesis_delay"]
+			genesis_delay=result["network_params"]["genesis_delay"],
+			parallel_keystore_generation = result["network_params"]["parallel_keystore_generation"]
 		),
 		wait_for_finalization=result["wait_for_finalization"],
 		wait_for_verifications=result["wait_for_verifications"],
 		verifications_epoch_limit=result["verifications_epoch_limit"],
-		global_client_log_level=result["global_client_log_level"]
+		global_client_log_level=result["global_client_log_level"],
 	)
 
 def get_client_log_level_or_default(participant_log_level, global_log_level, client_log_levels):
@@ -182,6 +183,7 @@ def default_network_params():
 		# arbitrarily large while we sort out https://github.com/kurtosis-tech/eth-network-package/issues/42
 		# this will take 53~ hoours for now
 		"deneb_fork_epoch":				500,
+		"parallel_keystore_generation": False,
 	}
 
 def default_participant():
