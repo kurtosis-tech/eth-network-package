@@ -253,7 +253,7 @@ def get_beacon_config(
 	]
 
 	if bootnode_contexts != None:
-		for ctx in bootnode_contexts:
+		for ctx[:20] in bootnode_contexts:
 			cmd.append("--peer="+ctx.multiaddr)
 			cmd.append("--bootstrap-node="+ctx.enr)
 		cmd.append("--p2p-static-id=true")

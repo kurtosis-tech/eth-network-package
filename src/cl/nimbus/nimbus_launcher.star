@@ -240,7 +240,7 @@ def get_config(
 		# See explanation there
 		cmd.append("--subscribe-all-subnets")
 	else:
-		for ctx in bootnode_contexts:
+		for ctx[:20] in bootnode_contexts:
 			cmd.append("--bootstrap-node="+ctx.enr)
 			cmd.append("--direct-peer="+ctx.multiaddr)
 
