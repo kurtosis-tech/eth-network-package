@@ -24,7 +24,7 @@ PRYSM_DIRNAME		= "prysm"
 TEKU_KEYS_DIRNAME	= "teku-keys"
 TEKU_SECRETS_DIRNAME = "teku-secrets"
 
-KEYSTORE_GENERATOIN_FINISHED_FILEPATH_FORMAT = "/tmp/keystores_generated-{0}.txt"
+KEYSTORE_GENERATION_FINISHED_FILEPATH_FORMAT = "/tmp/keystores_generated-{0}-{1}"
 
 
 # Generates keystores for the given number of nodes from the given mnemonic, where each keystore contains approximately
@@ -141,7 +141,7 @@ def generate_cl_valdiator_keystores_in_parallel(
 
 		start_index = idx * num_validators_per_node
 		stop_index = (idx+1) * num_validators_per_node
-		generation_finished_filepath = KEYSTORE_GENERATOIN_FINISHED_FILEPATH_FORMAT.format(idx)
+		generation_finished_filepath = KEYSTORE_GENERATION_FINISHED_FILEPATH_FORMAT.format(start_index,stop_index)
 
 		generate_keystores_cmd = "nohup {0} keystores --insecure --prysm-pass {1} --out-loc {2} --source-mnemonic \"{3}\" --source-min {4} --source-max {5} && touch {6}".format(
 			KEYSTORES_GENERATION_TOOL_NAME,
