@@ -230,8 +230,8 @@ def get_config(
 	]
 
 	if bootnode_contexts != None:
-		cmd.append("--p2p-discovery-bootnodes="+",".join([ctx.enr for ctx in bootnode_contexts[:20]]))
-		cmd.append("--p2p-static-peers="+",".join([ctx.multiaddr for ctx in bootnode_contexts[:20]]))
+		cmd.append("--p2p-discovery-bootnodes="+",".join([ctx.enr for ctx in bootnode_contexts[package.io_MAX_ENR_ENTRIES]]))
+		cmd.append("--p2p-static-peers="+",".join([ctx.multiaddr for ctx in bootnode_contexts[package.io_MAX_ENR_ENTRIES]]))
 
 	if len(extra_params) > 0:
 		# we do the list comprehension as the default extra_params is a proto repeated string
