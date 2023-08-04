@@ -149,8 +149,7 @@ def launch(
 		}
 	)
 	response = plan.request(recipe = beacon_node_identity_recipe, service_name = beacon_node_service_name)
-	# TODO fix this after lodestar generates valid ENR with valid IP
-	beacon_node_enr = package_io.ENR_TO_SKIP
+	beacon_node_enr = response["extract.enr"]
 	beacon_multiaddr = response["extract.multiaddr"]
 	beacon_peer_id = response["extract.peer_id"]
 
@@ -216,7 +215,7 @@ def get_beacon_config(
 		"--rest.address=0.0.0.0",
 		"--rest.namespace=*",
 		"--rest.port={0}".format(HTTP_PORT_NUM),
-		"--nat=" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
+		"--nat=true",
 		"--enr.ip=" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		"--enr.tcp={0}".format(DISCOVERY_PORT_NUM),
 		"--enr.udp={0}".format(DISCOVERY_PORT_NUM),
@@ -231,7 +230,7 @@ def get_beacon_config(
 	]
 
 	if bootnode_contexts != None :
-		cmd.append("--bootnodes="+",".join([ctx.enr for ctx in bootnode_contexts if ctx.enr != package_io.ENR_TO_SKIP]))
+		cmd.append("--bootnodes="+",".join([ctx.enr for ctx in bootnode_contexts]))
 
 	if len(extra_params) > 0:
 		# this is a repeated<proto type>, we convert it into Starlark
