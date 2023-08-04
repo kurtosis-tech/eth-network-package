@@ -168,7 +168,7 @@ def generate_cl_valdiator_keystores_in_parallel(
 		output_dirpath = all_output_dirpaths[idx]
 		generation_finished_filepath = KEYSTORE_GENERATOIN_FINISHED_FILEPATH_FORMAT.format(idx)
 		verificaiton_command = ["ls", generation_finished_filepath]
-		plan.wait(recipe = ExecRecipe(command=verificaiton_command), service_name=service_name, field="code", assertion="==", target_value=0, timeout="5m", interval="10s")
+		plan.wait(recipe = ExecRecipe(command=verificaiton_command), service_name=service_name, field="code", assertion="==", target_value=0, timeout="5m", interval="2s")
 
 	# Store outputs into files artifacts
 	keystore_files = []
