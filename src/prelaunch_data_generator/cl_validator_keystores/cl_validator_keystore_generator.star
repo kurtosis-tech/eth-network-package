@@ -135,6 +135,7 @@ def generate_cl_valdiator_keystores_in_parallel(
 
 	all_output_dirpaths = []
 	all_generation_commands = []
+	finished_files_to_verify = []
 
 	for idx, participant in enumerate(participants):
 		output_dirpath = NODE_KEYSTORES_OUTPUT_DIRPATH_FORMAT_STR.format(idx)
@@ -142,6 +143,7 @@ def generate_cl_valdiator_keystores_in_parallel(
 		start_index = idx * num_validators_per_node
 		stop_index = (idx+1) * num_validators_per_node
 		generation_finished_filepath = KEYSTORE_GENERATION_FINISHED_FILEPATH_FORMAT.format(start_index,stop_index)
+		finished_files_to_verify.append(generation_finished_filepath)
 
 		generate_keystores_cmd = "nohup {0} keystores --insecure --prysm-pass {1} --out-loc {2} --source-mnemonic \"{3}\" --source-min {4} --source-max {5} && touch {6}".format(
 			KEYSTORES_GENERATION_TOOL_NAME,
@@ -166,9 +168,9 @@ def generate_cl_valdiator_keystores_in_parallel(
 	for idx in range(0, len(participants)):
 		service_name = service_names[idx]
 		output_dirpath = all_output_dirpaths[idx]
-		generation_finished_filepath = KEYSTORE_GENERATOIN_FINISHED_FILEPATH_FORMAT.format(idx)
+		generation_finished_filepath = finished_files_to_verify[idx]
 		verificaiton_command = ["ls", generation_finished_filepath]
-		plan.wait(recipe = ExecRecipe(command=verificaiton_command), service_name=service_name, field="code", assertion="==", target_value=0, timeout="5m", interval="2s")
+		plan.wait(recipe = ExecRecipe(command=verificaiton_command), service_name=service_name, field="code", assertion="==", target_value=0, timeout="5m", interval="0.5s")
 
 	# Store outputs into files artifacts
 	keystore_files = []
