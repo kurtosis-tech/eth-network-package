@@ -59,6 +59,7 @@ VERBOSITY_LEVELS = {
 	package_io.GLOBAL_CLIENT_LOG_LEVEL.trace: "5",
 }
 
+BUILDER_IMAGE_STR = "builder"
 
 def launch(
 	plan,
@@ -88,6 +89,7 @@ def launch(
 		launcher.el_genesis_data,
 		launcher.prefunded_geth_keys_artifact_uuid,
 		launcher.prefunded_account_info,
+		launcher.genesis_validators_root,
 		image,
 		existing_el_clients,
 		log_level,
@@ -121,6 +123,7 @@ def get_config(
 	genesis_data,
 	prefunded_geth_keys_artifact_uuid,
 	prefunded_account_info,
+	genesis_validators_root,
 	image,
 	existing_el_clients,
 	verbosity_level,
@@ -136,7 +139,13 @@ def get_config(
 	account_addresses_to_unlock = []
 	for prefunded_account in prefunded_account_info:
 		account_addresses_to_unlock.append(prefunded_account.address)
+	
+	for index, extra_param in enumerate(extra_params):
+		if package_io.GENESIS_VALIDATORS_ROOT_PLACEHOLDER in extra_param:
+			extra_params[index] = extra_param.replace(package_io.GENESIS_VALIDATORS_ROOT_PLACEHOLDER, genesis_validators_root)
 
+	if BUILDER_IMAGE_STR in image:
+		pass
 
 	accounts_to_unlock_str = ",".join(account_addresses_to_unlock)
 
@@ -228,10 +237,11 @@ def get_config(
 	), jwt_secret_json_filepath_on_client
 
 
-def new_geth_launcher(network_id, el_genesis_data, prefunded_geth_keys_artifact_uuid, prefunded_account_info):
+def new_geth_launcher(network_id, el_genesis_data, prefunded_geth_keys_artifact_uuid, prefunded_account_info, genesis_validators_root = ""):
 	return struct(
 		network_id = network_id,
 		el_genesis_data = el_genesis_data,
 		prefunded_account_info = prefunded_account_info,
 		prefunded_geth_keys_artifact_uuid = prefunded_geth_keys_artifact_uuid,
+		genesis_validators_root = genesis_validators_root
 	)
