@@ -83,10 +83,36 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 
 	geth_prefunded_keys_artifact_name = plan.upload_files(static_files.GETH_PREFUNDED_KEYS_DIRPATH, name="geth-prefunded-keys")
 
-	plan.print("Uploaded GETH files succesfully, launching EL participants")
+	plan.print("Uploaded GETH files succesfully")
+
+	plan.print("Generating CL data")
+
+	genesis_generation_config_yml_template = read_file(static_files.CL_GENESIS_GENERATION_CONFIG_TEMPLATE_FILEPATH)
+	genesis_generation_mnemonics_yml_template = read_file(static_files.CL_GENESIS_GENERATION_MNEMONICS_TEMPLATE_FILEPATH)
+	total_number_of_validator_keys = network_params.num_validator_keys_per_node * num_participants
+	cl_genesis_data = cl_genesis_data_generator.generate_cl_genesis_data(
+		plan,
+		genesis_generation_config_yml_template,
+		genesis_generation_mnemonics_yml_template,
+		el_genesis_data,
+		final_genesis_timestamp,
+		network_params.network_id,
+		network_params.deposit_contract_address,
+		network_params.seconds_per_slot,
+		network_params.preregistered_validator_keys_mnemonic,
+		total_number_of_validator_keys,
+		network_params.genesis_delay,
+		network_params.capella_fork_epoch,
+		network_params.deneb_fork_epoch
+	)
+
+	plan.print(json.indent(json.encode(cl_genesis_data)))
+	plan.print("Generated CL genesis data succesfully, launching EL & CL Participants")
+
+	genesis_validators_root = cl_genesis_data.genesis_validators_root
 
 	el_launchers = {
-		package_io.EL_CLIENT_TYPE.geth : {"launcher": geth.new_geth_launcher(network_params.network_id, el_genesis_data, geth_prefunded_keys_artifact_name, genesis_constants.PRE_FUNDED_ACCOUNTS), "launch_method": geth.launch},
+		package_io.EL_CLIENT_TYPE.geth : {"launcher": geth.new_geth_launcher(network_params.network_id, el_genesis_data, geth_prefunded_keys_artifact_name, genesis_constants.PRE_FUNDED_ACCOUNTS, genesis_validators_root), "launch_method": geth.launch},
 		package_io.EL_CLIENT_TYPE.besu : {"launcher": besu.new_besu_launcher(network_params.network_id, el_genesis_data), "launch_method": besu.launch},
 		package_io.EL_CLIENT_TYPE.erigon : {"launcher": erigon.new_erigon_launcher(network_params.network_id, el_genesis_data), "launch_method": erigon.launch},
 		package_io.EL_CLIENT_TYPE.nethermind : {"launcher": nethermind.new_nethermind_launcher(el_genesis_data), "launch_method": nethermind.launch},
@@ -127,30 +153,6 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		all_el_client_contexts.append(el_client_context)
 
 	plan.print("Succesfully added {0} EL participants".format(num_participants))
-
-
-	plan.print("Generating CL data")
-
-	genesis_generation_config_yml_template = read_file(static_files.CL_GENESIS_GENERATION_CONFIG_TEMPLATE_FILEPATH)
-	genesis_generation_mnemonics_yml_template = read_file(static_files.CL_GENESIS_GENERATION_MNEMONICS_TEMPLATE_FILEPATH)
-	total_number_of_validator_keys = network_params.num_validator_keys_per_node * num_participants
-	cl_genesis_data = cl_genesis_data_generator.generate_cl_genesis_data(
-		plan,
-		genesis_generation_config_yml_template,
-		genesis_generation_mnemonics_yml_template,
-		el_genesis_data,
-		final_genesis_timestamp,
-		network_params.network_id,
-		network_params.deposit_contract_address,
-		network_params.seconds_per_slot,
-		network_params.preregistered_validator_keys_mnemonic,
-		total_number_of_validator_keys,
-		network_params.genesis_delay,
-		network_params.capella_fork_epoch,
-		network_params.deneb_fork_epoch
-	)
-
-	plan.print(json.indent(json.encode(cl_genesis_data)))
 
 	plan.print("Launching CL network")
 
@@ -248,7 +250,7 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		all_participants.append(participant_entry)
 
 
-	return all_participants, final_genesis_timestamp
+	return all_participants, final_genesis_timestamp, genesis_validators_root
 
 def zfill_calculator(participants):
 	for zf, par in GLOBAL_INDEX_ZFILL['zfill_values']:

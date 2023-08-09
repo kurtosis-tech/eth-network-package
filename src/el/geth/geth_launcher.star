@@ -59,6 +59,7 @@ VERBOSITY_LEVELS = {
 	package_io.GLOBAL_CLIENT_LOG_LEVEL.trace: "5",
 }
 
+BUILDER_IMAGE_STR = "builder"
 
 def launch(
 	plan,
@@ -88,6 +89,7 @@ def launch(
 		launcher.el_genesis_data,
 		launcher.prefunded_geth_keys_artifact_uuid,
 		launcher.prefunded_account_info,
+		launcher.genesis_validators_root,
 		image,
 		existing_el_clients,
 		log_level,
@@ -121,6 +123,7 @@ def get_config(
 	genesis_data,
 	prefunded_geth_keys_artifact_uuid,
 	prefunded_account_info,
+	genesis_validators_root,
 	image,
 	existing_el_clients,
 	verbosity_level,
@@ -137,6 +140,19 @@ def get_config(
 	for prefunded_account in prefunded_account_info:
 		account_addresses_to_unlock.append(prefunded_account.address)
 
+	for index, extra_param in enumerate(extra_params):
+		if package_io.GENESIS_VALIDATORS_ROOT_PLACEHOLDER in extra_param:
+			extra_params[index] = extra_param.replace(package_io.GENESIS_VALIDATORS_ROOT_PLACEHOLDER, genesis_validators_root)
+
+	env_vars = {}
+
+	# the key here is the private key of the first genesis account
+	# note that the mev builder is the one that needs this and not other nodes
+	# TODO productize a way to send custom env variables
+	if BUILDER_IMAGE_STR in image:
+		env_vars = {
+			"BUILDER_TX_SIGNING_KEY": "0xef5177cd0b6b21c87db5a0bf35d4084a8a57a9d6a064f86d51ac85f2b873a4e2"
+		}
 
 	accounts_to_unlock_str = ",".join(account_addresses_to_unlock)
 
@@ -170,11 +186,11 @@ def get_config(
 		"--http.corsdomain=*",
 		# WARNING: The admin info endpoint is enabled so that we can easily get ENR/enode, which means
 		#  that users should NOT store private information in these Kurtosis nodes!
-		"--http.api=admin,engine,net,eth",
+		"--http.api=admin,engine,net,eth,web3,debug",
 		"--ws",
 		"--ws.addr=0.0.0.0",
 		"--ws.port={0}".format(WS_PORT_NUM),
-		"--ws.api=engine,net,eth",
+		"--ws.api=admin,engine,net,eth,web3,debug",
 		"--ws.origins=*",
 		"--allow-insecure-unlock",
 		"--nat=extip:" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
@@ -186,6 +202,10 @@ def get_config(
 		"--syncmode=full",
 		"--rpc.allow-unprotected-txs"
 	]
+
+	if BUILDER_IMAGE_STR in image:
+		launch_node_cmd[10] = "--http.api=admin,engine,net,eth,web3,debug,flashbots"
+		launch_node_cmd[14] = "--ws.api=admin,engine,net,eth,web3,debug,flashbots"
 
 	bootnode_enode = ""
 	if len(existing_el_clients) > 0:
@@ -224,14 +244,16 @@ def get_config(
 		min_cpu = el_min_cpu,
 		max_cpu = el_max_cpu,
 		min_memory = el_min_mem,
-		max_memory = el_max_mem
+		max_memory = el_max_mem,
+		env_vars = env_vars
 	), jwt_secret_json_filepath_on_client
 
 
-def new_geth_launcher(network_id, el_genesis_data, prefunded_geth_keys_artifact_uuid, prefunded_account_info):
+def new_geth_launcher(network_id, el_genesis_data, prefunded_geth_keys_artifact_uuid, prefunded_account_info, genesis_validators_root = ""):
 	return struct(
 		network_id = network_id,
 		el_genesis_data = el_genesis_data,
 		prefunded_account_info = prefunded_account_info,
 		prefunded_geth_keys_artifact_uuid = prefunded_geth_keys_artifact_uuid,
+		genesis_validators_root = genesis_validators_root
 	)
