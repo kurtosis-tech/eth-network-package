@@ -152,6 +152,8 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 
 	plan.print(json.indent(json.encode(cl_genesis_data)))
 
+	genesis_validators_root = cl_genesis_data.genesis_validators_root
+
 	plan.print("Launching CL network")
 
 	cl_launchers = {
@@ -248,7 +250,7 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		all_participants.append(participant_entry)
 
 
-	return all_participants, final_genesis_timestamp
+	return all_participants, final_genesis_timestamp, genesis_validators_root
 
 def zfill_calculator(participants):
 	for zf, par in GLOBAL_INDEX_ZFILL['zfill_values']:
