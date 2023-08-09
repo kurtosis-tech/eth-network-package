@@ -139,7 +139,7 @@ def get_config(
 	account_addresses_to_unlock = []
 	for prefunded_account in prefunded_account_info:
 		account_addresses_to_unlock.append(prefunded_account.address)
-	
+
 	for index, extra_param in enumerate(extra_params):
 		if package_io.GENESIS_VALIDATORS_ROOT_PLACEHOLDER in extra_param:
 			extra_params[index] = extra_param.replace(package_io.GENESIS_VALIDATORS_ROOT_PLACEHOLDER, genesis_validators_root)
@@ -190,7 +190,7 @@ def get_config(
 		"--ws",
 		"--ws.addr=0.0.0.0",
 		"--ws.port={0}".format(WS_PORT_NUM),
-		"--ws.api=engine,net,eth,web3,debug",
+		"--ws.api=admin,engine,net,eth,web3,debug",
 		"--ws.origins=*",
 		"--allow-insecure-unlock",
 		"--nat=extip:" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
