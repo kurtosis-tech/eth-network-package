@@ -203,6 +203,10 @@ def get_config(
 		"--rpc.allow-unprotected-txs"
 	]
 
+	if BUILDER_IMAGE_STR in image:
+		launch_node_cmd[10] = "--http.api=admin,engine,net,eth,web3,debug,flashbots"
+		launch_node_cmd[14] = "--ws.api=admin,engine,net,eth,web3,debug,flashbots"
+
 	bootnode_enode = ""
 	if len(existing_el_clients) > 0:
 		bootnode_context = existing_el_clients[0]
