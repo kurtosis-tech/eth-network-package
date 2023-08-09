@@ -144,8 +144,15 @@ def get_config(
 		if package_io.GENESIS_VALIDATORS_ROOT_PLACEHOLDER in extra_param:
 			extra_params[index] = extra_param.replace(package_io.GENESIS_VALIDATORS_ROOT_PLACEHOLDER, genesis_validators_root)
 
+	env_vars = {}
+
+	# the key here is the private key of the first genesis account
+	# note that the mev builder is the one that needs this and not other nodes
+	# TODO productize a way to send custom env variables
 	if BUILDER_IMAGE_STR in image:
-		pass
+		env_vars = {
+			"BUILDER_TX_SIGNING_KEY": "0xef5177cd0b6b21c87db5a0bf35d4084a8a57a9d6a064f86d51ac85f2b873a4e2"
+		}
 
 	accounts_to_unlock_str = ",".join(account_addresses_to_unlock)
 
@@ -179,11 +186,11 @@ def get_config(
 		"--http.corsdomain=*",
 		# WARNING: The admin info endpoint is enabled so that we can easily get ENR/enode, which means
 		#  that users should NOT store private information in these Kurtosis nodes!
-		"--http.api=admin,engine,net,eth",
+		"--http.api=admin,engine,net,eth,web3,debug",
 		"--ws",
 		"--ws.addr=0.0.0.0",
 		"--ws.port={0}".format(WS_PORT_NUM),
-		"--ws.api=engine,net,eth",
+		"--ws.api=engine,net,eth,web3,debug",
 		"--ws.origins=*",
 		"--allow-insecure-unlock",
 		"--nat=extip:" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
@@ -233,7 +240,8 @@ def get_config(
 		min_cpu = el_min_cpu,
 		max_cpu = el_max_cpu,
 		min_memory = el_min_mem,
-		max_memory = el_max_mem
+		max_memory = el_max_mem,
+		env_vars = env_vars
 	), jwt_secret_json_filepath_on_client
 
 
