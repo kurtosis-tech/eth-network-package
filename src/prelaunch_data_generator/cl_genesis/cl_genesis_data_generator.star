@@ -161,7 +161,7 @@ def generate_cl_genesis_data(
 	deposit_block_hash_file_generation_str = " ".join(deposit_block_hash_generation_cmd)
 	plan.exec(recipe = ExecRecipe(command = ["/bin/sh", "-c", deposit_block_hash_file_generation_str]), service_name = launcher_service_name)
 
-	genesis_validators_root = get_genesis_validators_root(plan, launcher_service_name, shared_utils.path_to_jin(OUTPUT_DIRPATH_ON_GENERATOR, PARSED_BEACON_STATE_FILENAME))
+	genesis_validators_root = get_genesis_validators_root(plan, launcher_service_name, shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, PARSED_BEACON_STATE_FILENAME))
 
 	shared_utils.download_trusted_setup(plan, launcher_service_name, shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, TRUSTED_SETUP_FILENAME))
 
