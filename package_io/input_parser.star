@@ -66,6 +66,12 @@ def parse_input(input_args):
 				fail("{0} received an empty image name and we don't have a default for it".format(cl_client_type))
 			participant["cl_client_image"] = default_image
 
+		snooper_enabled = participant["snooper_enabled"]
+		if snooper_enabled == False:
+			default_snooper_enabled = result["snooper_enabled"]
+			if default_snooper_enabled:
+				participant["snooper_enabled"] = default_snooper_enabled
+
 		beacon_extra_params = participant.get("beacon_extra_params", [])
 		participant["beacon_extra_params"] = beacon_extra_params
 
@@ -129,6 +135,7 @@ def parse_input(input_args):
 			v_max_cpu=participant["v_max_cpu"],
 			v_min_mem=participant["v_min_mem"],
 			v_max_mem=participant["v_max_mem"],
+			snooper_enabled = participant["snooper_enabled"],
 			count=participant["count"]
 		) for participant in result["participants"]],
 		network_params=struct(
@@ -141,12 +148,13 @@ def parse_input(input_args):
 			capella_fork_epoch=result["network_params"]["capella_fork_epoch"],
 			deneb_fork_epoch=result["network_params"]["deneb_fork_epoch"],
 			genesis_delay=result["network_params"]["genesis_delay"],
-			parallel_keystore_generation = result["network_params"]["parallel_keystore_generation"]
+			parallel_keystore_generation = result["network_params"]["parallel_keystore_generation"],
 		),
 		wait_for_finalization=result["wait_for_finalization"],
 		wait_for_verifications=result["wait_for_verifications"],
 		verifications_epoch_limit=result["verifications_epoch_limit"],
 		global_client_log_level=result["global_client_log_level"],
+		snooper_enabled = result["snooper_enabled"],
 	)
 
 def get_client_log_level_or_default(participant_log_level, global_log_level, client_log_levels):
@@ -166,7 +174,8 @@ def default_input_args():
 		"wait_for_finalization":		False,
 		"wait_for_verifications":		False,
 		"verifications_epoch_limit":	5,
-		"global_client_log_level":		"info"
+		"global_client_log_level":		"info",
+		"snooper_enabled":				False,
 	}
 
 def default_network_params():
@@ -210,5 +219,6 @@ def default_participant():
 			"v_max_cpu":				0,
 			"v_min_mem":				0,
 			"v_max_mem":				0,
+			"snooper_enabled":			False,
 			"count": 					1
 	}
