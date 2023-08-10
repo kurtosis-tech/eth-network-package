@@ -37,7 +37,7 @@ def get_config(
 
 	engine_rpc_port_num = "http://{0}:{1}".format(
 		el_client_context.ip_addr,
-		el_client_context.rpc_port_num,
+		el_client_context.engine_rpc_port_num,
 	)
 	cmd = [
 		SNOOPER_BINARY_COMMAND,
