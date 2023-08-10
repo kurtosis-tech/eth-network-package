@@ -188,6 +188,7 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		el_client_context = all_el_client_contexts[index]
 
 		cl_client_context = None
+		snooper_engine_context = None
 		if participant.snooper_enabled:
 			snooper_service_name = "snooper-{0}-{1}-{2}".format(index_str, cl_client_type, el_client_type)
 			snooper_image = package_io.DEFAULT_SNOOPER_IMAGE
@@ -198,7 +199,8 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 				el_client_context,
 			)
 			plan.print("Succesfully added {0} snooper participants".format(snooper_engine_context))
-			all_snooper_engine_contexts.append(snooper_engine_context)
+
+		all_snooper_engine_contexts.append(snooper_engine_context)
 
 		if index == 0:
 			cl_client_context = launch_method(
