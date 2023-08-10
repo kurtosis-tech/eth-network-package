@@ -3,6 +3,7 @@ input_parser = import_module("github.com/kurtosis-tech/eth-network-package/packa
 el_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/el/el_client_context.star")
 el_admin_node_info = import_module("github.com/kurtosis-tech/eth-network-package/src/el/el_admin_node_info.star")
 package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
+snooper_engine_context = import_module("github.com/kurtosis-tech/eth-network-package/src/snooper/snooper_engine_context.star")
 
 SNOOPER_ENGINE_RPC_PORT_NUM = 8561
 SNOOPER_ENGINE_RPC_PORT_ID = "http"
@@ -30,6 +31,11 @@ def launch(
 
 	snooper_service = plan.add_service(snooper_service_name, snooper_config )
 	snooper_http_port = snooper_service.ports[SNOOPER_ENGINE_RPC_PORT_ID]
+	return snooper_engine_context.new_snooper_engine_client_context(
+		snooper_service.ip_address,
+		SNOOPER_ENGINE_RPC_PORT_NUM
+	)
+
 def get_config(
 	image,
 	service_name,
