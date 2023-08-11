@@ -93,6 +93,8 @@ def launch(
 	v_max_cpu,
 	v_min_mem,
 	v_max_mem,
+	snooper_enabled,
+	snooper_engine_context,
 	extra_beacon_params,
 	extra_validator_params):
 
@@ -133,6 +135,8 @@ def launch(
 		bn_max_cpu,
 		bn_min_mem,
 		bn_max_mem,
+		snooper_enabled,
+		snooper_engine_context,
 		extra_beacon_params,
 	)
 
@@ -199,6 +203,8 @@ def launch(
 		validator_node_service_name,
 		beacon_multiaddr,
 		beacon_peer_id,
+		snooper_enabled,
+		snooper_engine_context,
 	)
 
 
@@ -212,10 +218,19 @@ def get_beacon_config(
 		bn_max_cpu,
 		bn_min_mem,
 		bn_max_mem,
+		snooper_enabled,
+		snooper_engine_context,
 		extra_params,
 	):
 
-	el_client_engine_rpc_url_str = "http://{0}:{1}".format(
+	# If snooper is enabled use the snooper engine context, otherwise use the execution client context
+	if snooper_enabled:
+		EXECUTION_ENGINE_ENDPOINT = "http://{0}:{1}".format(
+		snooper_engine_context.ip_addr,
+		snooper_engine_context.engine_rpc_port_num,
+	)
+	else:
+		EXECUTION_ENGINE_ENDPOINT = "http://{0}:{1}".format(
 		el_client_context.ip_addr,
 		el_client_context.engine_rpc_port_num,
 	)
@@ -230,7 +245,7 @@ def get_beacon_config(
 		"--datadir=" + CONSENSUS_DATA_DIRPATH_ON_SERVICE_CONTAINER,
 		"--chain-config-file=" + genesis_config_filepath,
 		"--genesis-state=" + genesis_ssz_filepath,
-		"--execution-endpoint=" + el_client_engine_rpc_url_str,
+		"--execution-endpoint=" + EXECUTION_ENGINE_ENDPOINT,
 		"--rpc-host=0.0.0.0",
 		"--rpc-port={0}".format(RPC_PORT_NUM),
 		"--grpc-gateway-host=0.0.0.0",

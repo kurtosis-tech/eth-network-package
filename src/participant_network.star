@@ -17,6 +17,8 @@ nimbus = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/nimb
 prysm = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/prysm/prysm_launcher.star")
 teku = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/teku/teku_launcher.star")
 
+snooper = import_module("github.com/kurtosis-tech/eth-network-package/src/snooper/snooper_engine_launcher.star")
+
 genesis_constants = import_module("github.com/kurtosis-tech/eth-network-package/src/prelaunch_data_generator/genesis_constants/genesis_constants.star")
 participant_module = import_module("github.com/kurtosis-tech/eth-network-package/src/participant.star")
 
@@ -164,6 +166,7 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		package_io.CL_CLIENT_TYPE.teku: {"launcher": teku.new_teku_launcher(cl_genesis_data), "launch_method": teku.launch},
 	}
 
+	all_snooper_engine_contexts = []
 	all_cl_client_contexts = []
 	preregistered_validator_keys_for_nodes = cl_validator_data.per_node_keystores
 
@@ -185,6 +188,19 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		el_client_context = all_el_client_contexts[index]
 
 		cl_client_context = None
+		snooper_engine_context = None
+		if participant.snooper_enabled:
+			snooper_service_name = "snooper-{0}-{1}-{2}".format(index_str, cl_client_type, el_client_type)
+			snooper_image = package_io.DEFAULT_SNOOPER_IMAGE
+			snooper_engine_context = snooper.launch(
+				plan,
+				snooper_service_name,
+				snooper_image,
+				el_client_context,
+			)
+			plan.print("Succesfully added {0} snooper participants".format(snooper_engine_context))
+
+		all_snooper_engine_contexts.append(snooper_engine_context)
 
 		if index == 0:
 			cl_client_context = launch_method(
@@ -205,6 +221,8 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 				participant.v_max_cpu,
 				participant.v_min_mem,
 				participant.v_max_mem,
+				participant.snooper_enabled,
+				snooper_engine_context,
 				participant.beacon_extra_params,
 				participant.validator_extra_params,
 			)
@@ -228,6 +246,8 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 				participant.v_max_cpu,
 				participant.v_min_mem,
 				participant.v_max_mem,
+				participant.snooper_enabled,
+				snooper_engine_context,
 				participant.beacon_extra_params,
 				participant.validator_extra_params,
 			)
@@ -244,8 +264,10 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 
 		el_client_context = all_el_client_contexts[index]
 		cl_client_context = all_cl_client_contexts[index]
+		if participant.snooper_enabled:
+			snooper_engine_context = all_snooper_engine_contexts[index]
 
-		participant_entry = participant_module.new_participant(el_client_type, cl_client_type, el_client_context, cl_client_context)
+		participant_entry = participant_module.new_participant(el_client_type, cl_client_type, el_client_context, cl_client_context, snooper_engine_context)
 
 		all_participants.append(participant_entry)
 

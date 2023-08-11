@@ -84,6 +84,8 @@ def launch(
 	v_max_cpu,
 	v_min_mem,
 	v_max_mem,
+	snooper_enabled,
+	snooper_engine_context,
 	extra_beacon_params,
 	extra_validator_params):
 
@@ -113,6 +115,8 @@ def launch(
 		bn_max_cpu,
 		bn_min_mem,
 		bn_max_mem,
+		snooper_enabled,
+		snooper_engine_context,
 		extra_params
 	)
 
@@ -148,6 +152,8 @@ def launch(
 		service_name,
 		multiaddr = multiaddr,
 		peer_id = peer_id,
+		snooper_enabled = snooper_enabled,
+		snooper_engine_context = snooper_engine_context,
 	)
 
 
@@ -155,18 +161,27 @@ def get_config(
 	genesis_data,
 	image,
 	bootnode_contexts,
-	el_client_ctx,
+	el_client_context,
 	log_level,
 	node_keystore_files,
 	bn_min_cpu,
 	bn_max_cpu,
 	bn_min_mem,
 	bn_max_mem,
+	snooper_enabled,
+	snooper_engine_context,
 	extra_params):
 
-	el_client_engine_rpc_url_str = "http://{0}:{1}".format(
-		el_client_ctx.ip_addr,
-		el_client_ctx.engine_rpc_port_num,
+	# If snooper is enabled use the snooper engine context, otherwise use the execution client context
+	if snooper_enabled:
+		EXECUTION_ENGINE_ENDPOINT = "http://{0}:{1}".format(
+		snooper_engine_context.ip_addr,
+		snooper_engine_context.engine_rpc_port_num,
+	)
+	else:
+		EXECUTION_ENGINE_ENDPOINT = "http://{0}:{1}".format(
+		el_client_context.ip_addr,
+		el_client_context.engine_rpc_port_num,
 	)
 
 	# For some reason, Nimbus takes in the parent directory of the config file (rather than the path to the config file itself)
@@ -210,7 +225,7 @@ def get_config(
 		"--tcp-port={0}".format(DISCOVERY_PORT_NUM),
 		"--network=" + genesis_config_parent_dirpath_on_client,
 		"--data-dir=" + CONSENSUS_DATA_DIRPATH_IN_SERVICE_CONTAINER,
-		"--web3-url=" + el_client_engine_rpc_url_str,
+		"--web3-url=" + EXECUTION_ENGINE_ENDPOINT,
 		"--nat=extip:" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		"--enr-auto-update=false",
 		"--rest",

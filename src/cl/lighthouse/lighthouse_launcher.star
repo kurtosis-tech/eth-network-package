@@ -90,6 +90,8 @@ def launch(
 	v_max_cpu,
 	v_min_mem,
 	v_max_mem,
+	snooper_enabled,
+	snooper_engine_context,
 	extra_beacon_params,
 	extra_validator_params):
 
@@ -119,6 +121,8 @@ def launch(
 		bn_max_cpu,
 		bn_min_mem,
 		bn_max_mem,
+		snooper_enabled,
+		snooper_engine_context,
 		extra_beacon_params,
 	)
 
@@ -178,7 +182,9 @@ def launch(
 		beacon_node_service_name,
 		validator_node_service_name,
 		beacon_multiaddr,
-		beacon_peer_id
+		beacon_peer_id,
+		snooper_enabled,
+		snooper_engine_context,
 	)
 
 
@@ -186,17 +192,26 @@ def get_beacon_config(
 	genesis_data,
 	image,
 	boot_cl_client_ctxs,
-	el_client_ctx,
+	el_client_context,
 	log_level,
 	bn_min_cpu,
 	bn_max_cpu,
 	bn_min_mem,
 	bn_max_mem,
+	snooper_enabled,
+	snooper_engine_context,
 	extra_params):
 
-	el_client_engine_rpc_url_str = "http://{0}:{1}".format(
-		el_client_ctx.ip_addr,
-		el_client_ctx.engine_rpc_port_num,
+	# If snooper is enabled use the snooper engine context, otherwise use the execution client context
+	if snooper_enabled:
+		EXECUTION_ENGINE_ENDPOINT = "http://{0}:{1}".format(
+		snooper_engine_context.ip_addr,
+		snooper_engine_context.engine_rpc_port_num,
+	)
+	else:
+		EXECUTION_ENGINE_ENDPOINT = "http://{0}:{1}".format(
+		el_client_context.ip_addr,
+		el_client_context.engine_rpc_port_num,
 	)
 
 	# For some reason, Lighthouse takes in the parent directory of the config file (rather than the path to the config file itself)
@@ -233,7 +248,7 @@ def get_beacon_config(
 		#   https://github.com/sigp/lighthouse/blob/7c88f582d955537f7ffff9b2c879dcf5bf80ce13/scripts/local_testnet/beacon_node.sh
 		# and the option says it's "useful for testing in smaller networks" (unclear what happens in larger networks)
 		"--disable-packet-filter",
-		"--execution-endpoints=" + el_client_engine_rpc_url_str,
+		"--execution-endpoints=" + EXECUTION_ENGINE_ENDPOINT,
 		"--jwt-secrets=" + jwt_secret_filepath,
 		"--suggested-fee-recipient=" + package_io.VALIDATING_REWARDS_ACCOUNT,
 		# Set per Paris' recommendation to reduce noise in the logs
