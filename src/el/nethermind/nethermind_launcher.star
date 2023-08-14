@@ -136,22 +136,9 @@ def get_config(
 		"--Network.OnlyStaticPeers=true",
 	]
 
-	bootnode_enode_1 = ""
-	bootnode_enode_2 = ""
-	if len(existing_el_clients) > 0:
-		bootnode_context = existing_el_clients[0]
-		bootnode_enode_1 = bootnode_context.enode
+	if existing_el_clients != None:
+		command_args.append("--Network.StaticPeers="+",".join([ctx.enode for ctx in existing_el_clients[:package_io.MAX_ENR_ENTRIES]]))
 
-	command_args.append(
-		'--Network.StaticPeers={0}"'.format(bootnode_enode_1),
-	)
-
-	if len(existing_el_clients) > 1:
-		bootnode_context = existing_el_clients[1]
-		bootnode_enode_2 = bootnode_context.enode
-	command_args.append(
-		'--Network.StaticPeers={0}"'.format(bootnode_enode_2),
-	)
 	if len(extra_params) > 0:
 		# this is a repeated<proto type>, we convert it into Starlark
 		command_args.extend([param for param in extra_params])
