@@ -110,8 +110,6 @@ def get_config(
 	el_min_mem,
 	el_max_mem,
 	extra_params):
-	if len(existing_el_clients) < 2:
-		fail("Nethermind node cannot be boot nodes, and due to a bug it requires two nodes to exist beforehand")
 
 	bootnode_1 = existing_el_clients[0]
 	bootnode_2 = existing_el_clients[1]
