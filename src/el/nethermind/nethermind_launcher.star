@@ -111,8 +111,6 @@ def get_config(
 	el_max_mem,
 	extra_params):
 
-	bootnode_1 = existing_el_clients[0]
-	bootnode_2 = existing_el_clients[1]
 
 	genesis_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH, genesis_data.nethermind_genesis_json_relative_filepath)
 	jwt_secret_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH, genesis_data.jwt_secret_relative_filepath)
@@ -136,11 +134,20 @@ def get_config(
 		"--Network.P2PPort={0}".format(DISCOVERY_PORT_NUM),
 		"--JsonRpc.JwtSecretFile={0}".format(jwt_secret_json_filepath_on_client),
 		"--Network.OnlyStaticPeers=true",
-		"--Network.StaticPeers={0},{1}".format(
-			bootnode_1.enode,
-			bootnode_2.enode,
-		),
 	]
+
+	bootnode_enode = ""
+	if len(existing_el_clients) > 0:
+		bootnode_context = existing_el_clients[0]
+		bootnode_enode = bootnode_context.enode
+
+	launch_node_cmd.append(
+		'--Network.StaticPeers={0}"'.format(bootnode_enode),
+	)
+
+	if len(extra_params) > 0:
+		# this is a repeated<proto type>, we convert it into Starlark
+		launch_node_cmd.extend([param for param in extra_params])
 
 	if len(extra_params) > 0:
 		# we do this as extra_params is a repeated proto aray
