@@ -141,13 +141,13 @@ def get_config(
 		bootnode_context = existing_el_clients[0]
 		bootnode_enode = bootnode_context.enode
 
-	launch_node_cmd.append(
+	command_args.append(
 		'--Network.StaticPeers={0}"'.format(bootnode_enode),
 	)
 
 	if len(extra_params) > 0:
 		# this is a repeated<proto type>, we convert it into Starlark
-		launch_node_cmd.extend([param for param in extra_params])
+		command_args.extend([param for param in extra_params])
 
 	if len(extra_params) > 0:
 		# we do this as extra_params is a repeated proto aray
