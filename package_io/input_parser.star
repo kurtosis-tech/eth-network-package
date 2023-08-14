@@ -48,8 +48,8 @@ def parse_input(input_args):
 		el_client_type = participant["el_client_type"]
 		cl_client_type = participant["cl_client_type"]
 
-		if index == 0 and el_client_type in (BESU_NODE_NAME, NETHERMIND_NODE_NAME):
-			fail("besu/nethermind cant be the first participant")
+		if index == 0 and el_client_type in (BESU_NODE_NAME):
+			fail("besu cant be the first participant")
 		if cl_client_type in (NIMBUS_NODE_NAME) and (result["network_params"]["seconds_per_slot"] < 12):
 			fail("nimbus can't be run with slot times below 12 seconds")
 		el_image = participant["el_client_image"]
@@ -106,10 +106,6 @@ def parse_input(input_args):
 	actual_num_validators = len(result["participants"]) * result["network_params"]["num_validator_keys_per_node"]
 	if required_num_validtors > actual_num_validators:
 		fail("required_num_validtors - {0} is greater than actual_num_validators - {1}".format(required_num_validtors, actual_num_validators))
-
-	# Remove if nethermind doesn't break as second node we already test above if its the first node
-	if len(result["participants"]) >= 2 and result["participants"][1]["el_client_type"] == NETHERMIND_NODE_NAME:
-		fail("nethermind can't be the first or second node")
 
 	return struct(
 		participants=[struct(
