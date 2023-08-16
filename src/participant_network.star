@@ -46,7 +46,7 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 
 	plan.print("Generating cl validator key stores")
 	cl_validator_data = None
-	if parallel_keystore_generation:
+	if not parallel_keystore_generation:
 		cl_validator_data = cl_validator_keystores.generate_cl_validator_keystores(
 			plan,
 			network_params.preregistered_validator_keys_mnemonic,
