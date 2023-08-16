@@ -41,12 +41,12 @@ GLOBAL_INDEX_ZFILL = {
 	"zfill_values": [(1,1), (2,10), (3,100), (4,1000), (5,10000)]
 }
 
-def launch_participant_network(plan, participants, network_params, global_log_level):
+def launch_participant_network(plan, participants, network_params, global_log_level, parallel_keystore_generation = False):
 	num_participants = len(participants)
 
 	plan.print("Generating cl validator key stores")
 	cl_validator_data = None
-	if not network_params.parallel_keystore_generation:
+	if parallel_keystore_generation:
 		cl_validator_data = cl_validator_keystores.generate_cl_validator_keystores(
 			plan,
 			network_params.preregistered_validator_keys_mnemonic,
