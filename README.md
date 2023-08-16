@@ -138,12 +138,12 @@ these and other parameters are configurable through a json file Read more about 
 
     //  This mnemonic will a) be used to create keystores for all the types of validators that we have and b) be used to generate a CL genesis.ssz that has the children
     //   validator keys already preregistered as validators
-    "preregistered_validator_keys_mnemonic": "giant issue aisle success illegal bike spike question tent bar rely arctic volcano long crawl hungry vocal artwork sniff fantasy very lucky have athlete",
+    "preregistered_validator_keys_mnemonic": "giant issue aisle success illegal bike spike question tent bar rely arctic volcano long crawl hungry vocal artwork sniff fantasy very lucky have athlete"
+  },
 
-    // Parallelizes keystore generation so that each node has keystores being generated in their own container
-    // Use against large clusters only
-    "parallel_keystore_generation": false
-  }
+  // Parallelizes keystore generation so that each node has keystores being generated in their own container
+  // Use against large clusters only
+  "parallel_keystore_generation": false
 }
 ```
 
@@ -192,9 +192,9 @@ For example, this `eth-network-params.json` adds a second node, running a differ
     "genesis_delay": 10,
     "capella_fork_epoch": 1,
     "deneb_fork_epoch": 500,
-    "parallel_keystore_generation": false
   },
-  "global_client_log_level": "info"
+  "global_client_log_level": "info",
+  "parallel_keystore_generation": false
 }
 ```
 
