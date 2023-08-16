@@ -150,7 +150,7 @@ def parse_input(input_args):
 		verifications_epoch_limit=result["verifications_epoch_limit"],
 		global_client_log_level=result["global_client_log_level"],
 		snooper_enabled = result["snooper_enabled"],
-		parallel_keystore_generation = result["network_params"]["parallel_keystore_generation"]
+		parallel_keystore_generation = result["parallel_keystore_generation"]
 	)
 
 def get_client_log_level_or_default(participant_log_level, global_log_level, client_log_levels):
