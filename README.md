@@ -39,7 +39,7 @@ these and other parameters are configurable through a json file Read more about 
       //  - erigon: thorax/erigon:devel
       //  - nethermind:	nethermind/nethermind:latest
       //  - besu:	hyperledger/besu:develop
-      //  - reth: h4ck3rk3y/reth (TODO: update when an official Reth image is published)
+      //  - reth: ghcr.io/paradigmxyz/reth
       "el_client_image": "",
 
       //  The log level string that this participant's EL client should log at
