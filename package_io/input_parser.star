@@ -3,8 +3,7 @@ DEFAULT_EL_IMAGES = {
 	"erigon":		"thorax/erigon:devel",
 	"nethermind":	"nethermind/nethermind:latest",
 	"besu":			"hyperledger/besu:develop",
-	# TODO change this when an official image gets published
-	"reth": "h4ck3rk3y/reth"
+	"reth": 		"ghcr.io/paradigmxyz/reth"
 }
 
 DEFAULT_CL_IMAGES = {
