@@ -3,8 +3,7 @@ DEFAULT_EL_IMAGES = {
 	"erigon":		"thorax/erigon:devel",
 	"nethermind":	"nethermind/nethermind:latest",
 	"besu":			"hyperledger/besu:develop",
-	# TODO change this when an official image gets published
-	"reth": "h4ck3rk3y/reth"
+	"reth": 		"ghcr.io/paradigmxyz/reth"
 }
 
 DEFAULT_CL_IMAGES = {
@@ -144,13 +143,13 @@ def parse_input(input_args):
 			capella_fork_epoch=result["network_params"]["capella_fork_epoch"],
 			deneb_fork_epoch=result["network_params"]["deneb_fork_epoch"],
 			genesis_delay=result["network_params"]["genesis_delay"],
-			parallel_keystore_generation = result["network_params"]["parallel_keystore_generation"],
 		),
 		wait_for_finalization=result["wait_for_finalization"],
 		wait_for_verifications=result["wait_for_verifications"],
 		verifications_epoch_limit=result["verifications_epoch_limit"],
 		global_client_log_level=result["global_client_log_level"],
 		snooper_enabled = result["snooper_enabled"],
+		parallel_keystore_generation = result["parallel_keystore_generation"]
 	)
 
 def get_client_log_level_or_default(participant_log_level, global_log_level, client_log_levels):
@@ -172,6 +171,7 @@ def default_input_args():
 		"verifications_epoch_limit":	5,
 		"global_client_log_level":		"info",
 		"snooper_enabled":				False,
+		"parallel_keystore_generation": False,
 	}
 
 def default_network_params():
@@ -188,7 +188,6 @@ def default_network_params():
 		# arbitrarily large while we sort out https://github.com/kurtosis-tech/eth-network-package/issues/42
 		# this will take 53~ hoours for now
 		"deneb_fork_epoch":				500,
-		"parallel_keystore_generation": False,
 	}
 
 def default_participant():
