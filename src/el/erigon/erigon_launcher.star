@@ -136,8 +136,6 @@ def get_config(
 		"--ws",
 		"--allow-insecure-unlock",
 		"--nat=extip:" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
-		"--nodiscover",
-		"--staticpeers={0}".format(boot_node_1.enode),
 		"--http",
 		"--http.addr=0.0.0.0",
 		"--http.corsdomain=*",
@@ -150,6 +148,7 @@ def get_config(
 
 	if len(existing_el_clients) > 0:
 		cmd.append("--bootnodes=" + ",".join([ctx.enode for ctx in existing_el_clients[:package_io.MAX_ENODE_ENTRIES]]))
+		cmd.append("--staticpeers=" + ",".join([ctx.enode for ctx in existing_el_clients[:package_io.MAX_ENODE_ENTRIES]]))
 
 
 	if len(extra_params) > 0:
