@@ -207,14 +207,8 @@ def get_config(
 		launch_node_cmd[10] = "--http.api=admin,engine,net,eth,web3,debug,flashbots"
 		launch_node_cmd[14] = "--ws.api=admin,engine,net,eth,web3,debug,flashbots"
 
-	bootnode_enode = ""
 	if len(existing_el_clients) > 0:
-		bootnode_context = existing_el_clients[0]
-		bootnode_enode = bootnode_context.enode
-
-	launch_node_cmd.append(
-		'--bootnodes="{0}"'.format(bootnode_enode),
-	)
+		cmd.append("--bootnodes=" + ",".join([ctx.enode for ctx in existing_el_clients[:package_io.MAX_ENODE_ENTRIES]]))
 
 	if len(extra_params) > 0:
 		# this is a repeated<proto type>, we convert it into Starlark

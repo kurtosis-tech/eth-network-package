@@ -149,7 +149,7 @@ def get_config(
 	]
 
 	if len(existing_el_clients) > 0:
-		launch_node_cmd.append("--bootnodes={0}".format(boot_node_1.enode))
+		cmd.append("--bootnodes=" + ",".join([ctx.enode for ctx in existing_el_clients[:package_io.MAX_ENODE_ENTRIES]]))
 
 
 	if len(extra_params) > 0:

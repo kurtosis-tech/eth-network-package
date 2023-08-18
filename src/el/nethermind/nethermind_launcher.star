@@ -136,7 +136,7 @@ def get_config(
 		"--Network.OnlyStaticPeers=true",
 	]
 
-	if existing_el_clients != None:
+	if len(existing_el_clients) > 0:
 		command_args.append("--Network.StaticPeers="+",".join([ctx.enode for ctx in existing_el_clients[:package_io.MAX_ENR_ENTRIES]]))
 
 	if len(extra_params) > 0:

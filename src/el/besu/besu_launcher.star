@@ -115,9 +115,6 @@ def get_config(
 	if len(existing_el_clients) < 2:
 		fail("Besu node cannot be boot nodes, and due to a bug it requires two nodes to exist beforehand")
 
-	boot_node_1 = existing_el_clients[0]
-	boot_node_2 = existing_el_clients[1]
-
 	genesis_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_DIRPATH_ON_CLIENT_CONTAINER, genesis_data.besu_genesis_json_relative_filepath)
 	jwt_secret_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_DIRPATH_ON_CLIENT_CONTAINER, genesis_data.jwt_secret_relative_filepath)
 
@@ -150,7 +147,7 @@ def get_config(
 	]
 
 	if len(existing_el_clients) > 0:
-		launch_node_command.append("--bootnodes={0},{1}".format(boot_node_1.enode, boot_node_2.enode))
+		cmd.append("--bootnodes=" + ",".join([ctx.enode for ctx in existing_el_clients[:package_io.MAX_ENODE_ENTRIES]]))
 
 	if len(extra_params) > 0:
 		# we do this as extra_params isn't a normal [] but a proto repeated array

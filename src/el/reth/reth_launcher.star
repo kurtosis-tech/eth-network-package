@@ -153,13 +153,8 @@ def get_config(
         "--metrics=0.0.0.0:{0}".format(METRICS_PORT_NUM)
 	]
 
-	bootnode_enode = ""
 	if len(existing_el_clients) > 0:
-		bootnode_context = existing_el_clients[0]
-		bootnode_enode = bootnode_context.enode
-		launch_node_cmd.append(
-			'--bootnodes="{0}"'.format(bootnode_enode),
-		)
+		cmd.append("--bootnodes=" + ",".join([ctx.enode for ctx in existing_el_clients[:package_io.MAX_ENODE_ENTRIES]]))
 
 	if len(extra_params) > 0:
 		# this is a repeated<proto type>, we convert it into Starlark
