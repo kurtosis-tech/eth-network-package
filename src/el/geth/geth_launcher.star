@@ -173,7 +173,7 @@ def get_config(
 		GETH_ACCOUNT_PASSWORDS_FILE,
 	) + '}'
 
-	launch_node_cmd = [
+	cmd = [
 		"geth",
 		"--verbosity=" + verbosity_level,
 		"--unlock=" + accounts_to_unlock_str,
@@ -204,30 +204,24 @@ def get_config(
 	]
 
 	if BUILDER_IMAGE_STR in image:
-		launch_node_cmd[10] = "--http.api=admin,engine,net,eth,web3,debug,flashbots"
-		launch_node_cmd[14] = "--ws.api=admin,engine,net,eth,web3,debug,flashbots"
+		cmd[10] = "--http.api=admin,engine,net,eth,web3,debug,flashbots"
+		cmd[14] = "--ws.api=admin,engine,net,eth,web3,debug,flashbots"
 
-	bootnode_enode = ""
 	if len(existing_el_clients) > 0:
-		bootnode_context = existing_el_clients[0]
-		bootnode_enode = bootnode_context.enode
-
-	launch_node_cmd.append(
-		'--bootnodes="{0}"'.format(bootnode_enode),
-	)
+		cmd.append("--bootnodes=" + ",".join([ctx.enode for ctx in existing_el_clients[:package_io.MAX_ENODE_ENTRIES]]))
 
 	if len(extra_params) > 0:
 		# this is a repeated<proto type>, we convert it into Starlark
-		launch_node_cmd.extend([param for param in extra_params])
+		cmd.extend([param for param in extra_params])
 
 
-	launch_node_cmd_str = " ".join(launch_node_cmd)
+	cmd_str = " ".join(cmd)
 
 	subcommand_strs = [
 		init_datadir_cmd_str,
 		copy_keys_into_keystore_cmd_str,
 		create_passwords_file_cmd_str,
-		launch_node_cmd_str,
+		cmd_str,
 	]
 	command_str = " && ".join(subcommand_strs)
 
