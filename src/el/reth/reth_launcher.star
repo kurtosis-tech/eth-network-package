@@ -128,7 +128,7 @@ def get_config(
         genesis_json_filepath_on_client,
 	)
 
-	launch_node_cmd = [
+	cmd = [
 		"reth",
         "node",
 		"-{0}".format(verbosity_level),
@@ -158,14 +158,14 @@ def get_config(
 
 	if len(extra_params) > 0:
 		# this is a repeated<proto type>, we convert it into Starlark
-		launch_node_cmd.extend([param for param in extra_params])
+		cmd.extend([param for param in extra_params])
 
 
-	launch_node_cmd_str = " ".join(launch_node_cmd)
+	cmd_str = " ".join(cmd)
 
 	subcommand_strs = [
 		init_datadir_cmd_str,
-		launch_node_cmd_str,
+		cmd_str,
 	]
 	command_str = " && ".join(subcommand_strs)
 

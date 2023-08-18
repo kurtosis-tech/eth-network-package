@@ -118,7 +118,7 @@ def get_config(
 	genesis_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_DIRPATH_ON_CLIENT_CONTAINER, genesis_data.besu_genesis_json_relative_filepath)
 	jwt_secret_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_DIRPATH_ON_CLIENT_CONTAINER, genesis_data.jwt_secret_relative_filepath)
 
-	launch_node_command = [
+	cmd = [
 		"besu",
 		"--logging=" + log_level,
 		"--data-path=" + EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER,
@@ -151,14 +151,14 @@ def get_config(
 
 	if len(extra_params) > 0:
 		# we do this as extra_params isn't a normal [] but a proto repeated array
-		launch_node_command.extend([param for param in extra_params])
+		cmd.extend([param for param in extra_params])
 
-	launch_node_command_str = " ".join(launch_node_command)
+	cmd_str = " ".join(cmd)
 
 	return ServiceConfig(
 		image = image,
 		ports = USED_PORTS,
-		cmd = [launch_node_command_str],
+		cmd = [cmd_str],
 		files = {
 			GENESIS_DATA_DIRPATH_ON_CLIENT_CONTAINER: genesis_data.files_artifact_uuid
 		},
