@@ -210,7 +210,7 @@ def get_genesis_validators_root(plan, service_name, beacon_state_file_path):
     response = plan.exec(
         service_name = service_name,
         recipe = ExecRecipe(
-            command = ["/bin/sh", "-c", "cat {0} | grep genesis_validators_root | grep -oE '0x[0-9a-fA-F]+'".format(beacon_state_file_path)],
+            command = ["/bin/sh", "-c", "cat {0} | grep genesis_validators_root | grep -oE '0x[0-9a-fA-F]+' | tr -d '\n'".format(beacon_state_file_path)],
         )
     )
 
