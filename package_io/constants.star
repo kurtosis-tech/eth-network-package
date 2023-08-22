@@ -3,7 +3,8 @@ EL_CLIENT_TYPE = struct(
 	erigon="erigon",
 	nethermind="nethermind",
 	besu="besu",
-	reth="reth"
+	reth="reth",
+	ethereumjs="ethereumjs"
 )
 
 CL_CLIENT_TYPE = struct(
