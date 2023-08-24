@@ -112,8 +112,6 @@ def get_config(
 	el_min_mem,
 	el_max_mem,
 	extra_params):
-	if len(existing_el_clients) < 2:
-		fail("Besu node cannot be boot nodes, and due to a bug it requires two nodes to exist beforehand")
 
 	genesis_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_DIRPATH_ON_CLIENT_CONTAINER, genesis_data.besu_genesis_json_relative_filepath)
 	jwt_secret_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_DIRPATH_ON_CLIENT_CONTAINER, genesis_data.jwt_secret_relative_filepath)
