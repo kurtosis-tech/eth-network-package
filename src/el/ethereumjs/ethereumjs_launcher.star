@@ -8,9 +8,10 @@ package_io = import_module("github.com/kurtosis-tech/eth-network-package/package
 
 RPC_PORT_NUM		= 8545
 WS_PORT_NUM			= 8546
+WS_PORT_ENGINE_NUM 	= 8547
 DISCOVERY_PORT_NUM	= 30303
 ENGINE_RPC_PORT_NUM = 8551
-METRICS_PORT_NUM = 9001
+#METRICS_PORT_NUM = 9001
 
 # The min/max CPU/memory that the execution node can use
 EXECUTION_MIN_CPU = 100
@@ -24,7 +25,8 @@ WS_PORT_ID			= "ws"
 TCP_DISCOVERY_PORT_ID = "tcp-discovery"
 UDP_DISCOVERY_PORT_ID = "udp-discovery"
 ENGINE_RPC_PORT_ID	= "engine-rpc"
-METRICS_PORT_ID = "metrics"
+WS_PORT_ENGINE_ID	= "ws-engine"
+#METRICS_PORT_ID = "metrics"
 
 GENESIS_DATA_MOUNT_DIRPATH = "/genesis"
 
@@ -38,13 +40,14 @@ PRIVATE_IP_ADDRESS_PLACEHOLDER = "KURTOSIS_IP_ADDR_PLACEHOLDER"
 USED_PORTS = {
 	RPC_PORT_ID: shared_utils.new_port_spec(RPC_PORT_NUM, shared_utils.TCP_PROTOCOL),
 	WS_PORT_ID: shared_utils.new_port_spec(WS_PORT_NUM, shared_utils.TCP_PROTOCOL),
+	WS_PORT_ENGINE_ID: shared_utils.new_port_spec(WS_PORT_ENGINE_NUM, shared_utils.TCP_PROTOCOL),
 	TCP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.TCP_PROTOCOL),
 	UDP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.UDP_PROTOCOL),
 	ENGINE_RPC_PORT_ID: shared_utils.new_port_spec(ENGINE_RPC_PORT_NUM, shared_utils.TCP_PROTOCOL),
-    METRICS_PORT_ID: shared_utils.new_port_spec(METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL)
+#    METRICS_PORT_ID: shared_utils.new_port_spec(METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL)
 }
 
-ENTRYPOINT_ARGS = ["sh", "-c"]
+ENTRYPOINT_ARGS = []
 
 VERBOSITY_LEVELS = {
 	package_io.GLOBAL_CLIENT_LOG_LEVEL.error: "error",
@@ -124,10 +127,9 @@ def get_config(
 	jwt_secret_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH, genesis_data.jwt_secret_relative_filepath)
 
 	cmd = [
-		"/usr/app/node_modules/.bin/ethereumjs",
 		"--gethGenesis=" + genesis_json_filepath_on_client,
 		"--dataDir=" + EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER,
-		"--port={0}".format(RPC_PORT_NUM),
+		"--port={0}".format(DISCOVERY_PORT_NUM),
 		"--rpc",
 		"--rpcAddr=0.0.0.0",
 		"--rpcPort={0}".format(RPC_PORT_NUM),
@@ -135,6 +137,11 @@ def get_config(
 		"--rpcEngine",
 		"--rpcEngineAddr=0.0.0.0",
 		"--rpcEnginePort={0}".format(ENGINE_RPC_PORT_NUM),
+		"--ws",
+		"--wsAddr=0.0.0.0",
+		"--wsPort={0}".format(WS_PORT_NUM),
+		"--wsEnginePort={0}".format(WS_PORT_ENGINE_NUM),
+		"--wsEngineAddr=0.0.0.0",
 		"--jwt-secret={0}".format(jwt_secret_json_filepath_on_client),
 		"--extIP={0}".format(PRIVATE_IP_ADDRESS_PLACEHOLDER),
 		"--sync=full",
