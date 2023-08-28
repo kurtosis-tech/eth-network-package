@@ -9,7 +9,7 @@ besu = import_module("github.com/kurtosis-tech/eth-network-package/src/el/besu/b
 erigon = import_module("github.com/kurtosis-tech/eth-network-package/src/el/erigon/erigon_launcher.star")
 nethermind = import_module("github.com/kurtosis-tech/eth-network-package/src/el/nethermind/nethermind_launcher.star")
 reth = import_module("github.com/kurtosis-tech/eth-network-package/src/el/reth/reth_launcher.star")
-
+ethereumjs = import_module("github.com/kurtosis-tech/eth-network-package/src/el/ethereumjs/ethereumjs_launcher.star")
 
 lighthouse = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/lighthouse/lighthouse_launcher.star")
 lodestar = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/lodestar/lodestar_launcher.star")
@@ -119,6 +119,7 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		package_io.EL_CLIENT_TYPE.erigon : {"launcher": erigon.new_erigon_launcher(network_params.network_id, el_genesis_data), "launch_method": erigon.launch},
 		package_io.EL_CLIENT_TYPE.nethermind : {"launcher": nethermind.new_nethermind_launcher(el_genesis_data), "launch_method": nethermind.launch},
 		package_io.EL_CLIENT_TYPE.reth : {"launcher": reth.new_reth_launcher(el_genesis_data), "launch_method": reth.launch},
+		package_io.EL_CLIENT_TYPE.ethereumjs : {"launcher": ethereumjs.new_ethereumjs_launcher(el_genesis_data), "launch_method": ethereumjs.launch},
 	}
 
 	all_el_client_contexts = []
