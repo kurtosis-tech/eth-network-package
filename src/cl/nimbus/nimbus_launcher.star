@@ -228,6 +228,7 @@ def get_config(
 		"--web3-url=" + EXECUTION_ENGINE_ENDPOINT,
 		"--nat=extip:" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		"--enr-auto-update=false",
+		"--history={0}".format("archive" if package_io.ARCHIVE_MODE else "prune"),
 		"--rest",
 		"--rest-address=0.0.0.0",
 		"--rest-allow-origin=*",

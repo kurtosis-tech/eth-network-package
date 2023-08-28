@@ -112,8 +112,6 @@ def get_config(
 	el_min_mem,
 	el_max_mem,
 	extra_params):
-	if len(existing_el_clients) < 2:
-		fail("Besu node cannot be boot nodes, and due to a bug it requires two nodes to exist beforehand")
 
 	genesis_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_DIRPATH_ON_CLIENT_CONTAINER, genesis_data.besu_genesis_json_relative_filepath)
 	jwt_secret_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_DIRPATH_ON_CLIENT_CONTAINER, genesis_data.jwt_secret_relative_filepath)
@@ -128,12 +126,12 @@ def get_config(
 		"--rpc-http-enabled=true",
 		"--rpc-http-host=0.0.0.0",
 		"--rpc-http-port={0}".format(RPC_PORT_NUM),
-		"--rpc-http-api=ADMIN,CLIQUE,ETH,NET,DEBUG,TXPOOL,ENGINE",
+		"--rpc-http-api=ADMIN,CLIQUE,ETH,NET,DEBUG,TXPOOL,ENGINE,TRACE,WEB3",
 		"--rpc-http-cors-origins=*",
 		"--rpc-ws-enabled=true",
 		"--rpc-ws-host=0.0.0.0",
 		"--rpc-ws-port={0}".format(WS_PORT_NUM),
-		"--rpc-ws-api=ADMIN,CLIQUE,ETH,NET,DEBUG,TXPOOL,ENGINE",
+		"--rpc-ws-api=ADMIN,CLIQUE,ETH,NET,DEBUG,TXPOOL,ENGINE,TRACE,WEB3",
 		"--p2p-enabled=true",
 		"--p2p-host=" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		"--p2p-port={0}".format(DISCOVERY_PORT_NUM),
