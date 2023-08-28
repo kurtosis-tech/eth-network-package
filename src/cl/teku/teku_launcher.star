@@ -210,7 +210,7 @@ def get_config(
 		"--network=" + genesis_config_filepath,
 		"--initial-state=" + genesis_ssz_filepath,
 		"--data-path=" + CONSENSUS_DATA_DIRPATH_ON_SERVICE_CONTAINER,
-		"--data-storage-mode=PRUNE",
+		"--data-storage-mode={0}".format("ARCHIVE" if package_io.ARCHIVE_MODE else "PRUNE"),
 		"--p2p-enabled=true",
 		# Set per Pari's recommendation, to reduce noise in the logs
 		"--p2p-subscribe-all-subnets-enabled=true",

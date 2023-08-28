@@ -112,16 +112,11 @@ def get_config(
 	el_min_mem,
 	el_max_mem,
 	extra_params):
-	if len(existing_el_clients) < 2:
-		fail("Besu node cannot be boot nodes, and due to a bug it requires two nodes to exist beforehand")
-
-	boot_node_1 = existing_el_clients[0]
-	boot_node_2 = existing_el_clients[1]
 
 	genesis_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_DIRPATH_ON_CLIENT_CONTAINER, genesis_data.besu_genesis_json_relative_filepath)
 	jwt_secret_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_DIRPATH_ON_CLIENT_CONTAINER, genesis_data.jwt_secret_relative_filepath)
 
-	launch_node_command = [
+	cmd = [
 		"besu",
 		"--logging=" + log_level,
 		"--data-path=" + EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER,
@@ -131,12 +126,12 @@ def get_config(
 		"--rpc-http-enabled=true",
 		"--rpc-http-host=0.0.0.0",
 		"--rpc-http-port={0}".format(RPC_PORT_NUM),
-		"--rpc-http-api=ADMIN,CLIQUE,ETH,NET,DEBUG,TXPOOL,ENGINE",
+		"--rpc-http-api=ADMIN,CLIQUE,ETH,NET,DEBUG,TXPOOL,ENGINE,TRACE,WEB3",
 		"--rpc-http-cors-origins=*",
 		"--rpc-ws-enabled=true",
 		"--rpc-ws-host=0.0.0.0",
 		"--rpc-ws-port={0}".format(WS_PORT_NUM),
-		"--rpc-ws-api=ADMIN,CLIQUE,ETH,NET,DEBUG,TXPOOL,ENGINE",
+		"--rpc-ws-api=ADMIN,CLIQUE,ETH,NET,DEBUG,TXPOOL,ENGINE,TRACE,WEB3",
 		"--p2p-enabled=true",
 		"--p2p-host=" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		"--p2p-port={0}".format(DISCOVERY_PORT_NUM),
@@ -150,18 +145,18 @@ def get_config(
 	]
 
 	if len(existing_el_clients) > 0:
-		launch_node_command.append("--bootnodes={0},{1}".format(boot_node_1.enode, boot_node_2.enode))
+		cmd.append("--bootnodes=" + ",".join([ctx.enode for ctx in existing_el_clients[:package_io.MAX_ENODE_ENTRIES]]))
 
 	if len(extra_params) > 0:
 		# we do this as extra_params isn't a normal [] but a proto repeated array
-		launch_node_command.extend([param for param in extra_params])
+		cmd.extend([param for param in extra_params])
 
-	launch_node_command_str = " ".join(launch_node_command)
+	cmd_str = " ".join(cmd)
 
 	return ServiceConfig(
 		image = image,
 		ports = USED_PORTS,
-		cmd = [launch_node_command_str],
+		cmd = [cmd_str],
 		files = {
 			GENESIS_DATA_DIRPATH_ON_CLIENT_CONTAINER: genesis_data.files_artifact_uuid
 		},
