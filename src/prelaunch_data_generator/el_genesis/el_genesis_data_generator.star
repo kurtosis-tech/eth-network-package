@@ -60,6 +60,7 @@ def generate_el_genesis_data(
 		{
 			CONFIG_DIRPATH_ON_GENERATOR: genesis_generation_config_artifact_name,
 		},
+		"el-genesis-data"
 	)
 
 
@@ -133,8 +134,7 @@ def generate_el_genesis_data(
 		genesis_filename_to_relative_filepath_in_artifact[BESU_GENESIS_FILENAME],
 	)
 
-	# we cleanup as the data generation is done
-	plan.remove_service(launcher_service_name)
+	# TODO(gyani) remove the container when the job is done - this is a resource leaker
 	return result
 
 

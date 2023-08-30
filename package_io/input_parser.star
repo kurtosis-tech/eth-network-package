@@ -3,8 +3,8 @@ DEFAULT_EL_IMAGES = {
 	"erigon":		"thorax/erigon:devel",
 	"nethermind":	"nethermind/nethermind:latest",
 	"besu":			"hyperledger/besu:develop",
-	# TODO change this when an official image gets published
-	"reth": "h4ck3rk3y/reth"
+	"reth": 		"ghcr.io/paradigmxyz/reth",
+	"ethereumjs":	"ethpandaops/ethereumjs:master",
 }
 
 DEFAULT_CL_IMAGES = {
@@ -15,10 +15,8 @@ DEFAULT_CL_IMAGES = {
 	"lodestar":		"chainsafe/lodestar:latest",
 }
 
-BESU_NODE_NAME = "besu"
 NETHERMIND_NODE_NAME = "nethermind"
 NIMBUS_NODE_NAME = "nimbus"
-RETH_NODE_NAME = "reth"
 
 ATTR_TO_BE_SKIPPED_AT_ROOT = ("network_params", "participants")
 
@@ -49,8 +47,6 @@ def parse_input(input_args):
 		el_client_type = participant["el_client_type"]
 		cl_client_type = participant["cl_client_type"]
 
-		if index == 0 and el_client_type in (BESU_NODE_NAME, NETHERMIND_NODE_NAME, RETH_NODE_NAME):
-			fail("besu/nethermind/reth cant be the first participant")
 		if cl_client_type in (NIMBUS_NODE_NAME) and (result["network_params"]["seconds_per_slot"] < 12):
 			fail("nimbus can't be run with slot times below 12 seconds")
 		el_image = participant["el_client_image"]
@@ -66,6 +62,12 @@ def parse_input(input_args):
 			if default_image == "":
 				fail("{0} received an empty image name and we don't have a default for it".format(cl_client_type))
 			participant["cl_client_image"] = default_image
+
+		snooper_enabled = participant["snooper_enabled"]
+		if snooper_enabled == False:
+			default_snooper_enabled = result["snooper_enabled"]
+			if default_snooper_enabled:
+				participant["snooper_enabled"] = default_snooper_enabled
 
 		beacon_extra_params = participant.get("beacon_extra_params", [])
 		participant["beacon_extra_params"] = beacon_extra_params
@@ -99,10 +101,6 @@ def parse_input(input_args):
 	if required_num_validtors > actual_num_validators:
 		fail("required_num_validtors - {0} is greater than actual_num_validators - {1}".format(required_num_validtors, actual_num_validators))
 
-	# Remove if nethermind doesn't break as second node we already test above if its the first node
-	if len(result["participants"]) >= 2 and result["participants"][1]["el_client_type"] == NETHERMIND_NODE_NAME:
-		fail("nethermind can't be the first or second node")
-
 	return struct(
 		participants=[struct(
 			el_client_type=participant["el_client_type"],
@@ -127,6 +125,7 @@ def parse_input(input_args):
 			v_max_cpu=participant["v_max_cpu"],
 			v_min_mem=participant["v_min_mem"],
 			v_max_mem=participant["v_max_mem"],
+			snooper_enabled = participant["snooper_enabled"],
 			count=participant["count"]
 		) for participant in result["participants"]],
 		network_params=struct(
@@ -137,12 +136,14 @@ def parse_input(input_args):
 			seconds_per_slot=result["network_params"]["seconds_per_slot"],
 			slots_per_epoch=result["network_params"]["slots_per_epoch"],
 			deneb_fork_epoch=result["network_params"]["deneb_fork_epoch"],
-			genesis_delay=result["network_params"]["genesis_delay"]
+			genesis_delay=result["network_params"]["genesis_delay"],
 		),
 		wait_for_finalization=result["wait_for_finalization"],
 		wait_for_verifications=result["wait_for_verifications"],
 		verifications_epoch_limit=result["verifications_epoch_limit"],
-		global_client_log_level=result["global_client_log_level"]
+		global_client_log_level=result["global_client_log_level"],
+		snooper_enabled = result["snooper_enabled"],
+		parallel_keystore_generation = result["parallel_keystore_generation"]
 	)
 
 def get_client_log_level_or_default(participant_log_level, global_log_level, client_log_levels):
@@ -162,7 +163,9 @@ def default_input_args():
 		"wait_for_finalization":		False,
 		"wait_for_verifications":		False,
 		"verifications_epoch_limit":	5,
-		"global_client_log_level":		"info"
+		"global_client_log_level":		"info",
+		"snooper_enabled":				False,
+		"parallel_keystore_generation": False,
 	}
 
 def default_network_params():
@@ -204,5 +207,6 @@ def default_participant():
 			"v_max_cpu":				0,
 			"v_min_mem":				0,
 			"v_max_mem":				0,
+			"snooper_enabled":			False,
 			"count": 					1
 	}

@@ -86,6 +86,8 @@ def launch(
 	v_max_cpu,
 	v_min_mem,
 	v_max_mem,
+	snooper_enabled,
+	snooper_engine_context,
 	extra_beacon_params,
 	extra_validator_params):
 
@@ -115,6 +117,8 @@ def launch(
 		bn_max_cpu,
 		bn_min_mem,
 		bn_max_mem,
+		snooper_enabled,
+		snooper_engine_context,
 		extra_params
 	)
 
@@ -124,11 +128,15 @@ def launch(
 		endpoint = "/eth/v1/node/identity",
 		port_id = HTTP_PORT_ID,
 		extract = {
-			"enr": ".data.enr"
+			"enr": ".data.enr",
+			"multiaddr": ".data.discovery_addresses[0]",
+			"peer_id": ".data.peer_id"
 		}
 	)
-	node_enr = plan.request(recipe = node_identity_recipe, service_name = service_name)["extract.enr"]
-
+	response = plan.request(recipe = node_identity_recipe, service_name = service_name)
+	node_enr = response["extract.enr"]
+	multiaddr = response["extract.multiaddr"]
+	peer_id = response["extract.peer_id"]
 
 	teku_metrics_port = teku_service.ports[METRICS_PORT_ID]
 	teku_metrics_url = "{0}:{1}".format(teku_service.ip_address, teku_metrics_port.number)
@@ -142,31 +150,39 @@ def launch(
 		teku_service.ip_address,
 		HTTP_PORT_NUM,
 		nodes_metrics_info,
-		service_name
+		service_name,
+		multiaddr = multiaddr,
+		peer_id = peer_id,
+		snooper_enabled = snooper_enabled,
+		snooper_engine_context = snooper_engine_context,
 	)
 
 
 def get_config(
 	genesis_data,
 	image,
-	boot_cl_client_ctx,
-	el_client_ctx,
+	bootnode_contexts,
+	el_client_context,
 	log_level,
 	node_keystore_files,
 	bn_min_cpu,
 	bn_max_cpu,
 	bn_min_mem,
 	bn_max_mem,
+	snooper_enabled,
+	snooper_engine_context,
 	extra_params):
 
-	el_client_rpc_url_str = "http://{0}:{1}".format(
-		el_client_ctx.ip_addr,
-		el_client_ctx.rpc_port_num,
+	# If snooper is enabled use the snooper engine context, otherwise use the execution client context
+	if snooper_enabled:
+		EXECUTION_ENGINE_ENDPOINT = "http://{0}:{1}".format(
+		snooper_engine_context.ip_addr,
+		snooper_engine_context.engine_rpc_port_num,
 	)
-
-	el_client_engine_rpc_url_str = "http://{0}:{1}".format(
-		el_client_ctx.ip_addr,
-		el_client_ctx.engine_rpc_port_num,
+	else:
+		EXECUTION_ENGINE_ENDPOINT = "http://{0}:{1}".format(
+		el_client_context.ip_addr,
+		el_client_context.engine_rpc_port_num,
 	)
 
 	genesis_config_filepath = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, genesis_data.config_yml_rel_filepath)
@@ -194,7 +210,7 @@ def get_config(
 		"--network=" + genesis_config_filepath,
 		"--initial-state=" + genesis_ssz_filepath,
 		"--data-path=" + CONSENSUS_DATA_DIRPATH_ON_SERVICE_CONTAINER,
-		"--data-storage-mode=PRUNE",
+		"--data-storage-mode={0}".format("ARCHIVE" if package_io.ARCHIVE_MODE else "PRUNE"),
 		"--p2p-enabled=true",
 		# Set per Pari's recommendation, to reduce noise in the logs
 		"--p2p-subscribe-all-subnets-enabled=true",
@@ -212,7 +228,7 @@ def get_config(
 			DEST_VALIDATOR_SECRETS_DIRPATH_IN_SERVICE_CONTAINER,
 		),
 		"--ee-jwt-secret-file={0}".format(jwt_secret_filepath),
-		"--ee-endpoint=" + el_client_engine_rpc_url_str,
+		"--ee-endpoint=" + EXECUTION_ENGINE_ENDPOINT,
 		"--validators-proposer-default-fee-recipient=" + package_io.VALIDATING_REWARDS_ACCOUNT,
 		# vvvvvvvvvvvvvvvvvvv METRICS CONFIG vvvvvvvvvvvvvvvvvvvvv
 		"--metrics-enabled",
@@ -223,8 +239,9 @@ def get_config(
 		# ^^^^^^^^^^^^^^^^^^^ METRICS CONFIG ^^^^^^^^^^^^^^^^^^^^^
 	]
 
-	if boot_cl_client_ctx != None:
-		cmd.append("--p2p-discovery-bootnodes="+boot_cl_client_ctx.enr)
+	if bootnode_contexts != None:
+		cmd.append("--p2p-discovery-bootnodes="+",".join([ctx.enr for ctx in bootnode_contexts[:package_io.MAX_ENR_ENTRIES]]))
+		cmd.append("--p2p-static-peers="+",".join([ctx.multiaddr for ctx in bootnode_contexts[:package_io.MAX_ENR_ENTRIES]]))
 
 	if len(extra_params) > 0:
 		# we do the list comprehension as the default extra_params is a proto repeated string

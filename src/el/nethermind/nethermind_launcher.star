@@ -110,16 +110,12 @@ def get_config(
 	el_min_mem,
 	el_max_mem,
 	extra_params):
-	if len(existing_el_clients) < 2:
-		fail("Nethermind node cannot be boot nodes, and due to a bug it requires two nodes to exist beforehand")
 
-	bootnode_1 = existing_el_clients[0]
-	bootnode_2 = existing_el_clients[1]
 
 	genesis_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH, genesis_data.nethermind_genesis_json_relative_filepath)
 	jwt_secret_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH, genesis_data.jwt_secret_relative_filepath)
 
-	command_args = [
+	cmd = [
 		"--log=" + log_level,
 		"--datadir=" + EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER,
 		"--Init.ChainSpecPath=" + genesis_json_filepath_on_client,
@@ -138,20 +134,19 @@ def get_config(
 		"--Network.P2PPort={0}".format(DISCOVERY_PORT_NUM),
 		"--JsonRpc.JwtSecretFile={0}".format(jwt_secret_json_filepath_on_client),
 		"--Network.OnlyStaticPeers=true",
-		"--Network.StaticPeers={0},{1}".format(
-			bootnode_1.enode,
-			bootnode_2.enode,
-		),
 	]
 
+	if len(existing_el_clients) > 0:
+		cmd.append("--Network.StaticPeers="+",".join([ctx.enode for ctx in existing_el_clients[:package_io.MAX_ENODE_ENTRIES]]))
+
 	if len(extra_params) > 0:
-		# we do this as extra_params is a repeated proto aray
-		command_args.extend([param for param in extra_params])
+		# this is a repeated<proto type>, we convert it into Starlark
+		cmd.extend([param for param in extra_params])
 
 	return ServiceConfig(
 		image = image,
 		ports = USED_PORTS,
-		cmd = command_args,
+		cmd = cmd,
 		files = {
 			GENESIS_DATA_MOUNT_DIRPATH: genesis_data.files_artifact_uuid,
 		},

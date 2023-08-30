@@ -79,7 +79,7 @@ def launch(
 	image,
 	participant_log_level,
 	global_log_level,
-	bootnode_context,
+	bootnode_contexts,
 	el_client_context,
 	node_keystore_files,
 	bn_min_cpu,
@@ -90,6 +90,8 @@ def launch(
 	v_max_cpu,
 	v_min_mem,
 	v_max_mem,
+	snooper_enabled,
+	snooper_engine_context,
 	extra_beacon_params,
 	extra_validator_params):
 
@@ -112,13 +114,15 @@ def launch(
 	beacon_config = get_beacon_config(
 		launcher.genesis_data,
 		image,
-		bootnode_context,
+		bootnode_contexts,
 		el_client_context,
 		log_level,
 		bn_min_cpu,
 		bn_max_cpu,
 		bn_min_mem,
 		bn_max_mem,
+		snooper_enabled,
+		snooper_engine_context,
 		extra_beacon_params,
 	)
 
@@ -149,10 +153,15 @@ def launch(
 		endpoint = "/eth/v1/node/identity",
 		port_id = BEACON_HTTP_PORT_ID,
 		extract = {
-			"enr": ".data.enr"
+			"enr": ".data.enr",
+			"multiaddr": ".data.discovery_addresses[0]",
+			"peer_id": ".data.peer_id"
 		}
 	)
-	beacon_node_enr = plan.request(recipe = beacon_node_identity_recipe, service_name = beacon_node_service_name)["extract.enr"]
+	response = plan.request(recipe = beacon_node_identity_recipe, service_name = beacon_node_service_name)
+	beacon_node_enr = response["extract.enr"]
+	beacon_multiaddr = response["extract.multiaddr"]
+	beacon_peer_id = response["extract.peer_id"]
 
 	beacon_metrics_port = beacon_service.ports[BEACON_METRICS_PORT_ID]
 	beacon_metrics_url = "{0}:{1}".format(beacon_service.ip_address, beacon_metrics_port.number)
@@ -171,25 +180,38 @@ def launch(
 		BEACON_HTTP_PORT_NUM,
 		nodes_metrics_info,
 		beacon_node_service_name,
-		validator_node_service_name
+		validator_node_service_name,
+		beacon_multiaddr,
+		beacon_peer_id,
+		snooper_enabled,
+		snooper_engine_context,
 	)
 
 
 def get_beacon_config(
 	genesis_data,
 	image,
-	boot_cl_client_ctx,
-	el_client_ctx,
+	boot_cl_client_ctxs,
+	el_client_context,
 	log_level,
 	bn_min_cpu,
 	bn_max_cpu,
 	bn_min_mem,
 	bn_max_mem,
+	snooper_enabled,
+	snooper_engine_context,
 	extra_params):
 
-	el_client_engine_rpc_url_str = "http://{0}:{1}".format(
-		el_client_ctx.ip_addr,
-		el_client_ctx.engine_rpc_port_num,
+	# If snooper is enabled use the snooper engine context, otherwise use the execution client context
+	if snooper_enabled:
+		EXECUTION_ENGINE_ENDPOINT = "http://{0}:{1}".format(
+		snooper_engine_context.ip_addr,
+		snooper_engine_context.engine_rpc_port_num,
+	)
+	else:
+		EXECUTION_ENGINE_ENDPOINT = "http://{0}:{1}".format(
+		el_client_context.ip_addr,
+		el_client_context.engine_rpc_port_num,
 	)
 
 	# For some reason, Lighthouse takes in the parent directory of the config file (rather than the path to the config file itself)
@@ -222,11 +244,12 @@ def get_beacon_config(
 		"--http-address=0.0.0.0",
 		"--http-port={0}".format(BEACON_HTTP_PORT_NUM),
 		"--http-allow-sync-stalled",
+		"--slots-per-restore-point={0}".format(32 if package_io.ARCHIVE_MODE else 8192),
 		# NOTE: This comes from:
 		#   https://github.com/sigp/lighthouse/blob/7c88f582d955537f7ffff9b2c879dcf5bf80ce13/scripts/local_testnet/beacon_node.sh
 		# and the option says it's "useful for testing in smaller networks" (unclear what happens in larger networks)
 		"--disable-packet-filter",
-		"--execution-endpoints=" + el_client_engine_rpc_url_str,
+		"--execution-endpoints=" + EXECUTION_ENGINE_ENDPOINT,
 		"--jwt-secrets=" + jwt_secret_filepath,
 		"--suggested-fee-recipient=" + package_io.VALIDATING_REWARDS_ACCOUNT,
 		# Set per Paris' recommendation to reduce noise in the logs
@@ -239,8 +262,9 @@ def get_beacon_config(
 		# ^^^^^^^^^^^^^^^^^^^ METRICS CONFIG ^^^^^^^^^^^^^^^^^^^^^
 	]
 
-	if boot_cl_client_ctx != None:
-		cmd.append("--boot-nodes="+boot_cl_client_ctx.enr)
+	if boot_cl_client_ctxs != None:
+		cmd.append("--boot-nodes="+",".join([ctx.enr for ctx in boot_cl_client_ctxs[:package_io.MAX_ENR_ENTRIES]]))
+		cmd.append("--trusted-peers="+",".join([ctx.peer_id for ctx in boot_cl_client_ctxs[:package_io.MAX_ENR_ENTRIES]]))
 
 	if len(extra_params) > 0:
 		# this is a repeated<proto type>, we convert it into Starlark

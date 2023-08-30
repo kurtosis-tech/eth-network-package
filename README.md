@@ -30,12 +30,16 @@ these and other parameters are configurable through a json file Read more about 
   "participants": [
     {
       //  The type of EL client that should be started
-      //  Valid values are "geth, besu, nethermind"
+      //  Valid values are "geth, besu, erigon, nethermind, and reth"
       "el_client_type": "geth",
 
       //  The Docker image that should be used for the EL client; leave blank to use the default for the client type
       //  Defaults by client:
-      //  - geth: ethereum/client-go:v1.11.5
+      //  - geth: ethereum/client-go:latest
+      //  - erigon: thorax/erigon:devel
+      //  - nethermind:	nethermind/nethermind:latest
+      //  - besu:	hyperledger/besu:develop
+      //  - reth: ghcr.io/paradigmxyz/reth
       "el_client_image": "",
 
       //  The log level string that this participant's EL client should log at
@@ -49,14 +53,16 @@ these and other parameters are configurable through a json file Read more about 
       "el_extra_params": [],
 
       //  The type of CL client that should be started
-      //  Valid values are "lighthouse", "lodestar", "teku"
+      //  Valid values are "lighthouse", "nimbus", "lodestar", "teku", and "prysm"
       "cl_client_type": "lighthouse",
 
       //  The Docker image that should be used for the EL client; leave blank to use the default for the client type
       //  Defaults by client:
-      //  - lighthouse: sigp/lighthouse:v3.5.0
-      //  - teku: consensys/teku:23.1
-      //  - lodestar: chainsafe/lodestar:v1.7.2
+      //  - lighthouse: sigp/lighthouse:latest
+      //  - teku: consensys/teku:latest
+      //  - lodestar: chainsafe/lodestar:latest
+      //  - nimbus: statusim/nimbus-eth2:multiarch-latest
+      //  - prysm: prysmaticlabs/prysm-beacon-chain:latest,prysmaticlabs/prysm-validator:latest
       "cl_client_image": "",
 
       //  The log level string that this participant's EL client should log at
@@ -133,7 +139,11 @@ these and other parameters are configurable through a json file Read more about 
     //  This mnemonic will a) be used to create keystores for all the types of validators that we have and b) be used to generate a CL genesis.ssz that has the children
     //   validator keys already preregistered as validators
     "preregistered_validator_keys_mnemonic": "giant issue aisle success illegal bike spike question tent bar rely arctic volcano long crawl hungry vocal artwork sniff fantasy very lucky have athlete"
-  }
+  },
+
+  // Parallelizes keystore generation so that each node has keystores being generated in their own container
+  // Use against large clusters only
+  "parallel_keystore_generation": false
 }
 ```
 
@@ -183,7 +193,8 @@ For example, this `eth-network-params.json` adds a second node, running a differ
     "genesis_delay": 120,
     "deneb_fork_epoch": 500
   },
-  "global_client_log_level": "info"
+  "global_client_log_level": "info",
+  "parallel_keystore_generation": false
 }
 ```
 

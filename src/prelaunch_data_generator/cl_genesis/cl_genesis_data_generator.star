@@ -67,6 +67,7 @@ def generate_cl_genesis_data(
 			CONFIG_DIRPATH_ON_GENERATOR: genesis_generation_config_artifact_name,
 			EL_GENESIS_DIRPATH_ON_GENERATOR: el_genesis_data.files_artifact_uuid,
 		},
+		"cl-genesis-data",
 	)
 
 	all_dirpaths_to_create_on_generator = [
@@ -158,6 +159,8 @@ def generate_cl_genesis_data(
 	deposit_block_hash_file_generation_str = " ".join(deposit_block_hash_generation_cmd)
 	plan.exec(recipe = ExecRecipe(command = ["/bin/sh", "-c", deposit_block_hash_file_generation_str]), service_name = launcher_service_name)
 
+	genesis_validators_root = get_genesis_validators_root(plan, launcher_service_name, shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, PARSED_BEACON_STATE_FILENAME))
+
 	shared_utils.download_trusted_setup(plan, launcher_service_name, shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, TRUSTED_SETUP_FILENAME))
 
 	cl_genesis_data_artifact_name = plan.store_service_files(launcher_service_name, OUTPUT_DIRPATH_ON_GENERATOR, name = "cl-genesis-data")
@@ -179,10 +182,10 @@ def generate_cl_genesis_data(
 		jwt_secret_rel_filepath,
 		genesis_config_rel_filepath,
 		genesis_ssz_rel_filepath,
+		genesis_validators_root
 	)
 
-	# we cleanup as the data generation is done
-	plan.remove_service(launcher_service_name)
+	# TODO(gyani) remove the container when the job is done - this is a resource leaker
 	return result
 
 
@@ -198,3 +201,14 @@ def new_cl_genesis_config_template_data(network_id, seconds_per_slot, unix_times
 		"GenesisDelay": genesis_delay,
 		"DenebForkEpoch": deneb_fork_epoch
 	}
+
+
+def get_genesis_validators_root(plan, service_name, beacon_state_file_path):
+    response = plan.exec(
+        service_name = service_name,
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "cat {0} | grep genesis_validators_root | grep -oE '0x[0-9a-fA-F]+' | tr -d '\n'".format(beacon_state_file_path)],
+        )
+    )
+
+    return response["output"]

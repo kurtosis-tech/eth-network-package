@@ -73,7 +73,7 @@ def launch(
 	image,
 	participant_log_level,
 	global_log_level,
-	bootnode_context,
+	bootnode_contexts,
 	el_client_context,
 	node_keystore_files,
 	bn_min_cpu,
@@ -84,6 +84,8 @@ def launch(
 	v_max_cpu,
 	v_min_mem,
 	v_max_mem,
+	snooper_enabled,
+	snooper_engine_context,
 	extra_beacon_params,
 	extra_validator_params):
 
@@ -105,7 +107,7 @@ def launch(
 	config = get_config(
 		launcher.cl_genesis_data,
 		image,
-		bootnode_context,
+		bootnode_contexts,
 		el_client_context,
 		log_level,
 		node_keystore_files,
@@ -113,6 +115,8 @@ def launch(
 		bn_max_cpu,
 		bn_min_mem,
 		bn_max_mem,
+		snooper_enabled,
+		snooper_engine_context,
 		extra_params
 	)
 
@@ -122,10 +126,15 @@ def launch(
 		endpoint = "/eth/v1/node/identity",
 		port_id = HTTP_PORT_ID,
 		extract = {
-			"enr": ".data.enr"
+			"enr": ".data.enr",
+			"multiaddr": ".data.discovery_addresses[0]",
+			"peer_id": ".data.peer_id"
 		}
 	)
-	node_enr = plan.request(recipe = cl_node_identity_recipe, service_name = service_name)["extract.enr"]
+	response = plan.request(recipe = cl_node_identity_recipe, service_name = service_name)
+	node_enr = response["extract.enr"]
+	multiaddr = response["extract.multiaddr"]
+	peer_id = response["extract.peer_id"]
 
 	metrics_port = nimbus_service.ports[METRICS_PORT_ID]
 	metrics_url = "{0}:{1}".format(nimbus_service.ip_address, metrics_port.number)
@@ -141,25 +150,38 @@ def launch(
 		HTTP_PORT_NUM,
 		nodes_metrics_info,
 		service_name,
+		multiaddr = multiaddr,
+		peer_id = peer_id,
+		snooper_enabled = snooper_enabled,
+		snooper_engine_context = snooper_engine_context,
 	)
 
 
 def get_config(
 	genesis_data,
 	image,
-	bootnode_context,
-	el_client_ctx,
+	bootnode_contexts,
+	el_client_context,
 	log_level,
 	node_keystore_files,
 	bn_min_cpu,
 	bn_max_cpu,
 	bn_min_mem,
 	bn_max_mem,
+	snooper_enabled,
+	snooper_engine_context,
 	extra_params):
 
-	el_client_engine_rpc_url_str = "http://{0}:{1}".format(
-		el_client_ctx.ip_addr,
-		el_client_ctx.engine_rpc_port_num,
+	# If snooper is enabled use the snooper engine context, otherwise use the execution client context
+	if snooper_enabled:
+		EXECUTION_ENGINE_ENDPOINT = "http://{0}:{1}".format(
+		snooper_engine_context.ip_addr,
+		snooper_engine_context.engine_rpc_port_num,
+	)
+	else:
+		EXECUTION_ENGINE_ENDPOINT = "http://{0}:{1}".format(
+		el_client_context.ip_addr,
+		el_client_context.engine_rpc_port_num,
 	)
 
 	# For some reason, Nimbus takes in the parent directory of the config file (rather than the path to the config file itself)
@@ -199,13 +221,17 @@ def get_config(
 		DEFAULT_IMAGE_ENTRYPOINT,
 		"--non-interactive=true",
 		"--log-level=" + log_level,
+		"--udp-port={0}".format(DISCOVERY_PORT_NUM),
+		"--tcp-port={0}".format(DISCOVERY_PORT_NUM),
 		"--network=" + genesis_config_parent_dirpath_on_client,
 		"--data-dir=" + CONSENSUS_DATA_DIRPATH_IN_SERVICE_CONTAINER,
-		"--web3-url=" + el_client_engine_rpc_url_str,
+		"--web3-url=" + EXECUTION_ENGINE_ENDPOINT,
 		"--nat=extip:" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		"--enr-auto-update=false",
+		"--history={0}".format("archive" if package_io.ARCHIVE_MODE else "prune"),
 		"--rest",
 		"--rest-address=0.0.0.0",
+		"--rest-allow-origin=*",
 		"--rest-port={0}".format(HTTP_PORT_NUM),
 		"--validators-dir=" + VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER,
 		"--secrets-dir=" + VALIDATOR_SECRETS_DIRPATH_ON_SERVICE_CONTAINER,
@@ -225,12 +251,14 @@ def get_config(
 		"--metrics-port={0}".format(METRICS_PORT_NUM),
 		# ^^^^^^^^^^^^^^^^^^^ METRICS CONFIG ^^^^^^^^^^^^^^^^^^^^^
 	]
-	if bootnode_context == None:
+	if bootnode_contexts == None:
 		# Copied from https://github.com/status-im/nimbus-eth2/blob/67ab477a27e358d605e99bffeb67f98d18218eca/scripts/launch_local_testnet.sh#L417
 		# See explanation there
 		cmd.append("--subscribe-all-subnets")
 	else:
-		cmd.append("--bootstrap-node="+bootnode_context.enr)
+		for ctx in bootnode_contexts[:package_io.MAX_ENR_ENTRIES]:
+			cmd.append("--bootstrap-node="+ctx.enr)
+			cmd.append("--direct-peer="+ctx.multiaddr)
 
 	if len(extra_params) > 0:
 		cmd.extend([param for param in extra_params])

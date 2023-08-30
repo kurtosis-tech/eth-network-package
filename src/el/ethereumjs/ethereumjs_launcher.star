@@ -8,9 +8,10 @@ package_io = import_module("github.com/kurtosis-tech/eth-network-package/package
 
 RPC_PORT_NUM		= 8545
 WS_PORT_NUM			= 8546
+WS_PORT_ENGINE_NUM 	= 8547
 DISCOVERY_PORT_NUM	= 30303
 ENGINE_RPC_PORT_NUM = 8551
-METRICS_PORT_NUM = 9001
+#METRICS_PORT_NUM = 9001
 
 # The min/max CPU/memory that the execution node can use
 EXECUTION_MIN_CPU = 100
@@ -24,7 +25,8 @@ WS_PORT_ID			= "ws"
 TCP_DISCOVERY_PORT_ID = "tcp-discovery"
 UDP_DISCOVERY_PORT_ID = "udp-discovery"
 ENGINE_RPC_PORT_ID	= "engine-rpc"
-METRICS_PORT_ID = "metrics"
+WS_PORT_ENGINE_ID	= "ws-engine"
+#METRICS_PORT_ID = "metrics"
 
 GENESIS_DATA_MOUNT_DIRPATH = "/genesis"
 
@@ -38,20 +40,21 @@ PRIVATE_IP_ADDRESS_PLACEHOLDER = "KURTOSIS_IP_ADDR_PLACEHOLDER"
 USED_PORTS = {
 	RPC_PORT_ID: shared_utils.new_port_spec(RPC_PORT_NUM, shared_utils.TCP_PROTOCOL),
 	WS_PORT_ID: shared_utils.new_port_spec(WS_PORT_NUM, shared_utils.TCP_PROTOCOL),
+	WS_PORT_ENGINE_ID: shared_utils.new_port_spec(WS_PORT_ENGINE_NUM, shared_utils.TCP_PROTOCOL),
 	TCP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.TCP_PROTOCOL),
 	UDP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.UDP_PROTOCOL),
 	ENGINE_RPC_PORT_ID: shared_utils.new_port_spec(ENGINE_RPC_PORT_NUM, shared_utils.TCP_PROTOCOL),
-    METRICS_PORT_ID: shared_utils.new_port_spec(METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL)
+#    METRICS_PORT_ID: shared_utils.new_port_spec(METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL)
 }
 
-ENTRYPOINT_ARGS = ["sh", "-c"]
+ENTRYPOINT_ARGS = []
 
 VERBOSITY_LEVELS = {
-	package_io.GLOBAL_CLIENT_LOG_LEVEL.error: "v",
-	package_io.GLOBAL_CLIENT_LOG_LEVEL.warn:  "vv",
-	package_io.GLOBAL_CLIENT_LOG_LEVEL.info:  "vvv",
-	package_io.GLOBAL_CLIENT_LOG_LEVEL.debug: "vvvv",
-	package_io.GLOBAL_CLIENT_LOG_LEVEL.trace: "vvvvv",
+	package_io.GLOBAL_CLIENT_LOG_LEVEL.error: "error",
+	package_io.GLOBAL_CLIENT_LOG_LEVEL.warn:  "warn",
+	package_io.GLOBAL_CLIENT_LOG_LEVEL.info:  "info",
+	package_io.GLOBAL_CLIENT_LOG_LEVEL.debug: "debug",
+	package_io.GLOBAL_CLIENT_LOG_LEVEL.trace: "trace",
 }
 
 
@@ -98,8 +101,8 @@ def launch(
 	jwt_secret = shared_utils.read_file_from_service(plan, service_name, jwt_secret_json_filepath_on_client)
 
 	return el_client_context.new_el_client_context(
-		"reth",
-		"", # reth has no enr
+		"ethereumjs",
+		"", # ethereumjs has no enr
 		enode,
 		service.ip_address,
 		RPC_PORT_NUM,
@@ -123,34 +126,27 @@ def get_config(
 	genesis_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH, genesis_data.geth_genesis_json_relative_filepath)
 	jwt_secret_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH, genesis_data.jwt_secret_relative_filepath)
 
-	init_datadir_cmd_str = "reth init --datadir={0} --chain={1}".format(
-		EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER,
-        genesis_json_filepath_on_client,
-	)
-
 	cmd = [
-		"reth",
-        "node",
-		"-{0}".format(verbosity_level),
-		"--datadir=" + EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER,
-		"--chain=" + genesis_json_filepath_on_client,
-		"--http",
-        "--http.port={0}".format(RPC_PORT_NUM),
-		"--http.addr=0.0.0.0",
-		"--http.corsdomain=*",
-		# WARNING: The admin info endpoint is enabled so that we can easily get ENR/enode, which means
-		#  that users should NOT store private information in these Kurtosis nodes!
-		"--http.api=admin,net,eth",
+		"--gethGenesis=" + genesis_json_filepath_on_client,
+		"--dataDir=" + EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER,
+		"--port={0}".format(DISCOVERY_PORT_NUM),
+		"--rpc",
+		"--rpcAddr=0.0.0.0",
+		"--rpcPort={0}".format(RPC_PORT_NUM),
+		"--rpcCors=*",
+		"--rpcEngine",
+		"--rpcEngineAddr=0.0.0.0",
+		"--rpcEnginePort={0}".format(ENGINE_RPC_PORT_NUM),
 		"--ws",
-		"--ws.addr=0.0.0.0",
-		"--ws.port={0}".format(WS_PORT_NUM),
-		"--ws.api=net,eth",
-		"--ws.origins=*",
-		"--nat=extip:" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
-		"--authrpc.port={0}".format(ENGINE_RPC_PORT_NUM),
-        "--authrpc.jwtsecret={0}".format(jwt_secret_json_filepath_on_client),
-		"--authrpc.addr=0.0.0.0",
-        "--metrics=0.0.0.0:{0}".format(METRICS_PORT_NUM)
+		"--wsAddr=0.0.0.0",
+		"--wsPort={0}".format(WS_PORT_NUM),
+		"--wsEnginePort={0}".format(WS_PORT_ENGINE_NUM),
+		"--wsEngineAddr=0.0.0.0",
+		"--jwt-secret={0}".format(jwt_secret_json_filepath_on_client),
+		"--extIP={0}".format(PRIVATE_IP_ADDRESS_PLACEHOLDER),
+		"--sync=full",
+		"--isSingleNode=true",
+		"--logLevel={0}".format(verbosity_level),
 	]
 
 	if len(existing_el_clients) > 0:
@@ -161,18 +157,10 @@ def get_config(
 		cmd.extend([param for param in extra_params])
 
 
-	cmd_str = " ".join(cmd)
-
-	subcommand_strs = [
-		init_datadir_cmd_str,
-		cmd_str,
-	]
-	command_str = " && ".join(subcommand_strs)
-
 	return ServiceConfig(
 		image = image,
 		ports = USED_PORTS,
-		cmd = [command_str],
+		cmd = cmd,
 		files = {
 			GENESIS_DATA_MOUNT_DIRPATH: genesis_data.files_artifact_uuid,
 		},
@@ -185,7 +173,7 @@ def get_config(
 	), jwt_secret_json_filepath_on_client
 
 
-def new_reth_launcher(el_genesis_data):
+def new_ethereumjs_launcher(el_genesis_data):
 	return struct(
 		el_genesis_data = el_genesis_data,
 	)

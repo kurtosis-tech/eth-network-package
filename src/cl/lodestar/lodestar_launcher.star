@@ -69,7 +69,7 @@ def launch(
 	image,
 	participant_log_level,
 	global_log_level,
-	bootnode_context,
+	bootnode_contexts,
 	el_client_context,
 	node_keystore_files,
 	bn_min_cpu,
@@ -80,6 +80,8 @@ def launch(
 	v_max_cpu,
 	v_min_mem,
 	v_max_mem,
+	snooper_enabled,
+	snooper_engine_context,
 	extra_beacon_params,
 	extra_validator_params):
 
@@ -103,13 +105,15 @@ def launch(
 	beacon_config = get_beacon_config(
 		launcher.cl_genesis_data,
 		image,
-		bootnode_context,
+		bootnode_contexts,
 		el_client_context,
 		log_level,
 		bn_min_cpu,
 		bn_max_cpu,
 		bn_min_mem,
 		bn_max_mem,
+		snooper_enabled,
+		snooper_engine_context,
 		extra_beacon_params,
 	)
 
@@ -143,10 +147,15 @@ def launch(
 		endpoint = "/eth/v1/node/identity",
 		port_id = HTTP_PORT_ID,
 		extract = {
-			"enr": ".data.enr"
+			"enr": ".data.enr",
+			"multiaddr": ".data.p2p_addresses[-1]",
+			"peer_id": ".data.peer_id"
 		}
 	)
-	beacon_node_enr = plan.request(recipe = beacon_node_identity_recipe, service_name = beacon_node_service_name)["extract.enr"]
+	response = plan.request(recipe = beacon_node_identity_recipe, service_name = beacon_node_service_name)
+	beacon_node_enr = response["extract.enr"]
+	beacon_multiaddr = response["extract.multiaddr"]
+	beacon_peer_id = response["extract.peer_id"]
 
 	beacon_metrics_port = beacon_service.ports[METRICS_PORT_ID]
 	beacon_metrics_url = "{0}:{1}".format(beacon_service.ip_address, beacon_metrics_port.number)
@@ -161,30 +170,43 @@ def launch(
 		HTTP_PORT_NUM,
 		nodes_metrics_info,
 		beacon_node_service_name,
-		validator_node_service_name
+		validator_node_service_name,
+		beacon_multiaddr,
+		beacon_peer_id,
+		snooper_enabled,
+		snooper_engine_context,
 	)
 
 
 def get_beacon_config(
 	genesis_data,
 	image,
-	boot_cl_client_ctx,
-	el_client_ctx,
+	bootnode_contexts,
+	el_client_context,
 	log_level,
 	bn_min_cpu,
 	bn_max_cpu,
 	bn_min_mem,
 	bn_max_mem,
+	snooper_enabled,
+	snooper_engine_context,
 	extra_params):
 
 	el_client_rpc_url_str = "http://{0}:{1}".format(
-		el_client_ctx.ip_addr,
-		el_client_ctx.rpc_port_num,
+		el_client_context.ip_addr,
+		el_client_context.rpc_port_num,
 	)
 
-	el_client_engine_rpc_url_str = "http://{0}:{1}".format(
-		el_client_ctx.ip_addr,
-		el_client_ctx.engine_rpc_port_num,
+	# If snooper is enabled use the snooper engine context, otherwise use the execution client context
+	if snooper_enabled:
+		EXECUTION_ENGINE_ENDPOINT = "http://{0}:{1}".format(
+		snooper_engine_context.ip_addr,
+		snooper_engine_context.engine_rpc_port_num,
+	)
+	else:
+		EXECUTION_ENGINE_ENDPOINT = "http://{0}:{1}".format(
+		el_client_context.ip_addr,
+		el_client_context.engine_rpc_port_num,
 	)
 
 	genesis_config_filepath = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, genesis_data.config_yml_rel_filepath)
@@ -203,11 +225,12 @@ def get_beacon_config(
 		"--discv5=true",
 		"--eth1=true",
 		"--eth1.providerUrls=" + el_client_rpc_url_str,
-		"--execution.urls=" + el_client_engine_rpc_url_str,
+		"--execution.urls=" + EXECUTION_ENGINE_ENDPOINT,
 		"--rest=true",
 		"--rest.address=0.0.0.0",
 		"--rest.namespace=*",
 		"--rest.port={0}".format(HTTP_PORT_NUM),
+		"--nat=true",
 		"--enr.ip=" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		"--enr.tcp={0}".format(DISCOVERY_PORT_NUM),
 		"--enr.udp={0}".format(DISCOVERY_PORT_NUM),
@@ -221,8 +244,8 @@ def get_beacon_config(
 		# ^^^^^^^^^^^^^^^^^^^ METRICS CONFIG ^^^^^^^^^^^^^^^^^^^^^
 	]
 
-	if boot_cl_client_ctx != None :
-		cmd.append("--bootnodes="+boot_cl_client_ctx.enr)
+	if bootnode_contexts != None :
+		cmd.append("--bootnodes="+",".join([ctx.enr for ctx in bootnode_contexts[:package_io.MAX_ENR_ENTRIES]]))
 
 	if len(extra_params) > 0:
 		# this is a repeated<proto type>, we convert it into Starlark
