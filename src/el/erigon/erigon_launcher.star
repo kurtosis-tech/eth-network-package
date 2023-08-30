@@ -10,14 +10,18 @@ EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/home/erigon/execution-data"
 
 GENESIS_DATA_MOUNT_DIRPATH = "/genesis"
 
-RPC_PORT_NUM = 8545
-WS_PORT_NUM = 8546
+WS_RPC_PORT_NUM = 8545
 DISCOVERY_PORT_NUM = 30303
-ENGINE_RPC_PORT_NUM = 8550
+ENGINE_RPC_PORT_NUM = 8551
+
+# The min/max CPU/memory that the execution node can use
+EXECUTION_MIN_CPU = 100
+EXECUTION_MAX_CPU = 1000
+EXECUTION_MIN_MEMORY = 512
+EXECUTION_MAX_MEMORY = 2048
 
 # Port IDs
-RPC_PORT_ID = "rpc"
-WS_PORT_ID = "ws"
+WS_RPC_PORT_ID = "ws-rpc"
 TCP_DISCOVERY_PORT_ID = "tcp-discovery"
 UDP_DISCOVERY_PORT_ID = "udp-discovery"
 ENGINE_RPC_PORT_ID = "engine-rpc"
@@ -26,8 +30,7 @@ ENGINE_RPC_PORT_ID = "engine-rpc"
 PRIVATE_IP_ADDRESS_PLACEHOLDER = "KURTOSIS_IP_ADDR_PLACEHOLDER"
 
 USED_PORTS = {
-	RPC_PORT_ID: shared_utils.new_port_spec(RPC_PORT_NUM, shared_utils.TCP_PROTOCOL),
-	WS_PORT_ID: shared_utils.new_port_spec(WS_PORT_NUM, shared_utils.TCP_PROTOCOL),
+	WS_RPC_PORT_ID: shared_utils.new_port_spec(WS_RPC_PORT_NUM, shared_utils.TCP_PROTOCOL),
 	TCP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.TCP_PROTOCOL),
 	UDP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.UDP_PROTOCOL),
 }
@@ -50,16 +53,35 @@ def launch(
 	participant_log_level,
 	global_log_level,
 	existing_el_clients,
+	el_min_cpu,
+	el_max_cpu,
+	el_min_mem,
+	el_max_mem,
 	extra_params):
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, ERIGON_LOG_LEVELS)
 
-	config, jwt_secret_json_filepath_on_client = get_config(launcher.network_id, launcher.el_genesis_data,
-									image, existing_el_clients, log_level, extra_params)
+	el_min_cpu = el_min_cpu if int(el_min_cpu) > 0 else EXECUTION_MIN_CPU
+	el_max_cpu = el_max_cpu if int(el_max_cpu) > 0 else EXECUTION_MAX_CPU
+	el_min_mem = el_min_mem if int(el_min_mem) > 0 else EXECUTION_MIN_MEMORY
+	el_max_mem = el_max_mem if int(el_max_mem) > 0 else EXECUTION_MAX_MEMORY
+
+	config, jwt_secret_json_filepath_on_client = get_config(
+		launcher.network_id,
+		launcher.el_genesis_data,
+		image,
+		existing_el_clients,
+		log_level,
+		el_min_cpu,
+		el_max_cpu,
+		el_min_mem,
+		el_max_mem,
+		extra_params
+	)
 
 	service = plan.add_service(service_name, config)
 
-	enode, enr = el_admin_node_info.get_enode_enr_for_node(plan, service_name, RPC_PORT_ID)
+	enode, enr = el_admin_node_info.get_enode_enr_for_node(plan, service_name, WS_RPC_PORT_ID)
 
 	jwt_secret = shared_utils.read_file_from_service(plan, service_name, jwt_secret_json_filepath_on_client)
 
@@ -68,15 +90,25 @@ def launch(
 		enr,
 		enode,
 		service.ip_address,
-		RPC_PORT_NUM,
-		WS_PORT_NUM,
+		WS_RPC_PORT_NUM,
+		WS_RPC_PORT_NUM,
 		ENGINE_RPC_PORT_NUM,
 		jwt_secret,
 		service_name
 	)
 
 
-def get_config(network_id, genesis_data, image, existing_el_clients, verbosity_level, extra_params):
+def get_config(
+	network_id,
+	genesis_data,
+	image,
+	existing_el_clients,
+	verbosity_level,
+	el_min_cpu,
+	el_max_cpu,
+	el_min_mem,
+	el_max_mem,
+	extra_params):
 	network_id = network_id
 
 	genesis_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH, genesis_data.erigon_genesis_json_relative_filepath)
@@ -91,26 +123,34 @@ def get_config(network_id, genesis_data, image, existing_el_clients, verbosity_l
 	if len(existing_el_clients) == 0:
 		fail("Erigon needs at least one node to exist, which it treats as the bootnode")
 
-	boot_node = existing_el_clients[0]
+	boot_node_1 = existing_el_clients[0]
 
 	launch_node_cmd = [
 		"erigon",
 		"--log.console.verbosity=" + verbosity_level,
 		"--datadir=" + EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER,
+		"--port={0}".format(DISCOVERY_PORT_NUM),
 		"--networkid=" + network_id,
-		"--http",
-		"--http.addr=0.0.0.0",
-		"--http.corsdomain=*",
-		# WARNING: The admin info endpoint is enabled so that we can easily get ENR/enode, which means
-		#  that users should NOT store private information in these Kurtosis nodes!
-		"--http.api=admin,engine,net,eth",
+		"--http.api=eth,erigon,engine,web3,net,debug,trace,txpool,admin",
+		"--http.vhosts=*",
 		"--ws",
 		"--allow-insecure-unlock",
 		"--nat=extip:" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
-		"--authrpc.jwtsecret={0}".format(jwt_secret_json_filepath_on_client),
 		"--nodiscover",
-		"--staticpeers={0}".format(boot_node.enode),
+		"--staticpeers={0}".format(boot_node_1.enode),
+		"--http",
+		"--http.addr=0.0.0.0",
+		"--http.corsdomain=*",
+		"--http.port={0}".format(WS_RPC_PORT_NUM),
+		"--authrpc.jwtsecret={0}".format(jwt_secret_json_filepath_on_client),
+		"--authrpc.addr=0.0.0.0",
+		"--authrpc.port={0}".format(ENGINE_RPC_PORT_NUM),
+		"--authrpc.vhosts=*",
 	]
+
+	if len(existing_el_clients) > 0:
+		launch_node_cmd.append("--bootnodes={0}".format(boot_node_1.enode))
+
 
 	if len(extra_params) > 0:
 		# this is a repeated<proto type>, we convert it into Starlark
@@ -131,7 +171,11 @@ def get_config(network_id, genesis_data, image, existing_el_clients, verbosity_l
 			GENESIS_DATA_MOUNT_DIRPATH: genesis_data.files_artifact_uuid
 		},
 		entrypoint = ENTRYPOINT_ARGS,
-		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER
+		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
+		min_cpu = el_min_cpu,
+		max_cpu = el_max_cpu,
+		min_memory = el_min_mem,
+		max_memory = el_max_mem
 	), jwt_secret_json_filepath_on_client
 
 

@@ -7,13 +7,19 @@ package_io = import_module("github.com/kurtosis-tech/eth-network-package/package
 
 # The dirpath of the execution data directory on the client container
 EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/execution-data"
-
+KZG_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/genesis/output/trusted_setup.txt"
 GENESIS_DATA_MOUNT_DIRPATH = "/genesis"
 
 RPC_PORT_NUM = 8545
 WS_PORT_NUM = 8546
 DISCOVERY_PORT_NUM = 30303
 ENGINE_RPC_PORT_NUM = 8551
+
+# The min/max CPU/memory that the execution node can use
+EXECUTION_MIN_CPU = 100
+EXECUTION_MAX_CPU = 1000
+EXECUTION_MIN_MEMORY = 512
+EXECUTION_MAX_MEMORY = 2048
 
 # Port IDs
 RPC_PORT_ID = "rpc"
@@ -49,11 +55,30 @@ def launch(
 	participant_log_level,
 	global_log_level,
 	existing_el_clients,
+	el_min_cpu,
+	el_max_cpu,
+	el_min_mem,
+	el_max_mem,
 	extra_params):
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, NETHERMIND_LOG_LEVELS)
 
-	config, jwt_secret_json_filepath_on_client = get_config(launcher.el_genesis_data, image, existing_el_clients, log_level, extra_params)
+	el_min_cpu = el_min_cpu if int(el_min_cpu) > 0 else EXECUTION_MIN_CPU
+	el_max_cpu = el_max_cpu if int(el_max_cpu) > 0 else EXECUTION_MAX_CPU
+	el_min_mem = el_min_mem if int(el_min_mem) > 0 else EXECUTION_MIN_MEMORY
+	el_max_mem = el_max_mem if int(el_max_mem) > 0 else EXECUTION_MAX_MEMORY
+
+	config, jwt_secret_json_filepath_on_client = get_config(
+		launcher.el_genesis_data,
+		image,
+		existing_el_clients,
+		log_level,
+		el_min_cpu,
+		el_max_cpu,
+		el_min_mem,
+		el_max_mem,
+		extra_params
+	)
 
 	service = plan.add_service(service_name, config)
 
@@ -75,7 +100,16 @@ def launch(
 	)
 
 
-def get_config(genesis_data, image, existing_el_clients, log_level, extra_params):
+def get_config(
+	genesis_data,
+	image,
+	existing_el_clients,
+	log_level,
+	el_min_cpu,
+	el_max_cpu,
+	el_min_mem,
+	el_max_mem,
+	extra_params):
 	if len(existing_el_clients) < 2:
 		fail("Nethermind node cannot be boot nodes, and due to a bug it requires two nodes to exist beforehand")
 
@@ -90,18 +124,19 @@ def get_config(genesis_data, image, existing_el_clients, log_level, extra_params
 		"--datadir=" + EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER,
 		"--Init.ChainSpecPath=" + genesis_json_filepath_on_client,
 		"--Init.WebSocketsEnabled=true",
-		"--Init.DiagnosticMode=None",
+		"--Init.KzgSetupPath=" + KZG_DATA_DIRPATH_ON_CLIENT_CONTAINER,
+		"--config=none.cfg",
 		"--JsonRpc.Enabled=true",
 		"--JsonRpc.EnabledModules=net,eth,consensus,subscribe,web3,admin",
 		"--JsonRpc.Host=0.0.0.0",
 		"--JsonRpc.Port={0}".format(RPC_PORT_NUM),
 		"--JsonRpc.WebSocketsPort={0}".format(WS_PORT_NUM),
+		"--JsonRpc.EngineHost=0.0.0.0",
+		"--JsonRpc.EnginePort={0}".format(ENGINE_RPC_PORT_NUM),
 		"--Network.ExternalIp={0}".format(PRIVATE_IP_ADDRESS_PLACEHOLDER),
-		"--Network.LocalIp={0}".format(PRIVATE_IP_ADDRESS_PLACEHOLDER),
 		"--Network.DiscoveryPort={0}".format(DISCOVERY_PORT_NUM),
 		"--Network.P2PPort={0}".format(DISCOVERY_PORT_NUM),
 		"--JsonRpc.JwtSecretFile={0}".format(jwt_secret_json_filepath_on_client),
-		"--JsonRpc.AdditionalRpcUrls=[\"http://0.0.0.0:{0}|http;ws|net;eth;subscribe;engine;web3;client\"]".format(ENGINE_RPC_PORT_NUM),
 		"--Network.OnlyStaticPeers=true",
 		"--Network.StaticPeers={0},{1}".format(
 			bootnode_1.enode,
@@ -121,6 +156,10 @@ def get_config(genesis_data, image, existing_el_clients, log_level, extra_params
 			GENESIS_DATA_MOUNT_DIRPATH: genesis_data.files_artifact_uuid,
 		},
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
+		min_cpu = el_min_cpu,
+		max_cpu = el_max_cpu,
+		min_memory = el_min_mem,
+		max_memory = el_max_mem
 	), jwt_secret_json_filepath_on_client
 
 

@@ -1,4 +1,11 @@
-def new_cl_client_context(client_name, enr, ip_addr, http_port_num, cl_nodes_metrics_info, beacon_service_name, validator_service_name = ""):
+def new_cl_client_context(
+	client_name,
+	enr,
+	ip_addr,
+	http_port_num,
+	cl_nodes_metrics_info,
+	beacon_service_name,
+	validator_service_name = ""):
 	return struct(
 		client_name = client_name,
 		enr = enr,

@@ -10,6 +10,7 @@ RPC_PORT_NUM		= 8545
 WS_PORT_NUM			= 8546
 DISCOVERY_PORT_NUM	= 30303
 ENGINE_RPC_PORT_NUM = 8551
+METRICS_PORT_NUM = 9001
 
 # The min/max CPU/memory that the execution node can use
 EXECUTION_MIN_CPU = 100
@@ -23,10 +24,7 @@ WS_PORT_ID			= "ws"
 TCP_DISCOVERY_PORT_ID = "tcp-discovery"
 UDP_DISCOVERY_PORT_ID = "udp-discovery"
 ENGINE_RPC_PORT_ID	= "engine-rpc"
-ENGINE_WS_PORT_ID	= "engineWs"
-
-# TODO(old) Scale this dynamically based on CPUs available and Geth nodes mining
-NUM_MINING_THREADS = 1
+METRICS_PORT_ID = "metrics"
 
 GENESIS_DATA_MOUNT_DIRPATH = "/genesis"
 
@@ -34,10 +32,6 @@ PREFUNDED_KEYS_MOUNT_DIRPATH = "/prefunded-keys"
 
 # The dirpath of the execution data directory on the client container
 EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/execution-data"
-KEYSTORE_DIRPATH_ON_CLIENT_CONTAINER	= EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER + "/keystore"
-
-GETH_ACCOUNT_PASSWORD	= "password"		#  Password that the Geth accounts will be locked with
-GETH_ACCOUNT_PASSWORDS_FILE = "/tmp/password.txt" #  Importing an account to
 
 PRIVATE_IP_ADDRESS_PLACEHOLDER = "KURTOSIS_IP_ADDR_PLACEHOLDER"
 
@@ -46,17 +40,18 @@ USED_PORTS = {
 	WS_PORT_ID: shared_utils.new_port_spec(WS_PORT_NUM, shared_utils.TCP_PROTOCOL),
 	TCP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.TCP_PROTOCOL),
 	UDP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.UDP_PROTOCOL),
-	ENGINE_RPC_PORT_ID: shared_utils.new_port_spec(ENGINE_RPC_PORT_NUM, shared_utils.TCP_PROTOCOL)
+	ENGINE_RPC_PORT_ID: shared_utils.new_port_spec(ENGINE_RPC_PORT_NUM, shared_utils.TCP_PROTOCOL),
+    METRICS_PORT_ID: shared_utils.new_port_spec(METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL)
 }
 
 ENTRYPOINT_ARGS = ["sh", "-c"]
 
 VERBOSITY_LEVELS = {
-	package_io.GLOBAL_CLIENT_LOG_LEVEL.error: "1",
-	package_io.GLOBAL_CLIENT_LOG_LEVEL.warn:  "2",
-	package_io.GLOBAL_CLIENT_LOG_LEVEL.info:  "3",
-	package_io.GLOBAL_CLIENT_LOG_LEVEL.debug: "4",
-	package_io.GLOBAL_CLIENT_LOG_LEVEL.trace: "5",
+	package_io.GLOBAL_CLIENT_LOG_LEVEL.error: "v",
+	package_io.GLOBAL_CLIENT_LOG_LEVEL.warn:  "vv",
+	package_io.GLOBAL_CLIENT_LOG_LEVEL.info:  "vvv",
+	package_io.GLOBAL_CLIENT_LOG_LEVEL.debug: "vvvv",
+	package_io.GLOBAL_CLIENT_LOG_LEVEL.trace: "vvvvv",
 }
 
 
@@ -83,11 +78,9 @@ def launch(
 	el_min_mem = el_min_mem if int(el_min_mem) > 0 else EXECUTION_MIN_MEMORY
 	el_max_mem = el_max_mem if int(el_max_mem) > 0 else EXECUTION_MAX_MEMORY
 
+
 	config, jwt_secret_json_filepath_on_client = get_config(
-		launcher.network_id,
 		launcher.el_genesis_data,
-		launcher.prefunded_geth_keys_artifact_uuid,
-		launcher.prefunded_account_info,
 		image,
 		existing_el_clients,
 		log_level,
@@ -100,13 +93,13 @@ def launch(
 
 	service = plan.add_service(service_name, config)
 
-	enode, enr = el_admin_node_info.get_enode_enr_for_node(plan, service_name, RPC_PORT_ID)
+	enode = el_admin_node_info.get_enode_for_node(plan, service_name, RPC_PORT_ID)
 
 	jwt_secret = shared_utils.read_file_from_service(plan, service_name, jwt_secret_json_filepath_on_client)
 
 	return el_client_context.new_el_client_context(
-		"geth",
-		enr,
+		"reth",
+		"", # reth has no enr
 		enode,
 		service.ip_address,
 		RPC_PORT_NUM,
@@ -117,10 +110,7 @@ def launch(
 	)
 
 def get_config(
-	network_id,
 	genesis_data,
-	prefunded_geth_keys_artifact_uuid,
-	prefunded_account_info,
 	image,
 	existing_el_clients,
 	verbosity_level,
@@ -133,68 +123,43 @@ def get_config(
 	genesis_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH, genesis_data.geth_genesis_json_relative_filepath)
 	jwt_secret_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH, genesis_data.jwt_secret_relative_filepath)
 
-	account_addresses_to_unlock = []
-	for prefunded_account in prefunded_account_info:
-		account_addresses_to_unlock.append(prefunded_account.address)
-
-
-	accounts_to_unlock_str = ",".join(account_addresses_to_unlock)
-
-	init_datadir_cmd_str = "geth init --datadir={0} {1}".format(
+	init_datadir_cmd_str = "reth init --datadir={0} --chain={1}".format(
 		EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER,
-		genesis_json_filepath_on_client,
+        genesis_json_filepath_on_client,
 	)
-
-	# We need to put the keys into the right spot
-	copy_keys_into_keystore_cmd_str = "cp -r {0}/* {1}/".format(
-		PREFUNDED_KEYS_MOUNT_DIRPATH,
-		KEYSTORE_DIRPATH_ON_CLIENT_CONTAINER,
-	)
-
-	create_passwords_file_cmd_str = '{' + ' for i in $(seq 1 {0}); do echo "{1}" >> {2}; done; '.format(
-		len(prefunded_account_info),
-		GETH_ACCOUNT_PASSWORD,
-		GETH_ACCOUNT_PASSWORDS_FILE,
-	) + '}'
 
 	launch_node_cmd = [
-		"geth",
-		"--verbosity=" + verbosity_level,
-		"--unlock=" + accounts_to_unlock_str,
-		"--password=" + GETH_ACCOUNT_PASSWORDS_FILE,
+		"reth",
+        "node",
+		"-{0}".format(verbosity_level),
 		"--datadir=" + EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER,
-		"--networkid=" + network_id,
+		"--chain=" + genesis_json_filepath_on_client,
 		"--http",
+        "--http.port={0}".format(RPC_PORT_NUM),
 		"--http.addr=0.0.0.0",
-		"--http.vhosts=*",
 		"--http.corsdomain=*",
 		# WARNING: The admin info endpoint is enabled so that we can easily get ENR/enode, which means
 		#  that users should NOT store private information in these Kurtosis nodes!
-		"--http.api=admin,engine,net,eth",
+		"--http.api=admin,net,eth",
 		"--ws",
 		"--ws.addr=0.0.0.0",
 		"--ws.port={0}".format(WS_PORT_NUM),
-		"--ws.api=engine,net,eth",
+		"--ws.api=net,eth",
 		"--ws.origins=*",
-		"--allow-insecure-unlock",
 		"--nat=extip:" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
-		"--verbosity=" + verbosity_level,
 		"--authrpc.port={0}".format(ENGINE_RPC_PORT_NUM),
+        "--authrpc.jwtsecret={0}".format(jwt_secret_json_filepath_on_client),
 		"--authrpc.addr=0.0.0.0",
-		"--authrpc.vhosts=*",
-		"--authrpc.jwtsecret={0}".format(jwt_secret_json_filepath_on_client),
-		"--syncmode=full",
-		"--rpc.allow-unprotected-txs"
+        "--metrics=0.0.0.0:{0}".format(METRICS_PORT_NUM)
 	]
 
 	bootnode_enode = ""
 	if len(existing_el_clients) > 0:
 		bootnode_context = existing_el_clients[0]
 		bootnode_enode = bootnode_context.enode
-
-	launch_node_cmd.append(
-		'--bootnodes="{0}"'.format(bootnode_enode),
-	)
+		launch_node_cmd.append(
+			'--bootnodes="{0}"'.format(bootnode_enode),
+		)
 
 	if len(extra_params) > 0:
 		# this is a repeated<proto type>, we convert it into Starlark
@@ -205,8 +170,6 @@ def get_config(
 
 	subcommand_strs = [
 		init_datadir_cmd_str,
-		copy_keys_into_keystore_cmd_str,
-		create_passwords_file_cmd_str,
 		launch_node_cmd_str,
 	]
 	command_str = " && ".join(subcommand_strs)
@@ -217,7 +180,6 @@ def get_config(
 		cmd = [command_str],
 		files = {
 			GENESIS_DATA_MOUNT_DIRPATH: genesis_data.files_artifact_uuid,
-			PREFUNDED_KEYS_MOUNT_DIRPATH: prefunded_geth_keys_artifact_uuid
 		},
 		entrypoint = ENTRYPOINT_ARGS,
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
@@ -228,10 +190,7 @@ def get_config(
 	), jwt_secret_json_filepath_on_client
 
 
-def new_geth_launcher(network_id, el_genesis_data, prefunded_geth_keys_artifact_uuid, prefunded_account_info):
+def new_reth_launcher(el_genesis_data):
 	return struct(
-		network_id = network_id,
 		el_genesis_data = el_genesis_data,
-		prefunded_account_info = prefunded_account_info,
-		prefunded_geth_keys_artifact_uuid = prefunded_geth_keys_artifact_uuid,
 	)

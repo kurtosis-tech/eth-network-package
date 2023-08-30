@@ -8,11 +8,10 @@ package_io = import_module("github.com/kurtosis-tech/eth-network-package/package
 
 IMAGE_SEPARATOR_DELIMITER	= ","
 EXPECTED_NUM_IMAGES			= 2
-
+#  ---------------------------------- Beacon client -------------------------------------
 CONSENSUS_DATA_DIRPATH_ON_SERVICE_CONTAINER			= "/consensus-data"
 GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER		= "/genesis"
-VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER	= "/validator-keys"
-PRYSM_PASSWORD_MOUNT_DIRPATH_ON_SERVICE_CONTAINER	= "/prysm-password"
+
 
 # Port IDs
 TCP_DISCOVERY_PORT_ID		= "tcp-discovery"
@@ -20,7 +19,6 @@ UDP_DISCOVERY_PORT_ID		= "udp-discovery"
 RPC_PORT_ID					= "rpc"
 HTTP_PORT_ID				= "http"
 BEACON_MONITORING_PORT_ID	= "monitoring"
-VALIDATOR_MONITORING_PORT_ID= "monitoring"
 
 # Port nums
 DISCOVERY_TCP_PORT_NUM		= 13000
@@ -28,14 +26,32 @@ DISCOVERY_UDP_PORT_NUM		= 12000
 RPC_PORT_NUM				= 4000
 HTTP_PORT_NUM				= 3500
 BEACON_MONITORING_PORT_NUM	= 8080
+
+# The min/max CPU/memory that the beacon node can use
+BEACON_MIN_CPU = 50
+BEACON_MAX_CPU = 1000
+BEACON_MIN_MEMORY = 256
+BEACON_MAX_MEMORY = 1024
+
+#  ---------------------------------- Validator client -------------------------------------
+VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER	= "/validator-keys"
+PRYSM_PASSWORD_MOUNT_DIRPATH_ON_SERVICE_CONTAINER	= "/prysm-password"
+
+# Port IDs
 VALIDATOR_MONITORING_PORT_NUM  = 8081
-
-BEACON_SUFFIX_SERVICE_NAME	= "beacon"
-VALIDATOR_SUFFIX_SERVICE_NAME = "validator"
-
-MIN_PEERS = 1
+VALIDATOR_MONITORING_PORT_ID= "monitoring"
 
 METRICS_PATH = "/metrics"
+VALIDATOR_SUFFIX_SERVICE_NAME = "validator"
+
+# The min/max CPU/memory that the validator node can use
+VALIDATOR_MIN_CPU = 50
+VALIDATOR_MAX_CPU = 300
+VALIDATOR_MIN_MEMORY = 64
+VALIDATOR_MAX_MEMORY = 256
+
+
+MIN_PEERS = 1
 
 PRIVATE_IP_ADDRESS_PLACEHOLDER = "KURTOSIS_IP_ADDR_PLACEHOLDER"
 
@@ -70,6 +86,14 @@ def launch(
 	bootnode_context,
 	el_client_context,
 	node_keystore_files,
+	bn_min_cpu,
+	bn_max_cpu,
+	bn_min_mem,
+	bn_max_mem,
+	v_min_cpu,
+	v_max_cpu,
+	v_min_mem,
+	v_max_mem,
 	extra_beacon_params,
 	extra_validator_params):
 
@@ -85,10 +109,20 @@ def launch(
 		fail("An empty validator image was provided")
 
 
-	beacon_node_service_name = "{0}-{1}".format(service_name, BEACON_SUFFIX_SERVICE_NAME)
+	beacon_node_service_name = "{0}".format(service_name)
 	validator_node_service_name = "{0}-{1}".format(service_name, VALIDATOR_SUFFIX_SERVICE_NAME)
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, PRYSM_LOG_LEVELS)
+
+	bn_min_cpu = int(bn_min_cpu) if int(bn_min_cpu) > 0 else BEACON_MIN_CPU
+	bn_max_cpu = int(bn_max_cpu) if int(bn_max_cpu) > 0 else BEACON_MAX_CPU
+	bn_min_mem = int(bn_min_mem) if int(bn_min_mem) > 0 else BEACON_MIN_MEMORY
+	bn_max_mem = int(bn_max_mem) if int(bn_max_mem) > 0 else BEACON_MAX_MEMORY
+
+	v_min_cpu = int(v_min_cpu) if int(v_min_cpu) > 0 else VALIDATOR_MIN_CPU
+	v_max_cpu = int(v_max_cpu) if int(v_max_cpu) > 0 else VALIDATOR_MAX_CPU
+	v_min_mem = int(v_min_mem) if int(v_min_mem) > 0 else VALIDATOR_MIN_MEMORY
+	v_max_mem = int(v_max_mem) if int(v_max_mem) > 0 else VALIDATOR_MAX_MEMORY
 
 	beacon_config = get_beacon_config(
 		launcher.genesis_data,
@@ -96,6 +130,10 @@ def launch(
 		bootnode_context,
 		el_client_context,
 		log_level,
+		bn_min_cpu,
+		bn_max_cpu,
+		bn_min_mem,
+		bn_max_mem,
 		extra_beacon_params,
 	)
 
@@ -115,6 +153,10 @@ def launch(
 		beacon_rpc_endpoint,
 		beacon_http_endpoint,
 		node_keystore_files,
+		v_min_cpu,
+		v_max_cpu,
+		v_min_mem,
+		v_max_mem,
 		extra_validator_params,
 		launcher.prysm_password_relative_filepath,
 		launcher.prysm_password_artifact_uuid
@@ -160,6 +202,10 @@ def get_beacon_config(
 		bootnode_context,
 		el_client_context,
 		log_level,
+		bn_min_cpu,
+		bn_max_cpu,
+		bn_min_mem,
+		bn_max_mem,
 		extra_params,
 	):
 
@@ -179,10 +225,12 @@ def get_beacon_config(
 		"--chain-config-file=" + genesis_config_filepath,
 		"--genesis-state=" + genesis_ssz_filepath,
 		"--execution-endpoint=" + el_client_engine_rpc_url_str,
-		"--rpc-host=" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
+		"--rpc-host=0.0.0.0",
 		"--rpc-port={0}".format(RPC_PORT_NUM),
 		"--grpc-gateway-host=0.0.0.0",
+		"--grpc-gateway-corsdomain=*",
 		"--grpc-gateway-port={0}".format(HTTP_PORT_NUM),
+		"--p2p-host-ip=" + PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		"--p2p-tcp-port={0}".format(DISCOVERY_TCP_PORT_NUM),
 		"--p2p-udp-port={0}".format(DISCOVERY_UDP_PORT_NUM),
 		"--min-sync-peers={0}".format(MIN_PEERS),
@@ -212,7 +260,11 @@ def get_beacon_config(
 			GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: genesis_data.files_artifact_uuid,
 		},
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
-		ready_conditions = cl_node_ready_conditions.get_ready_conditions(HTTP_PORT_ID)
+		ready_conditions = cl_node_ready_conditions.get_ready_conditions(HTTP_PORT_ID),
+		min_cpu = bn_min_cpu,
+		max_cpu = bn_max_cpu,
+		min_memory = bn_min_mem,
+		max_memory = bn_max_mem
 	)
 
 
@@ -224,6 +276,10 @@ def get_validator_config(
 		beacon_rpc_endpoint,
 		beacon_http_endpoint,
 		node_keystore_files,
+		v_min_cpu,
+		v_max_cpu,
+		v_min_mem,
+		v_max_mem,
 		extra_params,
 		prysm_password_relative_filepath,
 		prysm_password_artifact_uuid
@@ -244,6 +300,7 @@ def get_validator_config(
 		"--datadir=" + consensus_data_dirpath,
 		"--monitoring-port={0}".format(VALIDATOR_MONITORING_PORT_NUM),
 		"--verbosity=" + log_level,
+		"--suggested-fee-recipient=" + package_io.VALIDATING_REWARDS_ACCOUNT,
 		# TODO(old) SOMETHING ABOUT JWT
 		# vvvvvvvvvvvvvvvvvvv METRICS CONFIG vvvvvvvvvvvvvvvvvvvvv
 		"--disable-monitoring=false",
@@ -266,7 +323,11 @@ def get_validator_config(
 			VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: node_keystore_files.files_artifact_uuid,
 			PRYSM_PASSWORD_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: prysm_password_artifact_uuid,
 		},
-		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER
+		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
+		min_cpu = v_min_cpu,
+		max_cpu = v_max_cpu,
+		min_memory = v_min_mem,
+		max_memory = v_max_mem
 	)
 
 

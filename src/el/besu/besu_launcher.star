@@ -6,6 +6,7 @@ package_io = import_module("github.com/kurtosis-tech/eth-network-package/package
 
 # The dirpath of the execution data directory on the client container
 EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/opt/besu/execution-data"
+KZG_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/opt/besu/genesis/output/trusted_setup.txt"
 
 GENESIS_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/opt/besu/genesis"
 
@@ -13,6 +14,12 @@ RPC_PORT_NUM = 8545
 WS_PORT_NUM = 8546
 DISCOVERY_PORT_NUM = 30303
 ENGINE_HTTP_RPC_PORT_NUM = 8551
+
+# The min/max CPU/memory that the execution node can use
+EXECUTION_MIN_CPU = 100
+EXECUTION_MAX_CPU = 1000
+EXECUTION_MIN_MEMORY = 512
+EXECUTION_MAX_MEMORY = 2048
 
 # Port IDs
 RPC_PORT_ID = "rpc"
@@ -49,12 +56,31 @@ def launch(
 	participant_log_level,
 	global_log_level,
 	existing_el_clients,
+	el_min_cpu,
+	el_max_cpu,
+	el_min_mem,
+	el_max_mem,
 	extra_params):
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, BESU_LOG_LEVELS)
 
-	config, jwt_secret_json_filepath_on_client = get_config(launcher.network_id, launcher.el_genesis_data,
-									image, existing_el_clients, log_level, extra_params)
+	el_min_cpu = int(el_min_cpu) if int(el_min_cpu) > 0 else EXECUTION_MIN_CPU
+	el_max_cpu = int(el_max_cpu) if int(el_max_cpu) > 0 else EXECUTION_MAX_CPU
+	el_min_mem = int(el_min_mem) if int(el_min_mem) > 0 else EXECUTION_MIN_MEMORY
+	el_max_mem = int(el_max_mem) if int(el_max_mem) > 0 else EXECUTION_MAX_MEMORY
+
+	config, jwt_secret_json_filepath_on_client = get_config(
+		launcher.network_id,
+		launcher.el_genesis_data,
+		image,
+		existing_el_clients,
+		log_level,
+		el_min_cpu,
+		el_max_cpu,
+		el_min_mem,
+		el_max_mem,
+		extra_params
+	)
 
 	service = plan.add_service(service_name, config)
 
@@ -75,7 +101,17 @@ def launch(
 	)
 
 
-def get_config(network_id, genesis_data, image, existing_el_clients, log_level, extra_params):
+def get_config(
+	network_id,
+	genesis_data,
+	image,
+	existing_el_clients,
+	log_level,
+	el_min_cpu,
+	el_max_cpu,
+	el_min_mem,
+	el_max_mem,
+	extra_params):
 	if len(existing_el_clients) < 2:
 		fail("Besu node cannot be boot nodes, and due to a bug it requires two nodes to exist beforehand")
 
@@ -110,6 +146,7 @@ def get_config(network_id, genesis_data, image, existing_el_clients, log_level, 
 		"--engine-rpc-port={0}".format(ENGINE_HTTP_RPC_PORT_NUM),
 		"--sync-mode=FULL",
 		"--data-storage-format=BONSAI",
+		"--kzg-trusted-setup=" + KZG_DATA_DIRPATH_ON_CLIENT_CONTAINER
 	]
 
 	if len(existing_el_clients) > 0:
@@ -129,7 +166,11 @@ def get_config(network_id, genesis_data, image, existing_el_clients, log_level, 
 			GENESIS_DATA_DIRPATH_ON_CLIENT_CONTAINER: genesis_data.files_artifact_uuid
 		},
 		entrypoint = ENTRYPOINT_ARGS,
-		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER
+		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
+		min_cpu = el_min_cpu,
+		max_cpu = el_max_cpu,
+		min_memory = el_min_mem,
+		max_memory = el_max_mem
 	), jwt_secret_json_filepath_on_client
 
 

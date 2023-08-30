@@ -2,7 +2,9 @@ DEFAULT_EL_IMAGES = {
 	"geth":			"ethereum/client-go:latest",
 	"erigon":		"thorax/erigon:devel",
 	"nethermind":	"nethermind/nethermind:latest",
-	"besu":			"hyperledger/besu:develop"
+	"besu":			"hyperledger/besu:develop",
+	# TODO change this when an official image gets published
+	"reth": "h4ck3rk3y/reth"
 }
 
 DEFAULT_CL_IMAGES = {
@@ -16,6 +18,7 @@ DEFAULT_CL_IMAGES = {
 BESU_NODE_NAME = "besu"
 NETHERMIND_NODE_NAME = "nethermind"
 NIMBUS_NODE_NAME = "nimbus"
+RETH_NODE_NAME = "reth"
 
 ATTR_TO_BE_SKIPPED_AT_ROOT = ("network_params", "participants")
 
@@ -46,8 +49,8 @@ def parse_input(input_args):
 		el_client_type = participant["el_client_type"]
 		cl_client_type = participant["cl_client_type"]
 
-		if index == 0 and el_client_type in (BESU_NODE_NAME, NETHERMIND_NODE_NAME):
-			fail("besu/nethermind cant be the first participant")
+		if index == 0 and el_client_type in (BESU_NODE_NAME, NETHERMIND_NODE_NAME, RETH_NODE_NAME):
+			fail("besu/nethermind/reth cant be the first participant")
 		if cl_client_type in (NIMBUS_NODE_NAME) and (result["network_params"]["seconds_per_slot"] < 12):
 			fail("nimbus can't be run with slot times below 12 seconds")
 		el_image = participant["el_client_image"]
@@ -111,7 +114,20 @@ def parse_input(input_args):
 			beacon_extra_params=participant["beacon_extra_params"],
 			el_extra_params=participant["el_extra_params"],
 			validator_extra_params=participant["validator_extra_params"],
-			builder_network_params=participant["builder_network_params"]
+			builder_network_params=participant["builder_network_params"],
+			el_min_cpu=participant["el_min_cpu"],
+			el_max_cpu=participant["el_max_cpu"],
+			el_min_mem=participant["el_min_mem"],
+			el_max_mem=participant["el_max_mem"],
+			bn_min_cpu=participant["bn_min_cpu"],
+			bn_max_cpu=participant["bn_max_cpu"],
+			bn_min_mem=participant["bn_min_mem"],
+			bn_max_mem=participant["bn_max_mem"],
+			v_min_cpu=participant["v_min_cpu"],
+			v_max_cpu=participant["v_max_cpu"],
+			v_min_mem=participant["v_min_mem"],
+			v_max_mem=participant["v_max_mem"],
+			count=participant["count"]
 		) for participant in result["participants"]],
 		network_params=struct(
 			preregistered_validator_keys_mnemonic=result["network_params"]["preregistered_validator_keys_mnemonic"],
@@ -176,5 +192,17 @@ def default_participant():
 			"el_extra_params":			[],
 			"validator_extra_params": 	[],
 			"builder_network_params": 	None,
+			"el_min_cpu":				0,
+			"el_max_cpu":				0,
+			"el_min_mem":				0,
+			"el_max_mem":				0,
+			"bn_min_cpu":				0,
+			"bn_max_cpu":				0,
+			"bn_min_mem":				0,
+			"bn_max_mem":				0,
+			"v_min_cpu":				0,
+			"v_max_cpu":				0,
+			"v_min_mem":				0,
+			"v_max_mem":				0,
 			"count": 					1
 	}
