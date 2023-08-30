@@ -1,4 +1,4 @@
-IMAGE = "ethpandaops/ethereum-genesis-generator:2.0.0-rc.1"
+IMAGE = "ethpandaops/ethereum-genesis-generator:2.0.0-rc.6"
 
 SERVICE_NAME_PREFIX = "prelaunch-data-generator-"
 

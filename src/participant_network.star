@@ -8,7 +8,8 @@ geth = import_module("github.com/kurtosis-tech/eth-network-package/src/el/geth/g
 besu = import_module("github.com/kurtosis-tech/eth-network-package/src/el/besu/besu_launcher.star")
 erigon = import_module("github.com/kurtosis-tech/eth-network-package/src/el/erigon/erigon_launcher.star")
 nethermind = import_module("github.com/kurtosis-tech/eth-network-package/src/el/nethermind/nethermind_launcher.star")
-
+reth = import_module("github.com/kurtosis-tech/eth-network-package/src/el/reth/reth_launcher.star")
+ethereumjs = import_module("github.com/kurtosis-tech/eth-network-package/src/el/ethereumjs/ethereumjs_launcher.star")
 
 lighthouse = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/lighthouse/lighthouse_launcher.star")
 lodestar = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/lodestar/lodestar_launcher.star")
@@ -16,13 +17,12 @@ nimbus = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/nimb
 prysm = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/prysm/prysm_launcher.star")
 teku = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/teku/teku_launcher.star")
 
+snooper = import_module("github.com/kurtosis-tech/eth-network-package/src/snooper/snooper_engine_launcher.star")
+
 genesis_constants = import_module("github.com/kurtosis-tech/eth-network-package/src/prelaunch_data_generator/genesis_constants/genesis_constants.star")
 participant_module = import_module("github.com/kurtosis-tech/eth-network-package/src/participant.star")
 
 package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
-
-CL_CLIENT_SERVICE_NAME_PREFIX = "cl-client-"
-EL_CLIENT_SERVICE_NAME_PREFIX = "el-client-"
 
 BOOT_PARTICIPANT_INDEX = 0
 
@@ -37,16 +37,29 @@ CL_NODE_STARTUP_TIME = 5 * time.second
 
 CL_CLIENT_CONTEXT_BOOTNODE = None
 
-def launch_participant_network(plan, participants, network_params, global_log_level):
+GLOBAL_INDEX_ZFILL = {
+	"zfill_values": [(1,1), (2,10), (3,100), (4,1000), (5,10000)]
+}
+
+def launch_participant_network(plan, participants, network_params, global_log_level, parallel_keystore_generation = False):
 	num_participants = len(participants)
 
 	plan.print("Generating cl validator key stores")
-	cl_validator_data = cl_validator_keystores.generate_cl_validator_keystores(
-		plan,
-		network_params.preregistered_validator_keys_mnemonic,
-		num_participants,
-		network_params.num_validator_keys_per_node,
-	)
+	cl_validator_data = None
+	if not parallel_keystore_generation:
+		cl_validator_data = cl_validator_keystores.generate_cl_validator_keystores(
+			plan,
+			network_params.preregistered_validator_keys_mnemonic,
+			participants,
+			network_params.num_validator_keys_per_node
+		)
+	else:
+		cl_validator_data = cl_validator_keystores.generate_cl_valdiator_keystores_in_parallel(
+			plan,
+			network_params.preregistered_validator_keys_mnemonic,
+			participants,
+			network_params.num_validator_keys_per_node
+		)
 
 	plan.print(json.indent(json.encode(cl_validator_data)))
 
@@ -62,6 +75,7 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		network_params.deposit_contract_address,
 		network_params.genesis_delay,
 		network_params.seconds_per_slot,
+		network_params.capella_fork_epoch,
 		network_params.deneb_fork_epoch
 	)
 
@@ -71,41 +85,7 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 
 	geth_prefunded_keys_artifact_name = plan.upload_files(static_files.GETH_PREFUNDED_KEYS_DIRPATH, name="geth-prefunded-keys")
 
-	plan.print("Uploaded GETH files succesfully, launching EL participants")
-
-	el_launchers = {
-		package_io.EL_CLIENT_TYPE.geth : {"launcher": geth.new_geth_launcher(network_params.network_id, el_genesis_data, geth_prefunded_keys_artifact_name, genesis_constants.PRE_FUNDED_ACCOUNTS), "launch_method": geth.launch},
-		package_io.EL_CLIENT_TYPE.besu : {"launcher": besu.new_besu_launcher(network_params.network_id, el_genesis_data), "launch_method": besu.launch},
-		package_io.EL_CLIENT_TYPE.erigon : {"launcher": erigon.new_erigon_launcher(network_params.network_id, el_genesis_data), "launch_method": erigon.launch},
-		package_io.EL_CLIENT_TYPE.nethermind : {"launcher": nethermind.new_nethermind_launcher(el_genesis_data), "launch_method": nethermind.launch},
-	}
-
-	all_el_client_contexts = []
-
-	for index, participant in enumerate(participants):
-		el_client_type = participant.el_client_type
-
-		if el_client_type not in el_launchers:
-			fail("Unsupported launcher '{0}', need one of '{1}'".format(el_client_type, ",".join([el.name for el in el_launchers.keys()])))
-
-		el_launcher, launch_method = el_launchers[el_client_type]["launcher"], el_launchers[el_client_type]["launch_method"]
-		el_service_name = "{0}{1}".format(EL_CLIENT_SERVICE_NAME_PREFIX, index)
-
-		el_client_context = launch_method(
-			plan,
-			el_launcher,
-			el_service_name,
-			participant.el_client_image,
-			participant.el_client_log_level,
-			global_log_level,
-			all_el_client_contexts,
-			participant.el_extra_params
-		)
-
-		all_el_client_contexts.append(el_client_context)
-
-	plan.print("Succesfully added {0} EL participants".format(num_participants))
-
+	plan.print("Uploaded GETH files succesfully")
 
 	plan.print("Generating CL data")
 
@@ -124,10 +104,58 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		network_params.preregistered_validator_keys_mnemonic,
 		total_number_of_validator_keys,
 		network_params.genesis_delay,
+		network_params.capella_fork_epoch,
 		network_params.deneb_fork_epoch
 	)
 
 	plan.print(json.indent(json.encode(cl_genesis_data)))
+	plan.print("Generated CL genesis data succesfully, launching EL & CL Participants")
+
+	genesis_validators_root = cl_genesis_data.genesis_validators_root
+
+	el_launchers = {
+		package_io.EL_CLIENT_TYPE.geth : {"launcher": geth.new_geth_launcher(network_params.network_id, el_genesis_data, geth_prefunded_keys_artifact_name, genesis_constants.PRE_FUNDED_ACCOUNTS, genesis_validators_root), "launch_method": geth.launch},
+		package_io.EL_CLIENT_TYPE.besu : {"launcher": besu.new_besu_launcher(network_params.network_id, el_genesis_data), "launch_method": besu.launch},
+		package_io.EL_CLIENT_TYPE.erigon : {"launcher": erigon.new_erigon_launcher(network_params.network_id, el_genesis_data), "launch_method": erigon.launch},
+		package_io.EL_CLIENT_TYPE.nethermind : {"launcher": nethermind.new_nethermind_launcher(el_genesis_data), "launch_method": nethermind.launch},
+		package_io.EL_CLIENT_TYPE.reth : {"launcher": reth.new_reth_launcher(el_genesis_data), "launch_method": reth.launch},
+		package_io.EL_CLIENT_TYPE.ethereumjs : {"launcher": ethereumjs.new_ethereumjs_launcher(el_genesis_data), "launch_method": ethereumjs.launch},
+	}
+
+	all_el_client_contexts = []
+
+	for index, participant in enumerate(participants):
+		cl_client_type = participant.cl_client_type
+		el_client_type = participant.el_client_type
+
+		if el_client_type not in el_launchers:
+			fail("Unsupported launcher '{0}', need one of '{1}'".format(el_client_type, ",".join([el.name for el in el_launchers.keys()])))
+
+		el_launcher, launch_method = el_launchers[el_client_type]["launcher"], el_launchers[el_client_type]["launch_method"]
+
+		# Zero-pad the index using the calculated zfill value
+		index_str = zfill_custom(index+1, zfill_calculator(participants))
+
+		el_service_name = "el-{0}-{1}-{2}".format(index_str, el_client_type, cl_client_type)
+
+		el_client_context = launch_method(
+			plan,
+			el_launcher,
+			el_service_name,
+			participant.el_client_image,
+			participant.el_client_log_level,
+			global_log_level,
+			all_el_client_contexts,
+			participant.el_min_cpu,
+			participant.el_max_cpu,
+			participant.el_min_mem,
+			participant.el_max_mem,
+			participant.el_extra_params
+		)
+
+		all_el_client_contexts.append(el_client_context)
+
+	plan.print("Succesfully added {0} EL participants".format(num_participants))
 
 	plan.print("Launching CL network")
 
@@ -139,23 +167,41 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		package_io.CL_CLIENT_TYPE.teku: {"launcher": teku.new_teku_launcher(cl_genesis_data), "launch_method": teku.launch},
 	}
 
+	all_snooper_engine_contexts = []
 	all_cl_client_contexts = []
 	preregistered_validator_keys_for_nodes = cl_validator_data.per_node_keystores
 
 	for index, participant in enumerate(participants):
 		cl_client_type = participant.cl_client_type
+		el_client_type = participant.el_client_type
 
 		if cl_client_type not in cl_launchers:
 			fail("Unsupported launcher '{0}', need one of '{1}'".format(cl_client_type, ",".join([cl.name for cl in cl_launchers.keys()])))
 
 		cl_launcher, launch_method = cl_launchers[cl_client_type]["launcher"], cl_launchers[cl_client_type]["launch_method"]
-		cl_service_name = "{0}{1}".format(CL_CLIENT_SERVICE_NAME_PREFIX, index)
+
+		index_str = zfill_custom(index+1, zfill_calculator(participants))
+
+		cl_service_name = "cl-{0}-{1}-{2}".format(index_str, cl_client_type, el_client_type)
 
 		new_cl_node_validator_keystores = preregistered_validator_keys_for_nodes[index]
 
 		el_client_context = all_el_client_contexts[index]
 
 		cl_client_context = None
+		snooper_engine_context = None
+		if participant.snooper_enabled:
+			snooper_service_name = "snooper-{0}-{1}-{2}".format(index_str, cl_client_type, el_client_type)
+			snooper_image = package_io.DEFAULT_SNOOPER_IMAGE
+			snooper_engine_context = snooper.launch(
+				plan,
+				snooper_service_name,
+				snooper_image,
+				el_client_context,
+			)
+			plan.print("Succesfully added {0} snooper participants".format(snooper_engine_context))
+
+		all_snooper_engine_contexts.append(snooper_engine_context)
 
 		if index == 0:
 			cl_client_context = launch_method(
@@ -168,11 +214,21 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 				CL_CLIENT_CONTEXT_BOOTNODE,
 				el_client_context,
 				new_cl_node_validator_keystores,
+				participant.bn_min_cpu,
+				participant.bn_max_cpu,
+				participant.bn_min_mem,
+				participant.bn_max_mem,
+				participant.v_min_cpu,
+				participant.v_max_cpu,
+				participant.v_min_mem,
+				participant.v_max_mem,
+				participant.snooper_enabled,
+				snooper_engine_context,
 				participant.beacon_extra_params,
-				participant.validator_extra_params
+				participant.validator_extra_params,
 			)
 		else:
-			boot_cl_client_ctx = all_cl_client_contexts[0]
+			boot_cl_client_ctx = all_cl_client_contexts
 			cl_client_context = launch_method(
 				plan,
 				cl_launcher,
@@ -183,8 +239,18 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 				boot_cl_client_ctx,
 				el_client_context,
 				new_cl_node_validator_keystores,
+				participant.bn_min_cpu,
+				participant.bn_max_cpu,
+				participant.bn_min_mem,
+				participant.bn_max_mem,
+				participant.v_min_cpu,
+				participant.v_max_cpu,
+				participant.v_min_mem,
+				participant.v_max_mem,
+				participant.snooper_enabled,
+				snooper_engine_context,
 				participant.beacon_extra_params,
-				participant.validator_extra_params
+				participant.validator_extra_params,
 			)
 
 		all_cl_client_contexts.append(cl_client_context)
@@ -199,11 +265,22 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 
 		el_client_context = all_el_client_contexts[index]
 		cl_client_context = all_cl_client_contexts[index]
+		if participant.snooper_enabled:
+			snooper_engine_context = all_snooper_engine_contexts[index]
 
-		participant_entry = participant_module.new_participant(el_client_type, cl_client_type, el_client_context, cl_client_context)
+		participant_entry = participant_module.new_participant(el_client_type, cl_client_type, el_client_context, cl_client_context, snooper_engine_context)
 
 		all_participants.append(participant_entry)
 
 
-	return all_participants, final_genesis_timestamp
+	return all_participants, final_genesis_timestamp, genesis_validators_root
 
+def zfill_calculator(participants):
+	for zf, par in GLOBAL_INDEX_ZFILL['zfill_values']:
+		if len(participants) < par:
+			zfill = zf-1
+			return zfill
+			break
+
+def zfill_custom(value, width):
+    return ("0" * (width - len(str(value)))) + str(value)
