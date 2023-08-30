@@ -191,7 +191,7 @@ For example, this `eth-network-params.json` adds a second node, running a differ
     "slots_per_epoch": 32,
     "genesis_delay": 10,
     "capella_fork_epoch": 1,
-    "deneb_fork_epoch": 500,
+    "deneb_fork_epoch": 500
   },
   "global_client_log_level": "info",
   "parallel_keystore_generation": false
