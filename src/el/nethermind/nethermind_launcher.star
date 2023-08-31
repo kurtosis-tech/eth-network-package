@@ -143,10 +143,6 @@ def get_config(
 		# this is a repeated<proto type>, we convert it into Starlark
 		cmd.extend([param for param in extra_params])
 
-	if len(extra_params) > 0:
-		# we do this as extra_params is a repeated proto aray
-		cmd.extend([param for param in extra_params])
-
 	return ServiceConfig(
 		image = image,
 		ports = USED_PORTS,
