@@ -1,5 +1,3 @@
-IMAGE = "ethpandaops/ethereum-genesis-generator:2.0.0-rc.6"
-
 SERVICE_NAME_PREFIX = "prelaunch-data-generator-"
 
 # We use Docker exec commands to run the commands we need, so we override the default
@@ -9,22 +7,21 @@ ENTRYPOINT_ARGS = [
 ]
 
 # Launches a prelaunch data generator IMAGE, for use in various of the genesis generation
-def launch_prelaunch_data_generator(plan, files_artifact_mountpoints, service_name_suffix):
+def launch_prelaunch_data_generator(plan, files_artifact_mountpoints, service_name_suffix, capella_fork_epoch):
 
-	config = get_config(files_artifact_mountpoints)
+	config = get_config(files_artifact_mountpoints, capella_fork_epoch)
 
 	service_name = "{0}{1}".format(
 		SERVICE_NAME_PREFIX,
 		service_name_suffix,
 	)
-
 	plan.add_service(service_name, config)
 
 	return service_name
 
 
-def launch_prelaunch_data_generator_parallel(plan, files_artifact_mountpoints, service_name_suffixes):
-	config = get_config(files_artifact_mountpoints)
+def launch_prelaunch_data_generator_parallel(plan, files_artifact_mountpoints, service_name_suffixes, capella_fork_epoch):
+	config = get_config(files_artifact_mountpoints, capella_fork_epoch)
 	service_names = ["{0}{1}".format(
 		SERVICE_NAME_PREFIX,
 		service_name_suffix,
@@ -34,11 +31,13 @@ def launch_prelaunch_data_generator_parallel(plan, files_artifact_mountpoints, s
 	return service_names
 
 
-def get_config(
-	files_artifact_mountpoints,
-):
+def get_config(files_artifact_mountpoints, capella_fork_epoch):
+	if capella_fork_epoch > 0:
+		img = "ethpandaops/ethereum-genesis-generator:1.3.4"
+	else:
+		img = "ethpandaops/ethereum-genesis-generator:2.0.0-rc.6"
 	return ServiceConfig(
-		image = IMAGE,
+		image = img,
 		entrypoint = ENTRYPOINT_ARGS,
 		files = files_artifact_mountpoints,
 	)
