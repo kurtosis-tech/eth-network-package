@@ -76,7 +76,8 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		network_params.genesis_delay,
 		network_params.seconds_per_slot,
 		network_params.capella_fork_epoch,
-		network_params.deneb_fork_epoch
+		network_params.deneb_fork_epoch,
+		network_params.electra_fork_epoch
 	)
 
 	plan.print(json.indent(json.encode(el_genesis_data)))
@@ -105,7 +106,8 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		total_number_of_validator_keys,
 		network_params.genesis_delay,
 		network_params.capella_fork_epoch,
-		network_params.deneb_fork_epoch
+		network_params.deneb_fork_epoch,
+		network_params.electra_fork_epoch
 	)
 
 	plan.print(json.indent(json.encode(cl_genesis_data)))

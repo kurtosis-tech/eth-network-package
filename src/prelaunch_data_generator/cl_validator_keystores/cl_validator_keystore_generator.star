@@ -41,6 +41,7 @@ def generate_cl_validator_keystores(
 		{},
 		"cl-validator-keystore",
 		capella_fork_epoch=0, # It doesn't matter how the validator keys are generated
+		electra_fork_epoch=None # It doesn't matter how the validator keys are generated
 	)
 
 	all_output_dirpaths = []
@@ -136,7 +137,8 @@ def generate_cl_valdiator_keystores_in_parallel(
 		plan,
 		{},
 		["cl-validator-keystore-" + str(idx) for idx in range(0, len(participants))],
-		capella_fork_epoch=0)  # It doesn't matter how the validator keys are generated
+		capella_fork_epoch=0, # It doesn't matter how the validator keys are generated
+		electra_fork_epoch=None)  # It doesn't matter how the validator keys are generated
 
 	all_output_dirpaths = []
 	all_generation_commands = []
