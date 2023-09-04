@@ -294,7 +294,6 @@ def zfill_custom(value, width):
 # time.now() runs everytime bringing non determinism
 # note that the timestamp it returns is a string
 def get_final_genesis_timestamp(plan, padding):
-	plan.print(padding)
 	result = plan.run_python(
 		run = """
 import time
