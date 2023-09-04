@@ -64,7 +64,7 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 	plan.print(json.indent(json.encode(cl_validator_data)))
 
 	# We need to send the same genesis time to both the EL and the CL to ensure that timestamp based forking works as expected
-	final_genesis_timestamp = (time.now() + CL_GENESIS_DATA_GENERATION_TIME + num_participants*CL_NODE_STARTUP_TIME).unix
+	final_genesis_timestamp = get_final_genesis_timestamp(CL_GENESIS_DATA_GENERATION_TIME + num_participants*CL_NODE_STARTUP_TIME)
 	plan.print("Generating EL data")
 	el_genesis_generation_config_template = read_file(static_files.EL_GENESIS_GENERATION_CONFIG_TEMPLATE_FILEPATH)
 	el_genesis_data = el_genesis_data_generator.generate_el_genesis_data(
@@ -275,6 +275,7 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 
 	return all_participants, final_genesis_timestamp, genesis_validators_root
 
+
 def zfill_calculator(participants):
 	for zf, par in GLOBAL_INDEX_ZFILL['zfill_values']:
 		if len(participants) < par:
@@ -282,5 +283,22 @@ def zfill_calculator(participants):
 			return zfill
 			break
 
+
 def zfill_custom(value, width):
     return ("0" * (width - len(str(value)))) + str(value)
+
+
+# this is a python procedure so that Kurtosis can do idempotent runs
+# time.now() runs everytime bringing non determinism
+def get_final_genesis_timestamp(padding):
+	result = plan.run_python(
+		run = """
+import time
+import sys
+padding = int(sys.argv[1])
+print((time.now()+padding).unix)
+""",
+		args = [padding]
+	)
+	genesis_time = int(result.output)
+	return genesis_time
