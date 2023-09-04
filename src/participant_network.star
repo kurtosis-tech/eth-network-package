@@ -27,13 +27,15 @@ package_io = import_module("github.com/kurtosis-tech/eth-network-package/package
 BOOT_PARTICIPANT_INDEX = 0
 
 # The time that the CL genesis generation step takes to complete, based off what we've seen
-CL_GENESIS_DATA_GENERATION_TIME = 5 * time.second
+# This is in seconds
+CL_GENESIS_DATA_GENERATION_TIME = 5
 
 # Each CL node takes about this time to start up and start processing blocks, so when we create the CL
 #  genesis data we need to set the genesis timestamp in the future so that nodes don't miss important slots
 # (e.g. Altair fork)
 # TODO(old) Make this client-specific (currently this is Nimbus)
-CL_NODE_STARTUP_TIME = 5 * time.second
+# This is in seconds
+CL_NODE_STARTUP_TIME = 5
 
 CL_CLIENT_CONTEXT_BOOTNODE = None
 
@@ -64,7 +66,7 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 	plan.print(json.indent(json.encode(cl_validator_data)))
 
 	# We need to send the same genesis time to both the EL and the CL to ensure that timestamp based forking works as expected
-	final_genesis_timestamp = get_final_genesis_timestamp(CL_GENESIS_DATA_GENERATION_TIME + num_participants*CL_NODE_STARTUP_TIME)
+	final_genesis_timestamp = get_final_genesis_timestamp(plan, CL_GENESIS_DATA_GENERATION_TIME + num_participants*CL_NODE_STARTUP_TIME)
 	plan.print("Generating EL data")
 	el_genesis_generation_config_template = read_file(static_files.EL_GENESIS_GENERATION_CONFIG_TEMPLATE_FILEPATH)
 	el_genesis_data = el_genesis_data_generator.generate_el_genesis_data(
@@ -290,15 +292,16 @@ def zfill_custom(value, width):
 
 # this is a python procedure so that Kurtosis can do idempotent runs
 # time.now() runs everytime bringing non determinism
-def get_final_genesis_timestamp(padding):
+# note that the timestamp it returns is a string
+def get_final_genesis_timestamp(plan, padding):
+	plan.print(padding)
 	result = plan.run_python(
 		run = """
 import time
 import sys
 padding = int(sys.argv[1])
-print((time.now()+padding).unix)
+print(int(time.time()+padding), end="")
 """,
-		args = [padding]
+		args = [str(padding)]
 	)
-	genesis_time = int(result.output)
-	return genesis_time
+	return result.output
