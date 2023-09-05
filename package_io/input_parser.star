@@ -96,7 +96,7 @@ def parse_input(input_args):
 	if result["network_params"]["deneb_fork_epoch"] == 0:
 		fail("deneb_fork_epoch is 0 needs to be > 0 ")
 
-	if result["network_params"]["electra_fork_epoch"] != None and result["network_params"]["deneb_fork_epoch"] < result["network_params"]["electra_fork_epoch"]:
+	if result["network_params"]["electra_fork_epoch"] != None and result["network_params"]["deneb_fork_epoch"] <= result["network_params"]["electra_fork_epoch"]:
 		fail("electra_fork_epoch has to happen before deneb, for now")
 
 	if result["network_params"]["capella_fork_epoch"] > 0 and result["network_params"]["electra_fork_epoch"] != None:
