@@ -2,6 +2,7 @@ shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/share
 input_parser = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
 el_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/el/el_client_context.star")
 el_admin_node_info = import_module("github.com/kurtosis-tech/eth-network-package/src/el/el_admin_node_info.star")
+genesis_constants = import_module("github.com/kurtosis-tech/eth-network-package/src/prelaunch_data_generator/genesis_constants/genesis_constants.star")
 
 package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
 
@@ -151,7 +152,7 @@ def get_config(
 	# TODO productize a way to send custom env variables
 	if BUILDER_IMAGE_STR in image:
 		env_vars = {
-			"BUILDER_TX_SIGNING_KEY": "0xef5177cd0b6b21c87db5a0bf35d4084a8a57a9d6a064f86d51ac85f2b873a4e2"
+			"BUILDER_TX_SIGNING_KEY": "0x" + genesis_constants.PRE_FUNDED_ACCOUNTS[0].private_key
 		}
 
 	accounts_to_unlock_str = ",".join(account_addresses_to_unlock)
