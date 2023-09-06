@@ -121,8 +121,8 @@ def generate_cl_validator_keystores(
 		keystore_files,
 	)
 
-	# we cleanup as the data generation is done
-	plan.remove_service(service_name)
+	# TODO replace this with a task so that we can get the container removed
+	# we are removing  a call to remove_service for idempotency
 	return result
 
 
