@@ -47,7 +47,7 @@ def get_config(files_artifact_mountpoints, capella_fork_epoch, electra_fork_epoc
 	elif capella_fork_epoch == 0 and electra_fork_epoch == None: # we are running dencun
 		img = "ethpandaops/ethereum-genesis-generator:2.0.0-rc.6"
 	else: # we are running electra
-		img = "ethpandaops/ethereum-genesis-generator:3.0.0-rc.1"
+		img = "ethpandaops/ethereum-genesis-generator:3.0.0-rc.2"
 
 	return ServiceConfig(
 		image = img,

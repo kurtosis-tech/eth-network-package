@@ -96,8 +96,8 @@ def parse_input(input_args):
 	if result["network_params"]["deneb_fork_epoch"] == 0:
 		fail("deneb_fork_epoch is 0 needs to be > 0 ")
 
-	if result["network_params"]["electra_fork_epoch"] != None and result["network_params"]["deneb_fork_epoch"] <= result["network_params"]["electra_fork_epoch"]:
-		fail("electra_fork_epoch has to happen before deneb, for now")
+	if result["network_params"]["electra_fork_epoch"] != None and result["network_params"]["deneb_fork_epoch"] != None:
+		fail("electra_fork_epoch has to without defining deneb, for now")
 
 	if result["network_params"]["capella_fork_epoch"] > 0 and result["network_params"]["electra_fork_epoch"] != None:
 		fail("electra can only happen with capella genesis not bellatrix")
@@ -187,9 +187,8 @@ def default_network_params():
 		"slots_per_epoch":				32,
 		"genesis_delay":				120,
 		"capella_fork_epoch":			0,
-		# arbitrarily large while we sort out https://github.com/kurtosis-tech/eth-network-package/issues/42
-		# this will take 53~ hoours for now
-		"deneb_fork_epoch":				500,
+		# In order to not break electra fork, deneb has to be undefined
+		"deneb_fork_epoch":				None,
 		"electra_fork_epoch":			None
 	}
 
