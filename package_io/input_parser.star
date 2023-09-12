@@ -18,6 +18,10 @@ DEFAULT_CL_IMAGES = {
 NETHERMIND_NODE_NAME = "nethermind"
 NIMBUS_NODE_NAME = "nimbus"
 
+# Placeholder value for the deneb fork epoch if electra is being run
+# TODO: This is a hack, and should be removed once we electra is rebased on deneb
+HIGH_DENEB_VALUE_FORK_VERKLE = 20000
+
 ATTR_TO_BE_SKIPPED_AT_ROOT = ("network_params", "participants")
 
 def parse_input(input_args):
@@ -98,7 +102,7 @@ def parse_input(input_args):
 
 	if result["network_params"]["electra_fork_epoch"] != None:
 		# if electra is defined, then deneb needs to be set very high
-		result["network_params"]["deneb_fork_epoch"] = 200000
+		result["network_params"]["deneb_fork_epoch"] = HIGH_DENEB_VALUE_FORK_VERKLE
 
 	if result["network_params"]["capella_fork_epoch"] > 0 and result["network_params"]["electra_fork_epoch"] != None:
 		fail("electra can only happen with capella genesis not bellatrix")
