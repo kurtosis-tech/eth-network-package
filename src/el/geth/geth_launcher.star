@@ -77,9 +77,7 @@ def launch(
 	el_max_mem,
 	extra_params):
 
-
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, VERBOSITY_LEVELS)
-
 	el_min_cpu = el_min_cpu if int(el_min_cpu) > 0 else EXECUTION_MIN_CPU
 	el_max_cpu = el_max_cpu if int(el_max_cpu) > 0 else EXECUTION_MAX_CPU
 	el_min_mem = el_min_mem if int(el_min_mem) > 0 else EXECUTION_MIN_MEMORY
@@ -98,7 +96,8 @@ def launch(
 		el_max_cpu,
 		el_min_mem,
 		el_max_mem,
-		extra_params
+		extra_params,
+		launcher.electra_fork_epoch
 	)
 
 	service = plan.add_service(service_name, config)
@@ -116,7 +115,7 @@ def launch(
 		WS_PORT_NUM,
 		ENGINE_RPC_PORT_NUM,
 		jwt_secret,
-		service_name,
+		service_name
 	)
 
 def get_config(
@@ -132,7 +131,8 @@ def get_config(
 	el_max_cpu,
 	el_min_mem,
 	el_max_mem,
-	extra_params):
+	extra_params,
+	electra_fork_epoch):
 
 	genesis_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH, genesis_data.geth_genesis_json_relative_filepath)
 	jwt_secret_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH, genesis_data.jwt_secret_relative_filepath)
@@ -157,7 +157,8 @@ def get_config(
 
 	accounts_to_unlock_str = ",".join(account_addresses_to_unlock)
 
-	init_datadir_cmd_str = "geth init --datadir={0} {1}".format(
+	init_datadir_cmd_str = "geth init {0} --datadir={1} {2}".format(
+		"--cache.preimages" if electra_fork_epoch != None else "",
 		EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER,
 		genesis_json_filepath_on_client,
 	)
@@ -244,11 +245,12 @@ def get_config(
 	), jwt_secret_json_filepath_on_client
 
 
-def new_geth_launcher(network_id, el_genesis_data, prefunded_geth_keys_artifact_uuid, prefunded_account_info, genesis_validators_root = ""):
+def new_geth_launcher(network_id, el_genesis_data, prefunded_geth_keys_artifact_uuid, prefunded_account_info, genesis_validators_root = "", electra_fork_epoch = None):
 	return struct(
 		network_id = network_id,
 		el_genesis_data = el_genesis_data,
 		prefunded_account_info = prefunded_account_info,
 		prefunded_geth_keys_artifact_uuid = prefunded_geth_keys_artifact_uuid,
-		genesis_validators_root = genesis_validators_root
+		genesis_validators_root = genesis_validators_root,
+		electra_fork_epoch = electra_fork_epoch
 	)

@@ -18,6 +18,10 @@ DEFAULT_CL_IMAGES = {
 NETHERMIND_NODE_NAME = "nethermind"
 NIMBUS_NODE_NAME = "nimbus"
 
+# Placeholder value for the deneb fork epoch if electra is being run
+# TODO: This is a hack, and should be removed once we electra is rebased on deneb
+HIGH_DENEB_VALUE_FORK_VERKLE = 20000
+
 ATTR_TO_BE_SKIPPED_AT_ROOT = ("network_params", "participants")
 
 def parse_input(input_args):
@@ -96,6 +100,13 @@ def parse_input(input_args):
 	if result["network_params"]["deneb_fork_epoch"] == 0:
 		fail("deneb_fork_epoch is 0 needs to be > 0 ")
 
+	if result["network_params"]["electra_fork_epoch"] != None:
+		# if electra is defined, then deneb needs to be set very high
+		result["network_params"]["deneb_fork_epoch"] = HIGH_DENEB_VALUE_FORK_VERKLE
+
+	if result["network_params"]["capella_fork_epoch"] > 0 and result["network_params"]["electra_fork_epoch"] != None:
+		fail("electra can only happen with capella genesis not bellatrix")
+
 	required_num_validtors = 2 * result["network_params"]["slots_per_epoch"]
 	actual_num_validators = len(result["participants"]) * result["network_params"]["num_validator_keys_per_node"]
 	if required_num_validtors > actual_num_validators:
@@ -135,9 +146,10 @@ def parse_input(input_args):
 			deposit_contract_address=result["network_params"]["deposit_contract_address"],
 			seconds_per_slot=result["network_params"]["seconds_per_slot"],
 			slots_per_epoch=result["network_params"]["slots_per_epoch"],
+			genesis_delay=result["network_params"]["genesis_delay"],
 			capella_fork_epoch=result["network_params"]["capella_fork_epoch"],
 			deneb_fork_epoch=result["network_params"]["deneb_fork_epoch"],
-			genesis_delay=result["network_params"]["genesis_delay"],
+			electra_fork_epoch=result["network_params"]["electra_fork_epoch"]
 		),
 		wait_for_finalization=result["wait_for_finalization"],
 		wait_for_verifications=result["wait_for_verifications"],
@@ -180,9 +192,8 @@ def default_network_params():
 		"slots_per_epoch":				32,
 		"genesis_delay":				120,
 		"capella_fork_epoch":			0,
-		# arbitrarily large while we sort out https://github.com/kurtosis-tech/eth-network-package/issues/42
-		# this will take 53~ hoours for now
 		"deneb_fork_epoch":				500,
+		"electra_fork_epoch":			None
 	}
 
 def default_participant():

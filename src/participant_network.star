@@ -78,7 +78,8 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		network_params.genesis_delay,
 		network_params.seconds_per_slot,
 		network_params.capella_fork_epoch,
-		network_params.deneb_fork_epoch
+		network_params.deneb_fork_epoch,
+		network_params.electra_fork_epoch
 	)
 
 	plan.print(json.indent(json.encode(el_genesis_data)))
@@ -107,7 +108,8 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		total_number_of_validator_keys,
 		network_params.genesis_delay,
 		network_params.capella_fork_epoch,
-		network_params.deneb_fork_epoch
+		network_params.deneb_fork_epoch,
+		network_params.electra_fork_epoch
 	)
 
 	plan.print(json.indent(json.encode(cl_genesis_data)))
@@ -116,7 +118,7 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 	genesis_validators_root = cl_genesis_data.genesis_validators_root
 
 	el_launchers = {
-		package_io.EL_CLIENT_TYPE.geth : {"launcher": geth.new_geth_launcher(network_params.network_id, el_genesis_data, geth_prefunded_keys_artifact_name, genesis_constants.PRE_FUNDED_ACCOUNTS, genesis_validators_root), "launch_method": geth.launch},
+		package_io.EL_CLIENT_TYPE.geth : {"launcher": geth.new_geth_launcher(network_params.network_id, el_genesis_data, geth_prefunded_keys_artifact_name, genesis_constants.PRE_FUNDED_ACCOUNTS, genesis_validators_root, network_params.electra_fork_epoch), "launch_method": geth.launch},
 		package_io.EL_CLIENT_TYPE.besu : {"launcher": besu.new_besu_launcher(network_params.network_id, el_genesis_data), "launch_method": besu.launch},
 		package_io.EL_CLIENT_TYPE.erigon : {"launcher": erigon.new_erigon_launcher(network_params.network_id, el_genesis_data), "launch_method": erigon.launch},
 		package_io.EL_CLIENT_TYPE.nethermind : {"launcher": nethermind.new_nethermind_launcher(el_genesis_data), "launch_method": nethermind.launch},

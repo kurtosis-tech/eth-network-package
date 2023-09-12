@@ -7,9 +7,14 @@ ENTRYPOINT_ARGS = [
 ]
 
 # Launches a prelaunch data generator IMAGE, for use in various of the genesis generation
-def launch_prelaunch_data_generator(plan, files_artifact_mountpoints, service_name_suffix, capella_fork_epoch):
+def launch_prelaunch_data_generator(
+	plan,
+	files_artifact_mountpoints,
+	service_name_suffix,
+	capella_fork_epoch,
+	electra_fork_epoch):
 
-	config = get_config(files_artifact_mountpoints, capella_fork_epoch)
+	config = get_config(files_artifact_mountpoints, capella_fork_epoch, electra_fork_epoch)
 
 	service_name = "{0}{1}".format(
 		SERVICE_NAME_PREFIX,
@@ -20,8 +25,13 @@ def launch_prelaunch_data_generator(plan, files_artifact_mountpoints, service_na
 	return service_name
 
 
-def launch_prelaunch_data_generator_parallel(plan, files_artifact_mountpoints, service_name_suffixes, capella_fork_epoch):
-	config = get_config(files_artifact_mountpoints, capella_fork_epoch)
+def launch_prelaunch_data_generator_parallel(
+	plan,
+	files_artifact_mountpoints,
+	service_name_suffixes,
+	capella_fork_epoch,
+	electra_fork_epoch):
+	config = get_config(files_artifact_mountpoints, capella_fork_epoch, electra_fork_epoch)
 	service_names = ["{0}{1}".format(
 		SERVICE_NAME_PREFIX,
 		service_name_suffix,
@@ -31,11 +41,14 @@ def launch_prelaunch_data_generator_parallel(plan, files_artifact_mountpoints, s
 	return service_names
 
 
-def get_config(files_artifact_mountpoints, capella_fork_epoch):
-	if capella_fork_epoch > 0:
+def get_config(files_artifact_mountpoints, capella_fork_epoch, electra_fork_epoch):
+	if capella_fork_epoch > 0 and electra_fork_epoch == None: # we are running capella
 		img = "ethpandaops/ethereum-genesis-generator:1.3.4"
-	else:
+	elif capella_fork_epoch == 0 and electra_fork_epoch == None: # we are running dencun
 		img = "ethpandaops/ethereum-genesis-generator:2.0.0-rc.6"
+	else: # we are running electra
+		img = "ethpandaops/ethereum-genesis-generator:3.0.0-rc.2"
+
 	return ServiceConfig(
 		image = img,
 		entrypoint = ENTRYPOINT_ARGS,

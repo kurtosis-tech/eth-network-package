@@ -35,7 +35,8 @@ def generate_el_genesis_data(
 	genesis_delay,
 	seconds_per_slot,
 	capella_fork_epoch,
-	deneb_fork_epoch
+	deneb_fork_epoch,
+	electra_fork_epoch
 	):
 
 	template_data = genesis_generation_config_template_data(
@@ -45,7 +46,8 @@ def generate_el_genesis_data(
 		genesis_delay,
 		seconds_per_slot,
 		capella_fork_epoch,
-		deneb_fork_epoch
+		deneb_fork_epoch,
+		electra_fork_epoch
 	)
 
 	genesis_config_file_template_and_data = shared_utils.new_template_and_data(genesis_generation_config_template, template_data)
@@ -63,7 +65,8 @@ def generate_el_genesis_data(
 			CONFIG_DIRPATH_ON_GENERATOR: genesis_generation_config_artifact_name,
 		},
 		"el-genesis-data",
-		capella_fork_epoch
+		capella_fork_epoch,
+		electra_fork_epoch
 	)
 
 
@@ -148,7 +151,8 @@ def genesis_generation_config_template_data(
 	genesis_delay,
 	seconds_per_slot,
 	capella_fork_epoch,
-	deneb_fork_epoch):
+	deneb_fork_epoch,
+	electra_fork_epoch):
 	return {
 		"NetworkId": network_id,
 		"DepositContractAddress": deposit_contract_address,
@@ -156,5 +160,6 @@ def genesis_generation_config_template_data(
 		"GenesisDelay": genesis_delay,
 		"SecondsPerSlot": seconds_per_slot,
 		"CapellaForkEpoch": capella_fork_epoch,
-		"DenebForkEpoch": deneb_fork_epoch
+		"DenebForkEpoch": deneb_fork_epoch,
+		"ElectraForkEpoch": electra_fork_epoch,
 	}
