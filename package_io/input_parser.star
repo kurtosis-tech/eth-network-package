@@ -24,94 +24,7 @@ HIGH_DENEB_VALUE_FORK_VERKLE = 20000
 
 ATTR_TO_BE_SKIPPED_AT_ROOT = ("network_params", "participants")
 
-def parse_input(input_args):
-	result = default_input_args()
-	for attr in input_args:
-		value = input_args[attr]
-		# if its insterted we use the value inserted
-		if attr not in ATTR_TO_BE_SKIPPED_AT_ROOT and attr in input_args:
-			result[attr] = value
-		elif attr == "network_params":
-			for sub_attr in input_args["network_params"]:
-				sub_value = input_args["network_params"][sub_attr]
-				result["network_params"][sub_attr] = sub_value
-		elif attr == "participants":
-			participants = []
-			for participant in input_args["participants"]:
-				new_participant = default_participant()
-				for sub_attr, sub_value in participant.items():
-					# if the value is set in input we set it in participant
-					new_participant[sub_attr] = sub_value
-				for _ in range(0, new_participant["count"]):
-					participants.append(new_participant)
-			result["participants"] = participants
-
-	# validation of the above defaults
-	for index, participant in enumerate(result["participants"]):
-		el_client_type = participant["el_client_type"]
-		cl_client_type = participant["cl_client_type"]
-
-		if cl_client_type in (NIMBUS_NODE_NAME) and (result["network_params"]["seconds_per_slot"] < 12):
-			fail("nimbus can't be run with slot times below 12 seconds")
-		el_image = participant["el_client_image"]
-		if el_image == "":
-			default_image = DEFAULT_EL_IMAGES.get(el_client_type, "")
-			if default_image == "":
-				fail("{0} received an empty image name and we don't have a default for it".format(el_client_type))
-			participant["el_client_image"] = default_image
-
-		cl_image = participant["cl_client_image"]
-		if cl_image == "":
-			default_image = DEFAULT_CL_IMAGES.get(cl_client_type, "")
-			if default_image == "":
-				fail("{0} received an empty image name and we don't have a default for it".format(cl_client_type))
-			participant["cl_client_image"] = default_image
-
-		snooper_enabled = participant["snooper_enabled"]
-		if snooper_enabled == False:
-			default_snooper_enabled = result["snooper_enabled"]
-			if default_snooper_enabled:
-				participant["snooper_enabled"] = default_snooper_enabled
-
-		beacon_extra_params = participant.get("beacon_extra_params", [])
-		participant["beacon_extra_params"] = beacon_extra_params
-
-		validator_extra_params = participant.get("validator_extra_params", [])
-		participant["validator_extra_params"] = validator_extra_params
-
-	if result["network_params"]["network_id"].strip() == "":
-		fail("network_id is empty or spaces it needs to be of non zero length")
-
-	if result["network_params"]["deposit_contract_address"].strip() == "":
-		fail("deposit_contract_address is empty or spaces it needs to be of non zero length")
-
-	if result["network_params"]["preregistered_validator_keys_mnemonic"].strip() == "":
-		fail("preregistered_validator_keys_mnemonic is empty or spaces it needs to be of non zero length")
-
-	if result["network_params"]["slots_per_epoch"] == 0:
-		fail("slots_per_epoch is 0 needs to be > 0 ")
-
-	if result["network_params"]["seconds_per_slot"] == 0:
-		fail("seconds_per_slot is 0 needs to be > 0 ")
-
-	if result["network_params"]["genesis_delay"] == 0:
-		fail("genesis_delay is 0 needs to be > 0 ")
-
-	if result["network_params"]["deneb_fork_epoch"] == 0:
-		fail("deneb_fork_epoch is 0 needs to be > 0 ")
-
-	if result["network_params"]["electra_fork_epoch"] != None:
-		# if electra is defined, then deneb needs to be set very high
-		result["network_params"]["deneb_fork_epoch"] = HIGH_DENEB_VALUE_FORK_VERKLE
-
-	if result["network_params"]["capella_fork_epoch"] > 0 and result["network_params"]["electra_fork_epoch"] != None:
-		fail("electra can only happen with capella genesis not bellatrix")
-
-	required_num_validtors = 2 * result["network_params"]["slots_per_epoch"]
-	actual_num_validators = len(result["participants"]) * result["network_params"]["num_validator_keys_per_node"]
-	if required_num_validtors > actual_num_validators:
-		fail("required_num_validtors - {0} is greater than actual_num_validators - {1}".format(required_num_validtors, actual_num_validators))
-
+def get_args_from_parsed_input_results(result):
 	return struct(
 		participants=[struct(
 			el_client_type=participant["el_client_type"],
@@ -158,6 +71,102 @@ def parse_input(input_args):
 		snooper_enabled = result["snooper_enabled"],
 		parallel_keystore_generation = result["parallel_keystore_generation"]
 	)
+
+def parse_input(input_args):
+	result = default_input_args()
+	for attr in input_args:
+		value = input_args[attr]
+		# if its insterted we use the value inserted
+		if attr not in ATTR_TO_BE_SKIPPED_AT_ROOT and attr in input_args:
+			result[attr] = value
+		elif attr == "network_params":
+			for sub_attr in input_args["network_params"]:
+				sub_value = input_args["network_params"][sub_attr]
+				result["network_params"][sub_attr] = sub_value
+		elif attr == "participants":
+			participants = []
+			for participant in input_args["participants"]:
+				new_participant = default_participant()
+				for sub_attr, sub_value in participant.items():
+					# if the value is set in input we set it in participant
+					new_participant[sub_attr] = sub_value
+				for _ in range(0, new_participant["count"]):
+					participants.append(new_participant)
+			result["participants"] = participants
+
+	total_participant_count = 0
+	# validation of the above defaults
+	for index, participant in enumerate(result["participants"]):
+		el_client_type = participant["el_client_type"]
+		cl_client_type = participant["cl_client_type"]
+
+		if cl_client_type in (NIMBUS_NODE_NAME) and (result["network_params"]["seconds_per_slot"] < 12):
+			fail("nimbus can't be run with slot times below 12 seconds")
+		el_image = participant["el_client_image"]
+		if el_image == "":
+			default_image = DEFAULT_EL_IMAGES.get(el_client_type, "")
+			if default_image == "":
+				fail("{0} received an empty image name and we don't have a default for it".format(el_client_type))
+			participant["el_client_image"] = default_image
+
+		cl_image = participant["cl_client_image"]
+		if cl_image == "":
+			default_image = DEFAULT_CL_IMAGES.get(cl_client_type, "")
+			if default_image == "":
+				fail("{0} received an empty image name and we don't have a default for it".format(cl_client_type))
+			participant["cl_client_image"] = default_image
+
+		snooper_enabled = participant["snooper_enabled"]
+		if snooper_enabled == False:
+			default_snooper_enabled = result["snooper_enabled"]
+			if default_snooper_enabled:
+				participant["snooper_enabled"] = default_snooper_enabled
+
+		beacon_extra_params = participant.get("beacon_extra_params", [])
+		participant["beacon_extra_params"] = beacon_extra_params
+
+		validator_extra_params = participant.get("validator_extra_params", [])
+		participant["validator_extra_params"] = validator_extra_params
+
+		total_participant_count += participant["count"]
+
+	if result["network_params"]["network_id"].strip() == "":
+		fail("network_id is empty or spaces it needs to be of non zero length")
+
+	if result["network_params"]["deposit_contract_address"].strip() == "":
+		fail("deposit_contract_address is empty or spaces it needs to be of non zero length")
+
+	if result["network_params"]["preregistered_validator_keys_mnemonic"].strip() == "":
+		fail("preregistered_validator_keys_mnemonic is empty or spaces it needs to be of non zero length")
+
+	if result["network_params"]["slots_per_epoch"] == 0:
+		fail("slots_per_epoch is 0 needs to be > 0 ")
+
+	if result["network_params"]["seconds_per_slot"] == 0:
+		fail("seconds_per_slot is 0 needs to be > 0 ")
+
+	if result["network_params"]["genesis_delay"] == 0:
+		fail("genesis_delay is 0 needs to be > 0 ")
+
+	if result["network_params"]["deneb_fork_epoch"] == 0:
+		fail("deneb_fork_epoch is 0 needs to be > 0 ")
+
+	if result["network_params"]["electra_fork_epoch"] != None:
+		# if electra is defined, then deneb needs to be set very high
+		result["network_params"]["deneb_fork_epoch"] = HIGH_DENEB_VALUE_FORK_VERKLE
+
+	if result["network_params"]["capella_fork_epoch"] > 0 and result["network_params"]["electra_fork_epoch"] != None:
+		fail("electra can only happen with capella genesis not bellatrix")
+
+	if total_participant_count < 1:
+		total_participant_count = 1
+
+	required_num_validators = 2 * result["network_params"]["slots_per_epoch"]
+	actual_num_validators = total_participant_count * result["network_params"]["num_validator_keys_per_node"]
+	if required_num_validators > actual_num_validators:
+		fail("required_num_validators - {0} is greater than actual_num_validators - {1}".format(required_num_validators, actual_num_validators))
+
+	return result
 
 def get_client_log_level_or_default(participant_log_level, global_log_level, client_log_levels):
 	log_level = participant_log_level
