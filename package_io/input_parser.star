@@ -97,8 +97,8 @@ def parse_input(input_args):
 		fail("deneb_fork_epoch is 0 needs to be > 0 ")
 
 	if result["network_params"]["electra_fork_epoch"] != None:
-		# if electra is defined, then deneb needs to be undefined
-		result["network_params"]["deneb_fork_epoch"] = None
+		# if electra is defined, then deneb needs to be set very high
+		result["network_params"]["deneb_fork_epoch"] = 200000
 
 	if result["network_params"]["capella_fork_epoch"] > 0 and result["network_params"]["electra_fork_epoch"] != None:
 		fail("electra can only happen with capella genesis not bellatrix")
