@@ -157,7 +157,7 @@ def get_config(
 
 	accounts_to_unlock_str = ",".join(account_addresses_to_unlock)
 
-	init_datadir_cmd_str = "geth init --datadir={0} {1}".format(
+	init_datadir_cmd_str = "geth init --cache.preimages --datadir={0} {1}".format(
 		EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER,
 		genesis_json_filepath_on_client,
 	)
