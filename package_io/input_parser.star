@@ -24,7 +24,8 @@ HIGH_DENEB_VALUE_FORK_VERKLE = 20000
 
 ATTR_TO_BE_SKIPPED_AT_ROOT = ("network_params", "participants")
 
-def get_args_from_parsed_input_results(result):
+def get_args_with_default_values(args):
+	result = parse_input(args)
 	return struct(
 		participants=[struct(
 			el_client_type=participant["el_client_type"],
