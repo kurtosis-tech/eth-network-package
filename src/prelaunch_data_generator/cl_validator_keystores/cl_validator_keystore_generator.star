@@ -40,6 +40,7 @@ def generate_cl_validator_keystores(
 		plan,
 		{},
 		"cl-validator-keystore",
+		capella_fork_epoch=0, # It doesn't matter how the validator keys are generated
 	)
 
 	all_output_dirpaths = []
@@ -119,8 +120,8 @@ def generate_cl_validator_keystores(
 		keystore_files,
 	)
 
-	# we cleanup as the data generation is done
-	plan.remove_service(service_name)
+	# TODO replace this with a task so that we can get the container removed
+	# we are removing  a call to remove_service for idempotency
 	return result
 
 
@@ -131,7 +132,11 @@ def generate_cl_valdiator_keystores_in_parallel(
 	participants,
 	num_validators_per_node):
 
-	service_names = prelaunch_data_generator_launcher.launch_prelaunch_data_generator_parallel(plan, {}, ["cl-validator-keystore-" + str(idx) for idx in range(0, len(participants))])
+	service_names = prelaunch_data_generator_launcher.launch_prelaunch_data_generator_parallel(
+		plan,
+		{},
+		["cl-validator-keystore-" + str(idx) for idx in range(0, len(participants))],
+		capella_fork_epoch=0)  # It doesn't matter how the validator keys are generated
 
 	all_output_dirpaths = []
 	all_generation_commands = []

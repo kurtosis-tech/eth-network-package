@@ -70,6 +70,7 @@ def generate_cl_genesis_data(
 			EL_GENESIS_DIRPATH_ON_GENERATOR: el_genesis_data.files_artifact_uuid,
 		},
 		"cl-genesis-data",
+		capella_fork_epoch
 	)
 
 	all_dirpaths_to_create_on_generator = [
@@ -125,7 +126,7 @@ def generate_cl_genesis_data(
 
 	cl_genesis_generation_cmd = [
 		CL_GENESIS_GENERATION_BINARY_FILEPATH_ON_CONTAINER,
-		"merge",
+		"merge" if capella_fork_epoch > 0 else "capella",
 		"--config", shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, GENESIS_CONFIG_YML_FILENAME),
 		"--mnemonics", shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, MNEMONICS_YML_FILENAME),
 		"--eth1-config", shared_utils.path_join(EL_GENESIS_DIRPATH_ON_GENERATOR, el_genesis_data.geth_genesis_json_relative_filepath),
@@ -138,7 +139,7 @@ def generate_cl_genesis_data(
 	parsed_beacon_state_file_generation = [
 		CL_PARSED_BEACON_STATE_GENERATOR_BINARY,
 		"pretty",
-		"bellatrix",
+		"bellatrix" if capella_fork_epoch > 0 else "capella",
 		"BeaconState",
 		shared_utils.path_join(OUTPUT_DIRPATH_ON_GENERATOR, GENESIS_STATE_FILENAME),
 		">",
@@ -192,7 +193,16 @@ def generate_cl_genesis_data(
 
 
 
-def new_cl_genesis_config_template_data(network_id, seconds_per_slot, unix_timestamp, num_validator_keys_to_preregister, preregistered_validator_keys_mnemonic, deposit_contract_address, genesis_delay, capella_fork_epoch, deneb_fork_epoch):
+def new_cl_genesis_config_template_data(
+	network_id,
+	seconds_per_slot,
+	unix_timestamp,
+	num_validator_keys_to_preregister,
+	preregistered_validator_keys_mnemonic,
+	deposit_contract_address,
+	genesis_delay,
+	capella_fork_epoch,
+	deneb_fork_epoch):
 	return {
 		"NetworkId": network_id,
 		"SecondsPerSlot": seconds_per_slot,

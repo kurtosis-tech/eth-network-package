@@ -62,7 +62,8 @@ def generate_el_genesis_data(
 		{
 			CONFIG_DIRPATH_ON_GENERATOR: genesis_generation_config_artifact_name,
 		},
-		"el-genesis-data"
+		"el-genesis-data",
+		capella_fork_epoch
 	)
 
 
@@ -140,7 +141,14 @@ def generate_el_genesis_data(
 	return result
 
 
-def genesis_generation_config_template_data(network_id, deposit_contract_address, unix_timestamp, genesis_delay, seconds_per_slot, capella_fork_epoch, deneb_fork_epoch):
+def genesis_generation_config_template_data(
+	network_id,
+	deposit_contract_address,
+	unix_timestamp,
+	genesis_delay,
+	seconds_per_slot,
+	capella_fork_epoch,
+	deneb_fork_epoch):
 	return {
 		"NetworkId": network_id,
 		"DepositContractAddress": deposit_contract_address,
@@ -149,4 +157,4 @@ def genesis_generation_config_template_data(network_id, deposit_contract_address
 		"SecondsPerSlot": seconds_per_slot,
 		"CapellaForkEpoch": capella_fork_epoch,
 		"DenebForkEpoch": deneb_fork_epoch
-		}
+	}
