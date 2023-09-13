@@ -187,8 +187,13 @@ def get_config(
 	# For some reason, Nimbus takes in the parent directory of the config file (rather than the path to the config file itself)
 	genesis_config_parent_dirpath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNTPOINT_ON_CLIENT, shared_utils.path_dir(genesis_data.config_yml_rel_filepath))
 	jwt_secret_filepath = shared_utils.path_join(GENESIS_DATA_MOUNTPOINT_ON_CLIENT, genesis_data.jwt_secret_rel_filepath)
-	validator_keys_dirpath = shared_utils.path_join(VALIDATOR_KEYS_MOUNTPOINT_ON_CLIENT, node_keystore_files.nimbus_keys_relative_dirpath)
-	validator_secrets_dirpath = shared_utils.path_join(VALIDATOR_KEYS_MOUNTPOINT_ON_CLIENT, node_keystore_files.raw_secrets_relative_dirpath)
+
+	if node_keystore_files != None:
+		validator_keys_dirpath = shared_utils.path_join(VALIDATOR_KEYS_MOUNTPOINT_ON_CLIENT, node_keystore_files.nimbus_keys_relative_dirpath)
+		validator_secrets_dirpath = shared_utils.path_join(VALIDATOR_KEYS_MOUNTPOINT_ON_CLIENT, node_keystore_files.raw_secrets_relative_dirpath)
+	else:
+		validator_keys_dirpath = ""
+		validator_secrets_dirpath = ""
 
 	# Sources for these flags:
 	#  1) https://github.com/status-im/nimbus-eth2/blob/stable/scripts/launch_local_testnet.sh
@@ -264,7 +269,7 @@ def get_config(
 		cmd.extend([param for param in extra_params])
 
 	cmd_str = " ".join(cmd)
-
+	NODE_ARTIFACT_UUID = node_keystore_files.files_artifact_uuid if node_keystore_files != None else package_io.NO_ARTIFACT_UUID
 	return ServiceConfig(
 		image = image,
 		ports = USED_PORTS,
@@ -272,7 +277,7 @@ def get_config(
 		entrypoint = ENTRYPOINT_ARGS,
 		files = {
 			GENESIS_DATA_MOUNTPOINT_ON_CLIENT: genesis_data.files_artifact_uuid,
-			VALIDATOR_KEYS_MOUNTPOINT_ON_CLIENT: node_keystore_files.files_artifact_uuid
+			VALIDATOR_KEYS_MOUNTPOINT_ON_CLIENT: NODE_ARTIFACT_UUID
 		},
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		ready_conditions = cl_node_ready_conditions.get_ready_conditions(HTTP_PORT_ID),

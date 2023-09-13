@@ -50,6 +50,7 @@ def get_args_with_default_values(args):
 			v_max_cpu=participant["v_max_cpu"],
 			v_min_mem=participant["v_min_mem"],
 			v_max_mem=participant["v_max_mem"],
+			validator_count=participant["validator_count"],
 			snooper_enabled = participant["snooper_enabled"],
 			count=participant["count"]
 		) for participant in result["participants"]],
@@ -96,6 +97,7 @@ def parse_input(input_args):
 			result["participants"] = participants
 
 	total_participant_count = 0
+	actual_num_validators = 0
 	# validation of the above defaults
 	for index, participant in enumerate(result["participants"]):
 		el_client_type = participant["el_client_type"]
@@ -122,6 +124,13 @@ def parse_input(input_args):
 			default_snooper_enabled = result["snooper_enabled"]
 			if default_snooper_enabled:
 				participant["snooper_enabled"] = default_snooper_enabled
+
+		validator_count = participant["validator_count"]
+		if validator_count == None:
+			default_validator_count = result["network_params"]["num_validator_keys_per_node"]
+			participant["validator_count"] = default_validator_count
+
+		actual_num_validators += participant["validator_count"]
 
 		beacon_extra_params = participant.get("beacon_extra_params", [])
 		participant["beacon_extra_params"] = beacon_extra_params
@@ -163,7 +172,6 @@ def parse_input(input_args):
 		total_participant_count = 1
 
 	required_num_validators = 2 * result["network_params"]["slots_per_epoch"]
-	actual_num_validators = total_participant_count * result["network_params"]["num_validator_keys_per_node"]
 	if required_num_validators > actual_num_validators:
 		fail("required_num_validators - {0} is greater than actual_num_validators - {1}".format(required_num_validators, actual_num_validators))
 
@@ -230,6 +238,7 @@ def default_participant():
 			"v_max_cpu":				0,
 			"v_min_mem":				0,
 			"v_max_mem":				0,
+			"validator_count":			None,
 			"snooper_enabled":			False,
 			"count": 					1
 	}

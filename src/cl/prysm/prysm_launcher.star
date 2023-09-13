@@ -312,17 +312,22 @@ def get_validator_config(
 	):
 
 	consensus_data_dirpath = shared_utils.path_join(CONSENSUS_DATA_DIRPATH_ON_SERVICE_CONTAINER, service_name)
-	prysm_keystore_dirpath = shared_utils.path_join(VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.prysm_relative_dirpath)
-	prysm_password_filepath = shared_utils.path_join(PRYSM_PASSWORD_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, prysm_password_relative_filepath)
 	genesis_config_filepath = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, genesis_data.config_yml_rel_filepath)
+
+	if node_keystore_files != None:
+		validator_keys_dirpath = shared_utils.path_join(VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.prysm_relative_dirpath)
+		validator_secrets_dirpath = shared_utils.path_join(PRYSM_PASSWORD_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, prysm_password_relative_filepath)
+	else:
+		validator_keys_dirpath = ""
+		validator_secrets_dirpath = ""
 
 	cmd = [
 		"--accept-terms-of-use=true",#it's mandatory in order to run the node
 		"--chain-config-file=" + genesis_config_filepath,
 		"--beacon-rpc-gateway-provider=" + beacon_http_endpoint,
 		"--beacon-rpc-provider=" + beacon_rpc_endpoint,
-		"--wallet-dir=" + prysm_keystore_dirpath,
-		"--wallet-password-file=" + prysm_password_filepath,
+		"--wallet-dir=" + validator_keys_dirpath,
+		"--wallet-password-file=" + validator_secrets_dirpath,
 		"--datadir=" + consensus_data_dirpath,
 		"--monitoring-port={0}".format(VALIDATOR_MONITORING_PORT_NUM),
 		"--verbosity=" + log_level,
@@ -339,14 +344,14 @@ def get_validator_config(
 		# we do the for loop as otherwise its a proto repeated array
 		cmd.extend([param for param in extra_params])
 
-
+	NODE_ARTIFACT_UUID = node_keystore_files.files_artifact_uuid if node_keystore_files != None else package_io.NO_ARTIFACT_UUID
 	return ServiceConfig(
 		image = validator_image,
 		ports = VALIDATOR_NODE_USED_PORTS,
 		cmd = cmd,
 		files = {
 			GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: genesis_data.files_artifact_uuid,
-			VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: node_keystore_files.files_artifact_uuid,
+			VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: NODE_ARTIFACT_UUID,
 			PRYSM_PASSWORD_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: prysm_password_artifact_uuid,
 		},
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,

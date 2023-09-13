@@ -188,8 +188,13 @@ def get_config(
 	genesis_config_filepath = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, genesis_data.config_yml_rel_filepath)
 	genesis_ssz_filepath = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, genesis_data.genesis_ssz_rel_filepath)
 	jwt_secret_filepath = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, genesis_data.jwt_secret_rel_filepath)
-	validator_keys_dirpath = shared_utils.path_join(VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.teku_keys_relative_dirpath)
-	validator_secrets_dirpath = shared_utils.path_join(VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.teku_secrets_relative_dirpath)
+
+	if node_keystore_files != None:
+		validator_keys_dirpath = shared_utils.path_join(VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.teku_keys_relative_dirpath)
+		validator_secrets_dirpath = shared_utils.path_join(VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.teku_secrets_relative_dirpath)
+	else:
+		validator_keys_dirpath = ""
+		validator_secrets_dirpath = ""
 
 	cmd = [
 		# Needed because the generated keys are owned by root and the Teku image runs as the 'teku' user
@@ -248,7 +253,7 @@ def get_config(
 		cmd.extend([param for param in extra_params])
 
 	cmd_str = " ".join(cmd)
-
+	NODE_ARTIFACT_UUID = node_keystore_files.files_artifact_uuid if node_keystore_files != None else package_io.NO_ARTIFACT_UUID
 	return ServiceConfig(
 		image = image,
 		ports = USED_PORTS,
@@ -256,7 +261,7 @@ def get_config(
 		entrypoint = ENTRYPOINT_ARGS,
 		files = {
 			GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: genesis_data.files_artifact_uuid,
-			VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER: node_keystore_files.files_artifact_uuid,
+			VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER: NODE_ARTIFACT_UUID,
 		},
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		ready_conditions = cl_node_ready_conditions.get_ready_conditions(HTTP_PORT_ID),
