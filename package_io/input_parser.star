@@ -159,8 +159,6 @@ def parse_input(input_args):
 	if result["network_params"]["capella_fork_epoch"] > 0 and result["network_params"]["electra_fork_epoch"] != None:
 		fail("electra can only happen with capella genesis not bellatrix")
 
-	if total_participant_count < 1:
-		total_participant_count = 1
 
 	required_num_validators = 2 * result["network_params"]["slots_per_epoch"]
 	actual_num_validators = total_participant_count * result["network_params"]["num_validator_keys_per_node"]
