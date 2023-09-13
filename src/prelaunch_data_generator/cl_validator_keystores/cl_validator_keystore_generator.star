@@ -68,7 +68,7 @@ def generate_cl_validator_keystores(
 	command_str = " && ".join(all_sub_command_strs)
 
 	command_result = plan.exec(recipe = ExecRecipe(command=["sh", "-c", command_str]), service_name=service_name)
-	plan.assert(command_result["code"], "==", SUCCESSFUL_EXEC_CMD_EXIT_CODE)
+	plan.verify(command_result["code"], "==", SUCCESSFUL_EXEC_CMD_EXIT_CODE)
 
 	# Store outputs into files artifacts
 	keystore_files = []
@@ -111,7 +111,7 @@ def generate_cl_validator_keystores(
 		),
 	]
 	write_prysm_password_file_cmd_result = plan.exec(recipe = ExecRecipe(command=write_prysm_password_file_cmd), service_name=service_name)
-	plan.assert(write_prysm_password_file_cmd_result["code"], "==", SUCCESSFUL_EXEC_CMD_EXIT_CODE)
+	plan.verify(write_prysm_password_file_cmd_result["code"], "==", SUCCESSFUL_EXEC_CMD_EXIT_CODE)
 
 	prysm_password_artifact_name = plan.store_service_files(service_name, PRYSM_PASSWORD_FILEPATH_ON_GENERATOR, name = "prysm-password")
 
@@ -221,7 +221,7 @@ def generate_cl_valdiator_keystores_in_parallel(
 		),
 	]
 	write_prysm_password_file_cmd_result = plan.exec(recipe = ExecRecipe(command=write_prysm_password_file_cmd), service_name=service_names[0])
-	plan.assert(write_prysm_password_file_cmd_result["code"], "==", SUCCESSFUL_EXEC_CMD_EXIT_CODE)
+	plan.verify(write_prysm_password_file_cmd_result["code"], "==", SUCCESSFUL_EXEC_CMD_EXIT_CODE)
 
 	prysm_password_artifact_name = plan.store_service_files(service_names[0], PRYSM_PASSWORD_FILEPATH_ON_GENERATOR, name = "prysm-password")
 
