@@ -146,10 +146,11 @@ def generate_cl_valdiator_keystores_in_parallel(
 	all_output_dirpaths = []
 	all_generation_commands = []
 	finished_files_to_verify = []
-
+	running_total_validator_count = 0
 	for idx, participant in enumerate(participants):
 		output_dirpath = NODE_KEYSTORES_OUTPUT_DIRPATH_FORMAT_STR.format(idx)
-
+		if participant.validator_count == 0:
+			continue
 		start_index = idx * participant.validator_count
 		stop_index = (idx+1) * participant.validator_count
 		generation_finished_filepath = KEYSTORE_GENERATION_FINISHED_FILEPATH_FORMAT.format(start_index,stop_index)
@@ -186,13 +187,16 @@ def generate_cl_valdiator_keystores_in_parallel(
 	keystore_files = []
 	running_total_validator_count = 0
 	for idx, participant in enumerate(participants):
+		if participant.validator_count == 0:
+			continue
 		service_name = service_names[idx]
 		output_dirpath = all_output_dirpaths[idx]
 
 		running_total_validator_count += participant.validator_count
 		padded_idx = zfill_custom(idx+1, len(str(len(participants))))
-		keystore_start_index = idx * running_total_validator_count
-		keystore_stop_index = ((idx+1) * participant.validator_count - 1)
+		keystore_start_index = running_total_validator_count
+		running_total_validator_count += participant.validator_count
+		keystore_stop_index = (keystore_start_index + participant.validator_count) - 1
 		artifact_name = "{0}-{1}-{2}-{3}-{4}".format(
 			padded_idx,
 			participant.cl_client_type,
