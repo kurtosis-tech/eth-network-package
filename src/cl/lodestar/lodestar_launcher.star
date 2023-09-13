@@ -125,21 +125,23 @@ def launch(
 	# Launch validator node
 	beacon_http_url = "http://{0}:{1}".format(beacon_service.ip_address, beacon_http_port.number)
 
-	validator_config = get_validator_config(
-		validator_node_service_name,
-		launcher.cl_genesis_data,
-		image,
-		log_level,
-		beacon_http_url,
-		node_keystore_files,
-		v_min_cpu,
-		v_max_cpu,
-		v_min_mem,
-		v_max_mem,
-		extra_validator_params,
-	)
+	if node_keystore_files != None:
 
-	validator_service = plan.add_service(validator_node_service_name, validator_config)
+		validator_config = get_validator_config(
+			validator_node_service_name,
+			launcher.cl_genesis_data,
+			image,
+			log_level,
+			beacon_http_url,
+			node_keystore_files,
+			v_min_cpu,
+			v_max_cpu,
+			v_min_mem,
+			v_max_mem,
+			extra_validator_params,
+		)
+
+		validator_service = plan.add_service(validator_node_service_name, validator_config)
 
 	# TODO(old) add validator availability using the validator API: https://ethereum.github.io/beacon-APIs/?urls.primaryName=v1#/ValidatorRequiredApi | from eth2-merge-kurtosis-module
 
