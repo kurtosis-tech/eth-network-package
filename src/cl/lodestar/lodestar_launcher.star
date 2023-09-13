@@ -290,7 +290,6 @@ def get_validator_config(
 	else:
 		validator_keys_dirpath = ""
 		validator_secrets_dirpath = ""
-		NO_ARTIFACT_UUID = ""
 
 	cmd = [
 		"validator",

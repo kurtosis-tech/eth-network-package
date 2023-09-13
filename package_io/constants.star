@@ -33,4 +33,4 @@ DEFAULT_SNOOPER_IMAGE = "parithoshj/json_rpc_snoop:v1.0.0-x86"
 
 ARCHIVE_MODE = True
 
-NO_ARTIFACT_UUID = ""
+NO_ARTIFACT_UUID = {}
