@@ -110,7 +110,7 @@ def launch(
 		WS_PORT_NUM,
 		ENGINE_RPC_PORT_NUM,
 		jwt_secret,
-		metric_url,
+		reth_metrics_info,
 		service_name,
 	)
 
