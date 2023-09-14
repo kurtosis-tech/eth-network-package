@@ -1,7 +1,7 @@
 shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/shared_utils/shared_utils.star")
 input_parser = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
 cl_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_client_context.star")
-cl_node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_metrics_info.star")
+node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/node_metrics_info.star")
 cl_node_ready_conditions = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_ready_conditions.star")
 package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
 
@@ -188,8 +188,8 @@ def launch(
 	validator_metrics_port = validator_service.ports[VALIDATOR_MONITORING_PORT_ID]
 	validator_metrics_url = "{0}:{1}".format(validator_service.ip_address, validator_metrics_port.number)
 
-	beacon_node_metrics_info = cl_node_metrics.new_cl_node_metrics_info(beacon_node_service_name, METRICS_PATH, beacon_metrics_url)
-	validator_node_metrics_info = cl_node_metrics.new_cl_node_metrics_info(validator_node_service_name, METRICS_PATH, validator_metrics_url)
+	beacon_node_metrics_info = node_metrics.new_node_metrics_info(beacon_node_service_name, METRICS_PATH, beacon_metrics_url)
+	validator_node_metrics_info = node_metrics.new_node_metrics_info(validator_node_service_name, METRICS_PATH, validator_metrics_url)
 	nodes_metrics_info = [beacon_node_metrics_info, validator_node_metrics_info]
 
 
