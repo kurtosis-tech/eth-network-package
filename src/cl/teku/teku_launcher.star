@@ -244,12 +244,13 @@ def get_config(
 		"--metrics-port={0}".format(METRICS_PORT_NUM),
 		# ^^^^^^^^^^^^^^^^^^^ METRICS CONFIG ^^^^^^^^^^^^^^^^^^^^^
 	]
+
 	# Depending on whether we're using a node keystore, we'll need to add the validator flags
 	cmd = []
 	if node_keystore_files != None:
-		cmd.append(validator_copy)
-		cmd.append(beacon_start)
-		cmd.append(validator_flags)
+		cmd.extend(validator_copy)
+		cmd.extend(beacon_start)
+		cmd.extend(validator_flags)
 	else:
 		cmd.append(beacon_start)
 
@@ -266,14 +267,14 @@ def get_config(
 	files = {
 			GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: genesis_data.files_artifact_uuid,
 	}
-
+	cmd_str = " ".join(cmd)
 	if node_artifact_uuid != package_io.NO_ARTIFACT_UUID:
 		files[VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER] = node_artifact_uuid
 
 	return ServiceConfig(
 		image = image,
 		ports = USED_PORTS,
-		cmd = cmd,
+		cmd = [cmd_str],
 		entrypoint = ENTRYPOINT_ARGS,
 		files = files,
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,

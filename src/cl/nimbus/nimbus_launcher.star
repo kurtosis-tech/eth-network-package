@@ -197,7 +197,7 @@ def get_config(
 	#  2) https://github.com/status-im/nimbus-eth2/blob/67ab477a27e358d605e99bffeb67f98d18218eca/scripts/launch_local_testnet.sh#L417
 	# WARNING: Do NOT set the --max-peers flag here, as doing so to the exact number of nodes seems to mess things up!
 	# See: https://github.com/kurtosis-tech/eth2-merge-kurtosis-module/issues/26
-	cmd = [
+	validator_copy = [
 		"mkdir",
 		CONSENSUS_DATA_DIRPATH_IN_SERVICE_CONTAINER,
 		"-m",
@@ -220,6 +220,15 @@ def get_config(
 		"600",
 		VALIDATOR_SECRETS_DIRPATH_ON_SERVICE_CONTAINER + "/*",
 		"&&",
+	]
+
+	validator_flags = [
+		"--validators-dir=" + VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER,
+		"--secrets-dir=" + VALIDATOR_SECRETS_DIRPATH_ON_SERVICE_CONTAINER,
+		"--suggested-fee-recipient=" + package_io.VALIDATING_REWARDS_ACCOUNT,
+	]
+
+	beacon_start = [
 		DEFAULT_IMAGE_ENTRYPOINT,
 		"--non-interactive=true",
 		"--log-level=" + log_level,
@@ -235,9 +244,6 @@ def get_config(
 		"--rest-address=0.0.0.0",
 		"--rest-allow-origin=*",
 		"--rest-port={0}".format(HTTP_PORT_NUM),
-		"--validators-dir=" + VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER,
-		"--secrets-dir=" + VALIDATOR_SECRETS_DIRPATH_ON_SERVICE_CONTAINER,
-		"--suggested-fee-recipient=" + package_io.VALIDATING_REWARDS_ACCOUNT,
 		# There's a bug where if we don't set this flag, the Nimbus nodes won't work:
 		# https://discord.com/channels/641364059387854899/674288681737256970/922890280120750170
 		# https://github.com/status-im/nimbus-eth2/issues/2451
@@ -253,6 +259,16 @@ def get_config(
 		"--metrics-port={0}".format(METRICS_PORT_NUM),
 		# ^^^^^^^^^^^^^^^^^^^ METRICS CONFIG ^^^^^^^^^^^^^^^^^^^^^
 	]
+
+	# Depending on whether we're using a node keystore, we'll need to add the validator flags
+	cmd = []
+	if node_keystore_files != None:
+		cmd.extend(validator_copy)
+		cmd.extend(beacon_start)
+		cmd.extend(validator_flags)
+	else:
+		cmd.extend(beacon_start)
+
 	if bootnode_contexts == None:
 		# Copied from https://github.com/status-im/nimbus-eth2/blob/67ab477a27e358d605e99bffeb67f98d18218eca/scripts/launch_local_testnet.sh#L417
 		# See explanation there
