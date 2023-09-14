@@ -189,8 +189,8 @@ def get_config(
 	genesis_ssz_filepath = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, genesis_data.genesis_ssz_rel_filepath)
 	jwt_secret_filepath = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, genesis_data.jwt_secret_rel_filepath)
 
-	validator_keys_dirpath = shared_utils.path_join(VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.teku_keys_relative_dirpath)
-	validator_secrets_dirpath = shared_utils.path_join(VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.teku_secrets_relative_dirpath)
+	validator_keys_dirpath = shared_utils.path_join(VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.teku_keys_relative_dirpath if node_keystore_files != None else package_io.NO_ARTIFACT_UUID)
+	validator_secrets_dirpath = shared_utils.path_join(VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.teku_secrets_relative_dirpath if node_keystore_files != None else package_io.NO_ARTIFACT_UUID)
 
 
 	validator_copy = [
@@ -252,7 +252,7 @@ def get_config(
 		cmd.extend(beacon_start)
 		cmd.extend(validator_flags)
 	else:
-		cmd.append(beacon_start)
+		cmd.extend(beacon_start)
 
 	if bootnode_contexts != None:
 		cmd.append("--p2p-discovery-bootnodes="+",".join([ctx.enr for ctx in bootnode_contexts[:package_io.MAX_ENR_ENTRIES]]))
@@ -267,14 +267,13 @@ def get_config(
 	files = {
 			GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: genesis_data.files_artifact_uuid,
 	}
-	cmd_str = " ".join(cmd)
 	if node_artifact_uuid != package_io.NO_ARTIFACT_UUID:
 		files[VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER] = node_artifact_uuid
 
 	return ServiceConfig(
 		image = image,
 		ports = USED_PORTS,
-		cmd = [cmd_str],
+		cmd = cmd,
 		entrypoint = ENTRYPOINT_ARGS,
 		files = files,
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,

@@ -281,7 +281,6 @@ def get_config(
 	if len(extra_params) > 0:
 		cmd.extend([param for param in extra_params])
 
-	cmd_str = " ".join(cmd)
 	node_artifact_uuid = node_keystore_files.files_artifact_uuid if node_keystore_files != None else package_io.NO_ARTIFACT_UUID
 	files = {
 			GENESIS_DATA_MOUNTPOINT_ON_CLIENT: genesis_data.files_artifact_uuid,
@@ -292,7 +291,7 @@ def get_config(
 	return ServiceConfig(
 		image = image,
 		ports = USED_PORTS,
-		cmd = [cmd_str],
+		cmd = cmd,
 		entrypoint = ENTRYPOINT_ARGS,
 		files = files,
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
