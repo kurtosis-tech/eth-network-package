@@ -47,9 +47,10 @@ def generate_cl_validator_keystores(
 	all_sub_command_strs = []
 	running_total_validator_count = 0
 	for idx, participant in enumerate(participants):
-		if participant.validator_count == 0:
-			continue
 		output_dirpath = NODE_KEYSTORES_OUTPUT_DIRPATH_FORMAT_STR.format(idx)
+		if participant.validator_count == 0:
+			all_output_dirpaths.append(output_dirpath)
+			continue
 		start_index = running_total_validator_count
 		running_total_validator_count += participant.validator_count
 		stop_index = (start_index + participant.validator_count)
@@ -75,9 +76,10 @@ def generate_cl_validator_keystores(
 	keystore_files = []
 	running_total_validator_count = 0
 	for idx, participant in enumerate(participants):
-		if participant.validator_count == 0:
-			continue
 		output_dirpath = all_output_dirpaths[idx]
+		if participant.validator_count == 0:
+			keystore_files.append("dummy")
+			continue
 		padded_idx = zfill_custom(idx+1, len(str(len(participants))))
 		keystore_start_index = running_total_validator_count
 		running_total_validator_count += participant.validator_count
@@ -148,9 +150,10 @@ def generate_cl_valdiator_keystores_in_parallel(
 	finished_files_to_verify = []
 	running_total_validator_count = 0
 	for idx, participant in enumerate(participants):
-		if participant.validator_count == 0:
-			continue
 		output_dirpath = NODE_KEYSTORES_OUTPUT_DIRPATH_FORMAT_STR.format(idx)
+		if participant.validator_count == 0:
+			all_output_dirpaths.append(output_dirpath)
+			continue
 		start_index = idx * participant.validator_count
 		stop_index = (idx+1) * participant.validator_count
 		generation_finished_filepath = KEYSTORE_GENERATION_FINISHED_FILEPATH_FORMAT.format(start_index,stop_index)
@@ -188,6 +191,7 @@ def generate_cl_valdiator_keystores_in_parallel(
 	running_total_validator_count = 0
 	for idx, participant in enumerate(participants):
 		if participant.validator_count == 0:
+			keystore_files.append("dummy")
 			continue
 		service_name = service_names[idx]
 		output_dirpath = all_output_dirpaths[idx]
