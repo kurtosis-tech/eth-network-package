@@ -94,6 +94,7 @@ def launch(
 		WS_RPC_PORT_NUM,
 		ENGINE_RPC_PORT_NUM,
 		jwt_secret,
+		"", # Passing empty metric_url for now
 		service_name
 	)
 

@@ -97,6 +97,8 @@ def launch(
 
 	jwt_secret = shared_utils.read_file_from_service(plan, service_name, jwt_secret_json_filepath_on_client)
 
+	metric_url = "http://{0}:{1}".format(service.ip_address, METRICS_PORT_NUM)
+
 	return el_client_context.new_el_client_context(
 		"reth",
 		"", # reth has no enr
@@ -106,6 +108,7 @@ def launch(
 		WS_PORT_NUM,
 		ENGINE_RPC_PORT_NUM,
 		jwt_secret,
+		metric_url,
 		service_name,
 	)
 
