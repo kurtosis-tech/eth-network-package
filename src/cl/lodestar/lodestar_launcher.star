@@ -87,19 +87,12 @@ def launch(
 
 	beacon_node_service_name = "{0}".format(service_name)
 	validator_node_service_name = "{0}-{1}".format(service_name, VALIDATOR_SUFFIX_SERVICE_NAME)
-
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, LODESTAR_LOG_LEVELS)
 
 	bn_min_cpu = int(bn_min_cpu) if int(bn_min_cpu) > 0 else BEACON_MIN_CPU
 	bn_max_cpu = int(bn_max_cpu) if int(bn_max_cpu) > 0 else BEACON_MAX_CPU
 	bn_min_mem = int(bn_min_mem) if int(bn_min_mem) > 0 else BEACON_MIN_MEMORY
 	bn_max_mem = int(bn_max_mem) if int(bn_max_mem) > 0 else BEACON_MAX_MEMORY
-
-	v_min_cpu = int(v_min_cpu) if int(v_min_cpu) > 0 else VALIDATOR_MIN_CPU
-	v_max_cpu = int(v_max_cpu) if int(v_max_cpu) > 0 else VALIDATOR_MAX_CPU
-	v_min_mem = int(v_min_mem) if int(v_min_mem) > 0 else VALIDATOR_MIN_MEMORY
-	v_max_mem = int(v_max_mem) if int(v_max_mem) > 0 else VALIDATOR_MAX_MEMORY
-
 
 	# Launch Beacon node
 	beacon_config = get_beacon_config(
@@ -121,12 +114,14 @@ def launch(
 
 	beacon_http_port = beacon_service.ports[HTTP_PORT_ID]
 
-
-	# Launch validator node
 	beacon_http_url = "http://{0}:{1}".format(beacon_service.ip_address, beacon_http_port.number)
 
+	# Launch validator node if we have a keystore
 	if node_keystore_files != None:
-
+		v_min_cpu = int(v_min_cpu) if int(v_min_cpu) > 0 else VALIDATOR_MIN_CPU
+		v_max_cpu = int(v_max_cpu) if int(v_max_cpu) > 0 else VALIDATOR_MAX_CPU
+		v_min_mem = int(v_min_mem) if int(v_min_mem) > 0 else VALIDATOR_MIN_MEMORY
+		v_max_mem = int(v_max_mem) if int(v_max_mem) > 0 else VALIDATOR_MAX_MEMORY
 		validator_config = get_validator_config(
 			validator_node_service_name,
 			launcher.cl_genesis_data,
@@ -286,12 +281,9 @@ def get_validator_config(
 
 	genesis_config_filepath = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, genesis_data.config_yml_rel_filepath)
 
-	if node_keystore_files != None:
-		validator_keys_dirpath = shared_utils.path_join(VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.raw_keys_relative_dirpath)
-		validator_secrets_dirpath = shared_utils.path_join(VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.raw_secrets_relative_dirpath)
-	else:
-		validator_keys_dirpath = ""
-		validator_secrets_dirpath = ""
+	validator_keys_dirpath = shared_utils.path_join(VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.raw_keys_relative_dirpath)
+	validator_secrets_dirpath = shared_utils.path_join(VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.raw_secrets_relative_dirpath)
+
 
 	cmd = [
 		"validator",

@@ -105,11 +105,6 @@ def launch(
 	bn_min_mem = int(bn_min_mem) if int(bn_min_mem) > 0 else BEACON_MIN_MEMORY
 	bn_max_mem = int(bn_max_mem) if int(bn_max_mem) > 0 else BEACON_MAX_MEMORY
 
-	v_min_cpu = int(v_min_cpu) if int(v_min_cpu) > 0 else VALIDATOR_MIN_CPU
-	v_max_cpu = int(v_max_cpu) if int(v_max_cpu) > 0 else VALIDATOR_MAX_CPU
-	v_min_mem = int(v_min_mem) if int(v_min_mem) > 0 else VALIDATOR_MIN_MEMORY
-	v_max_mem = int(v_max_mem) if int(v_max_mem) > 0 else VALIDATOR_MAX_MEMORY
-
 	# Launch Beacon node
 	beacon_config = get_beacon_config(
 		launcher.genesis_data,
@@ -130,23 +125,28 @@ def launch(
 
 	beacon_http_port = beacon_service.ports[BEACON_HTTP_PORT_ID]
 
-	# Launch validator node
+	# Launch validator node if we have a keystore
 	beacon_http_url = "http://{0}:{1}".format(beacon_service.ip_address, beacon_http_port.number)
+	if node_keystore_files != None:
+		v_min_cpu = int(v_min_cpu) if int(v_min_cpu) > 0 else VALIDATOR_MIN_CPU
+		v_max_cpu = int(v_max_cpu) if int(v_max_cpu) > 0 else VALIDATOR_MAX_CPU
+		v_min_mem = int(v_min_mem) if int(v_min_mem) > 0 else VALIDATOR_MIN_MEMORY
+		v_max_mem = int(v_max_mem) if int(v_max_mem) > 0 else VALIDATOR_MAX_MEMORY
 
-	validator_config = get_validator_config(
-		launcher.genesis_data,
-		image,
-		log_level,
-		beacon_http_url,
-		node_keystore_files,
-		v_min_cpu,
-		v_max_cpu,
-		v_min_mem,
-		v_max_mem,
-		extra_validator_params,
-	)
+		validator_config = get_validator_config(
+			launcher.genesis_data,
+			image,
+			log_level,
+			beacon_http_url,
+			node_keystore_files,
+			v_min_cpu,
+			v_max_cpu,
+			v_min_mem,
+			v_max_mem,
+			extra_validator_params,
+		)
 
-	validator_service = plan.add_service(validator_node_service_name, validator_config)
+		validator_service = plan.add_service(validator_node_service_name, validator_config)
 
 	# TODO(old) add validator availability using the validator API: https://ethereum.github.io/beacon-APIs/?urls.primaryName=v1#/ValidatorRequiredApi | from eth2-merge-kurtosis-module
 	beacon_node_identity_recipe = GetHttpRequestRecipe(
@@ -166,12 +166,14 @@ def launch(
 	beacon_metrics_port = beacon_service.ports[BEACON_METRICS_PORT_ID]
 	beacon_metrics_url = "{0}:{1}".format(beacon_service.ip_address, beacon_metrics_port.number)
 
-	validator_metrics_port = validator_service.ports[VALIDATOR_METRICS_PORT_ID]
-	validator_metrics_url = "{0}:{1}".format(validator_service.ip_address, validator_metrics_port.number)
+	if node_keystore_files != None:
+		validator_metrics_port = validator_service.ports[VALIDATOR_METRICS_PORT_ID]
+		validator_metrics_url = "{0}:{1}".format(validator_service.ip_address, validator_metrics_port.number)
+		validator_node_metrics_info = cl_node_metrics.new_cl_node_metrics_info(validator_node_service_name, METRICS_PATH, validator_metrics_url)
 
 	beacon_node_metrics_info = cl_node_metrics.new_cl_node_metrics_info(beacon_node_service_name, METRICS_PATH, beacon_metrics_url)
-	validator_node_metrics_info = cl_node_metrics.new_cl_node_metrics_info(validator_node_service_name, METRICS_PATH, validator_metrics_url)
-	nodes_metrics_info = [beacon_node_metrics_info, validator_node_metrics_info]
+
+	nodes_metrics_info = [beacon_node_metrics_info, validator_node_metrics_info if node_keystore_files != None else None]
 
 	return cl_client_context.new_cl_client_context(
 		"lighthouse",
@@ -317,12 +319,8 @@ def get_validator_config(
 	# For some reason, Lighthouse takes in the parent directory of the config file (rather than the path to the config file itself)
 	genesis_config_parent_dirpath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNTPOINT_ON_CLIENTS, shared_utils.path_dir(genesis_data.config_yml_rel_filepath))
 
-	if node_keystore_files != None:
-		validator_keys_dirpath = shared_utils.path_join(VALIDATOR_KEYS_MOUNTPOINT_ON_CLIENTS, node_keystore_files.raw_keys_relative_dirpath)
-		validator_secrets_dirpath = shared_utils.path_join(VALIDATOR_KEYS_MOUNTPOINT_ON_CLIENTS, node_keystore_files.raw_secrets_relative_dirpath)
-	else:
-		validator_keys_dirpath = ""
-		validator_secrets_dirpath = ""
+	validator_keys_dirpath = shared_utils.path_join(VALIDATOR_KEYS_MOUNTPOINT_ON_CLIENTS, node_keystore_files.raw_keys_relative_dirpath)
+	validator_secrets_dirpath = shared_utils.path_join(VALIDATOR_KEYS_MOUNTPOINT_ON_CLIENTS, node_keystore_files.raw_secrets_relative_dirpath)
 
 	cmd = [
 		"lighthouse",

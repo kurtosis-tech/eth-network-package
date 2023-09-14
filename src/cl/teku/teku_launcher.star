@@ -189,14 +189,11 @@ def get_config(
 	genesis_ssz_filepath = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, genesis_data.genesis_ssz_rel_filepath)
 	jwt_secret_filepath = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, genesis_data.jwt_secret_rel_filepath)
 
-	if node_keystore_files != None:
-		validator_keys_dirpath = shared_utils.path_join(VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.teku_keys_relative_dirpath)
-		validator_secrets_dirpath = shared_utils.path_join(VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.teku_secrets_relative_dirpath)
-	else:
-		validator_keys_dirpath = ""
-		validator_secrets_dirpath = ""
+	validator_keys_dirpath = shared_utils.path_join(VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.teku_keys_relative_dirpath)
+	validator_secrets_dirpath = shared_utils.path_join(VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.teku_secrets_relative_dirpath)
 
-	cmd = [
+
+	validator_copy = [
 		# Needed because the generated keys are owned by root and the Teku image runs as the 'teku' user
 		"cp",
 		"-R",
@@ -208,7 +205,16 @@ def get_config(
 		"-R",
 		validator_secrets_dirpath,
 		DEST_VALIDATOR_SECRETS_DIRPATH_IN_SERVICE_CONTAINER,
-		"&&",
+		"&&"
+	]
+	validator_flags = [
+		"--validator-keys={0}:{1}".format(
+			DEST_VALIDATOR_KEYS_DIRPATH_IN_SERVICE_CONTAINER,
+			DEST_VALIDATOR_SECRETS_DIRPATH_IN_SERVICE_CONTAINER,
+		),
+		"--validators-proposer-default-fee-recipient=" + package_io.VALIDATING_REWARDS_ACCOUNT,
+	]
+	beacon_start = [
 		TEKU_BINARY_FILEPATH_IN_IMAGE,
 		"--logging=" + log_level,
 		"--log-destination=CONSOLE",
@@ -228,13 +234,8 @@ def get_config(
 		"--rest-api-port={0}".format(HTTP_PORT_NUM),
 		"--rest-api-host-allowlist=*",
 		"--data-storage-non-canonical-blocks-enabled=true",
-		"--validator-keys={0}:{1}".format(
-			DEST_VALIDATOR_KEYS_DIRPATH_IN_SERVICE_CONTAINER,
-			DEST_VALIDATOR_SECRETS_DIRPATH_IN_SERVICE_CONTAINER,
-		),
 		"--ee-jwt-secret-file={0}".format(jwt_secret_filepath),
 		"--ee-endpoint=" + EXECUTION_ENGINE_ENDPOINT,
-		"--validators-proposer-default-fee-recipient=" + package_io.VALIDATING_REWARDS_ACCOUNT,
 		# vvvvvvvvvvvvvvvvvvv METRICS CONFIG vvvvvvvvvvvvvvvvvvvvv
 		"--metrics-enabled",
 		"--metrics-interface=0.0.0.0",
@@ -243,6 +244,14 @@ def get_config(
 		"--metrics-port={0}".format(METRICS_PORT_NUM),
 		# ^^^^^^^^^^^^^^^^^^^ METRICS CONFIG ^^^^^^^^^^^^^^^^^^^^^
 	]
+	# Depending on whether we're using a node keystore, we'll need to add the validator flags
+	cmd = []
+	if node_keystore_files != None:
+		cmd.append(validator_copy)
+		cmd.append(beacon_start)
+		cmd.append(validator_flags)
+	else:
+		cmd.append(beacon_start)
 
 	if bootnode_contexts != None:
 		cmd.append("--p2p-discovery-bootnodes="+",".join([ctx.enr for ctx in bootnode_contexts[:package_io.MAX_ENR_ENTRIES]]))
@@ -252,7 +261,6 @@ def get_config(
 		# we do the list comprehension as the default extra_params is a proto repeated string
 		cmd.extend([param for param in extra_params])
 
-	cmd_str = " ".join(cmd)
 	node_artifact_uuid = node_keystore_files.files_artifact_uuid if node_keystore_files != None else package_io.NO_ARTIFACT_UUID
 
 	files = {
@@ -265,7 +273,7 @@ def get_config(
 	return ServiceConfig(
 		image = image,
 		ports = USED_PORTS,
-		cmd = [cmd_str],
+		cmd = cmd,
 		entrypoint = ENTRYPOINT_ARGS,
 		files = files,
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
