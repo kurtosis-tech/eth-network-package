@@ -205,7 +205,7 @@ def get_config(
 		"-R",
 		validator_secrets_dirpath,
 		DEST_VALIDATOR_SECRETS_DIRPATH_IN_SERVICE_CONTAINER,
-		"&&"
+		"&&",
 	]
 	validator_flags = [
 		"--validator-keys={0}:{1}".format(
@@ -269,11 +269,11 @@ def get_config(
 	}
 	if node_artifact_uuid != package_io.NO_ARTIFACT_UUID:
 		files[VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER] = node_artifact_uuid
-
+	cmd_str = " ".join(cmd)
 	return ServiceConfig(
 		image = image,
 		ports = USED_PORTS,
-		cmd = cmd,
+		cmd = [cmd_str],
 		entrypoint = ENTRYPOINT_ARGS,
 		files = files,
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,

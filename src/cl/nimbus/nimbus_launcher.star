@@ -287,11 +287,11 @@ def get_config(
 	}
 	if node_artifact_uuid != package_io.NO_ARTIFACT_UUID:
 		files[VALIDATOR_KEYS_MOUNTPOINT_ON_CLIENT] = node_artifact_uuid
-
+	cmd_str = " ".join(cmd)
 	return ServiceConfig(
 		image = image,
 		ports = USED_PORTS,
-		cmd = cmd,
+		cmd = [cmd_str],
 		entrypoint = ENTRYPOINT_ARGS,
 		files = files,
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
