@@ -3,6 +3,7 @@ input_parser = import_module("github.com/kurtosis-tech/eth-network-package/packa
 el_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/el/el_client_context.star")
 el_admin_node_info = import_module("github.com/kurtosis-tech/eth-network-package/src/el/el_admin_node_info.star")
 
+node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/node_metrics_info.star")
 package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
 
 
@@ -11,7 +12,7 @@ WS_PORT_NUM			= 8546
 WS_PORT_ENGINE_NUM 	= 8547
 DISCOVERY_PORT_NUM	= 30303
 ENGINE_RPC_PORT_NUM = 8551
-#METRICS_PORT_NUM = 9001
+METRICS_PORT_NUM    = 9001
 
 # The min/max CPU/memory that the execution node can use
 EXECUTION_MIN_CPU = 100
@@ -26,11 +27,13 @@ TCP_DISCOVERY_PORT_ID = "tcp-discovery"
 UDP_DISCOVERY_PORT_ID = "udp-discovery"
 ENGINE_RPC_PORT_ID	= "engine-rpc"
 WS_PORT_ENGINE_ID	= "ws-engine"
-#METRICS_PORT_ID = "metrics"
+METRICS_PORT_ID     = "metrics"
 
 GENESIS_DATA_MOUNT_DIRPATH = "/genesis"
 
 PREFUNDED_KEYS_MOUNT_DIRPATH = "/prefunded-keys"
+
+METRICS_PATH = "/metrics"
 
 # The dirpath of the execution data directory on the client container
 EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/execution-data"
@@ -44,7 +47,7 @@ USED_PORTS = {
 	TCP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.TCP_PROTOCOL),
 	UDP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.UDP_PROTOCOL),
 	ENGINE_RPC_PORT_ID: shared_utils.new_port_spec(ENGINE_RPC_PORT_NUM, shared_utils.TCP_PROTOCOL),
-#    METRICS_PORT_ID: shared_utils.new_port_spec(METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL)
+    # METRICS_PORT_ID: shared_utils.new_port_spec(METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL)
 }
 
 ENTRYPOINT_ARGS = []
@@ -100,6 +103,10 @@ def launch(
 
 	jwt_secret = shared_utils.read_file_from_service(plan, service_name, jwt_secret_json_filepath_on_client)
 
+	# TODO: Passing empty string for metrics_url for now
+	# metrics_url = "http://{0}:{1}".format(service.ip_address, METRICS_PORT_NUM)
+	ethjs_metrics_info = node_metrics.new_node_metrics_info(service_name, METRICS_PATH, "")
+
 	return el_client_context.new_el_client_context(
 		"ethereumjs",
 		"", # ethereumjs has no enr
@@ -109,7 +116,7 @@ def launch(
 		WS_PORT_NUM,
 		ENGINE_RPC_PORT_NUM,
 		jwt_secret,
-		"", # TODO: Passing empty metric_url for now
+		ethjs_metrics_info,
 		service_name,
 	)
 
