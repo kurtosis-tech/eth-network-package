@@ -170,6 +170,7 @@ def parse_input(input_args):
 
 
 	required_num_validators = 2 * result["network_params"]["slots_per_epoch"]
+	actual_num_validators = total_participant_count * result["network_params"]["num_validator_keys_per_node"]
 	if required_num_validators > actual_num_validators:
 		fail("required_num_validators - {0} is greater than actual_num_validators - {1}".format(required_num_validators, actual_num_validators))
 
