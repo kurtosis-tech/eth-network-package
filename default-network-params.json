@@ -4,11 +4,12 @@
       "el_client_type": "geth",
       "el_client_image": "",
       "el_client_log_level": "",
+      "el_extra_params": [],
+      "el_extra_env_vars": {},
       "cl_client_type": "lighthouse",
       "cl_client_image": "",
       "cl_client_log_level": "",
       "beacon_extra_params": [],
-      "el_extra_params": [],
       "validator_extra_params": [],
       "builder_network_params": null,
       "count": 1

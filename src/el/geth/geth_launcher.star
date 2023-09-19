@@ -75,7 +75,8 @@ def launch(
 	el_max_cpu,
 	el_min_mem,
 	el_max_mem,
-	extra_params):
+	extra_params,
+	extra_env_vars):
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, VERBOSITY_LEVELS)
 	el_min_cpu = el_min_cpu if int(el_min_cpu) > 0 else EXECUTION_MIN_CPU
@@ -97,6 +98,7 @@ def launch(
 		el_min_mem,
 		el_max_mem,
 		extra_params,
+		extra_env_vars,
 		launcher.electra_fork_epoch
 	)
 
@@ -132,6 +134,7 @@ def get_config(
 	el_min_mem,
 	el_max_mem,
 	extra_params,
+	extra_env_vars,
 	electra_fork_epoch):
 
 	genesis_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH, genesis_data.geth_genesis_json_relative_filepath)
@@ -149,11 +152,12 @@ def get_config(
 
 	# the key here is the private key of the first genesis account
 	# note that the mev builder is the one that needs this and not other nodes
-	# TODO productize a way to send custom env variables
 	if BUILDER_IMAGE_STR in image:
-		env_vars = {
-			"BUILDER_TX_SIGNING_KEY": "0x" + genesis_constants.PRE_FUNDED_ACCOUNTS[0].private_key
-		}
+	 	env_vars = {
+	 		"BUILDER_TX_SIGNING_KEY": "0x" + genesis_constants.PRE_FUNDED_ACCOUNTS[0].private_key
+	 	}
+
+	extra_env_vars.update(env_vars)
 
 	accounts_to_unlock_str = ",".join(account_addresses_to_unlock)
 
@@ -241,7 +245,7 @@ def get_config(
 		max_cpu = el_max_cpu,
 		min_memory = el_min_mem,
 		max_memory = el_max_mem,
-		env_vars = env_vars
+		env_vars = extra_env_vars
 	), jwt_secret_json_filepath_on_client
 
 
