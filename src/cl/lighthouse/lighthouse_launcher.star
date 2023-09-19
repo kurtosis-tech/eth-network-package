@@ -122,11 +122,11 @@ def launch(
 	)
 
 	beacon_service = plan.add_service(beacon_node_service_name, beacon_config)
-
 	beacon_http_port = beacon_service.ports[BEACON_HTTP_PORT_ID]
+	beacon_http_url = "http://{0}:{1}".format(beacon_service.ip_address, beacon_http_port.number)
 
 	# Launch validator node if we have a keystore
-	beacon_http_url = "http://{0}:{1}".format(beacon_service.ip_address, beacon_http_port.number)
+	validator_service = None
 	if node_keystore_files != None:
 		v_min_cpu = int(v_min_cpu) if int(v_min_cpu) > 0 else VALIDATOR_MIN_CPU
 		v_max_cpu = int(v_max_cpu) if int(v_max_cpu) > 0 else VALIDATOR_MAX_CPU
@@ -165,15 +165,14 @@ def launch(
 
 	beacon_metrics_port = beacon_service.ports[BEACON_METRICS_PORT_ID]
 	beacon_metrics_url = "{0}:{1}".format(beacon_service.ip_address, beacon_metrics_port.number)
+	beacon_node_metrics_info = cl_node_metrics.new_cl_node_metrics_info(beacon_node_service_name, METRICS_PATH, beacon_metrics_url)
+	nodes_metrics_info = [beacon_node_metrics_info]
 
-	if node_keystore_files != None:
+	if validator_service:
 		validator_metrics_port = validator_service.ports[VALIDATOR_METRICS_PORT_ID]
 		validator_metrics_url = "{0}:{1}".format(validator_service.ip_address, validator_metrics_port.number)
 		validator_node_metrics_info = cl_node_metrics.new_cl_node_metrics_info(validator_node_service_name, METRICS_PATH, validator_metrics_url)
-
-	beacon_node_metrics_info = cl_node_metrics.new_cl_node_metrics_info(beacon_node_service_name, METRICS_PATH, beacon_metrics_url)
-
-	nodes_metrics_info = [beacon_node_metrics_info, validator_node_metrics_info if node_keystore_files != None else None]
+		nodes_metrics_info.append(validator_node_metrics_info)
 
 	return cl_client_context.new_cl_client_context(
 		"lighthouse",
