@@ -78,7 +78,7 @@ def generate_cl_validator_keystores(
 	for idx, participant in enumerate(participants):
 		output_dirpath = all_output_dirpaths[idx]
 		if participant.validator_count == 0:
-			keystore_files.append("dummy")
+			keystore_files.append(None)
 			continue
 		padded_idx = zfill_custom(idx+1, len(str(len(participants))))
 		keystore_start_index = running_total_validator_count
@@ -191,7 +191,7 @@ def generate_cl_valdiator_keystores_in_parallel(
 	running_total_validator_count = 0
 	for idx, participant in enumerate(participants):
 		if participant.validator_count == 0:
-			keystore_files.append("dummy")
+			keystore_files.append(None)
 			continue
 		service_name = service_names[idx]
 		output_dirpath = all_output_dirpaths[idx]

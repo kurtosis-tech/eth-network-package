@@ -92,9 +92,7 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 
 	genesis_generation_config_yml_template = read_file(static_files.CL_GENESIS_GENERATION_CONFIG_TEMPLATE_FILEPATH)
 	genesis_generation_mnemonics_yml_template = read_file(static_files.CL_GENESIS_GENERATION_MNEMONICS_TEMPLATE_FILEPATH)
-	total_number_of_validator_keys = 0
-	for index, participant in enumerate(participants):
-		total_number_of_validator_keys += participant.validator_count
+	total_number_of_validator_keys = sum([particiant.valdiator_count for paritcipant in participants])
 	cl_genesis_data = cl_genesis_data_generator.generate_cl_genesis_data(
 		plan,
 		genesis_generation_config_yml_template,
@@ -187,10 +185,9 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		index_str = zfill_custom(index+1, zfill_calculator(participants))
 
 		cl_service_name = "cl-{0}-{1}-{2}".format(index_str, cl_client_type, el_client_type)
+		new_cl_node_validator_keystores = None
 		if participant.validator_count != 0:
 			new_cl_node_validator_keystores = preregistered_validator_keys_for_nodes[index]
-		else:
-			new_cl_node_validator_keystores = None
 
 		el_client_context = all_el_client_contexts[index]
 
