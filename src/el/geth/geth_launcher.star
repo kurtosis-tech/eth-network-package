@@ -148,16 +148,6 @@ def get_config(
 		if package_io.GENESIS_VALIDATORS_ROOT_PLACEHOLDER in extra_param:
 			extra_params[index] = extra_param.replace(package_io.GENESIS_VALIDATORS_ROOT_PLACEHOLDER, genesis_validators_root)
 
-	env_vars = {}
-
-	# the key here is the private key of the first genesis account
-	# note that the mev builder is the one that needs this and not other nodes
-	if BUILDER_IMAGE_STR in image:
-	 	env_vars = {
-	 		"BUILDER_TX_SIGNING_KEY": "0x" + genesis_constants.PRE_FUNDED_ACCOUNTS[0].private_key
-	 	}
-
-	extra_env_vars.update(env_vars)
 
 	accounts_to_unlock_str = ",".join(account_addresses_to_unlock)
 

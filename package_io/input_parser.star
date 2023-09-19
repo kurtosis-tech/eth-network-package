@@ -224,7 +224,7 @@ def default_participant():
 			"cl_client_log_level":		"",
 			"beacon_extra_params":		[],
 			"el_extra_params":			[],
-			"el_extra_env_vars": 		{"LEO-DEBUG-2":"hehe"},
+			"el_extra_env_vars": 		{},
 			"validator_extra_params": 	[],
 			"builder_network_params": 	None,
 			"el_min_cpu":				0,
