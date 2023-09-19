@@ -92,7 +92,9 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 
 	genesis_generation_config_yml_template = read_file(static_files.CL_GENESIS_GENERATION_CONFIG_TEMPLATE_FILEPATH)
 	genesis_generation_mnemonics_yml_template = read_file(static_files.CL_GENESIS_GENERATION_MNEMONICS_TEMPLATE_FILEPATH)
-	total_number_of_validator_keys = sum([particiant.valdiator_count for paritcipant in participants])
+	total_number_of_validator_keys = 0
+	for participant in participants:
+		total_number_of_validator_keys += participant.validator_count
 	cl_genesis_data = cl_genesis_data_generator.generate_cl_genesis_data(
 		plan,
 		genesis_generation_config_yml_template,
