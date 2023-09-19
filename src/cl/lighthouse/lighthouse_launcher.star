@@ -350,14 +350,13 @@ def get_validator_config(
 	if len(extra_params):
 		cmd.extend([param for param in extra_params])
 
-	NODE_ARTIFACT_UUID = node_keystore_files.files_artifact_uuid if node_keystore_files != None else package_io.NO_ARTIFACT_UUID
 	return ServiceConfig(
 		image = image,
 		ports = VALIDATOR_USED_PORTS,
 		cmd = cmd,
 		files = {
 			GENESIS_DATA_MOUNTPOINT_ON_CLIENTS: genesis_data.files_artifact_uuid,
-			VALIDATOR_KEYS_MOUNTPOINT_ON_CLIENTS: NODE_ARTIFACT_UUID,
+			VALIDATOR_KEYS_MOUNTPOINT_ON_CLIENTS: node_keystore_files.files_artifact_uuid,
 		},
 		env_vars = {
 			RUST_BACKTRACE_ENVVAR_NAME: RUST_FULL_BACKTRACE_KEYWORD
