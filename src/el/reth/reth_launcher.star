@@ -110,8 +110,8 @@ def launch(
 		WS_PORT_NUM,
 		ENGINE_RPC_PORT_NUM,
 		jwt_secret,
-		reth_metrics_info,
 		service_name,
+		reth_metrics_info,
 	)
 
 def get_config(

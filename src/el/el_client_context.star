@@ -7,8 +7,8 @@ def new_el_client_context(
 	ws_port_num,
 	engine_rpc_port_num,
 	jwt_secret,
-	el_metrics_info,
-	service_name = ""):
+	service_name = "",
+	el_metrics_info = None):
 	return struct(
 		service_name = service_name,
 		client_name = client_name,

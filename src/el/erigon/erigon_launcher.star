@@ -104,8 +104,8 @@ def launch(
 		WS_RPC_PORT_NUM,
 		ENGINE_RPC_PORT_NUM,
 		jwt_secret,
-		erigon_metrics_info,
-		service_name
+		service_name,
+		erigon_metrics_info
 	)
 
 
