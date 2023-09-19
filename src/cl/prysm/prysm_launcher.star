@@ -142,6 +142,7 @@ def launch(
 	beacon_rpc_endpoint = "{0}:{1}".format(beacon_service.ip_address, RPC_PORT_NUM)
 
 	# Launch validator node if we have a keystore file
+	validator_service = None
 	if node_keystore_files != None:
 		v_min_cpu = int(v_min_cpu) if int(v_min_cpu) > 0 else VALIDATOR_MIN_CPU
 		v_max_cpu = int(v_max_cpu) if int(v_max_cpu) > 0 else VALIDATOR_MAX_CPU
@@ -183,14 +184,14 @@ def launch(
 
 	beacon_metrics_port = beacon_service.ports[BEACON_MONITORING_PORT_ID]
 	beacon_metrics_url = "{0}:{1}".format(beacon_service.ip_address, beacon_metrics_port.number)
+	beacon_node_metrics_info = cl_node_metrics.new_cl_node_metrics_info(beacon_node_service_name, METRICS_PATH, beacon_metrics_url)
+	nodes_metrics_info = [beacon_node_metrics_info]
 
-	if node_keystore_files != None:
+	if validator_service:
 		validator_metrics_port = validator_service.ports[VALIDATOR_MONITORING_PORT_ID]
 		validator_metrics_url = "{0}:{1}".format(validator_service.ip_address, validator_metrics_port.number)
 		validator_node_metrics_info = cl_node_metrics.new_cl_node_metrics_info(validator_node_service_name, METRICS_PATH, validator_metrics_url)
-
-	beacon_node_metrics_info = cl_node_metrics.new_cl_node_metrics_info(beacon_node_service_name, METRICS_PATH, beacon_metrics_url)
-	nodes_metrics_info = [beacon_node_metrics_info, validator_node_metrics_info if node_keystore_files != None else None]
+		nodes_metrics_info.append(validator_node_metrics_info)
 
 	return cl_client_context.new_cl_client_context(
 		"prysm",
@@ -339,14 +340,13 @@ def get_validator_config(
 		# we do the for loop as otherwise its a proto repeated array
 		cmd.extend([param for param in extra_params])
 
-	NODE_ARTIFACT_UUID = node_keystore_files.files_artifact_uuid if node_keystore_files != None else package_io.NO_ARTIFACT_UUID
 	return ServiceConfig(
 		image = validator_image,
 		ports = VALIDATOR_NODE_USED_PORTS,
 		cmd = cmd,
 		files = {
 			GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: genesis_data.files_artifact_uuid,
-			VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: NODE_ARTIFACT_UUID,
+			VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: node_keystore_files.files_artifact_uuid,
 			PRYSM_PASSWORD_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: prysm_password_artifact_uuid,
 		},
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
