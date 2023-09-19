@@ -262,13 +262,11 @@ def get_config(
 		# we do the list comprehension as the default extra_params is a proto repeated string
 		cmd.extend([param for param in extra_params])
 
-	node_artifact_uuid = node_keystore_files.files_artifact_uuid if node_keystore_files != None else package_io.NO_ARTIFACT_UUID
-
 	files = {
 			GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: genesis_data.files_artifact_uuid,
 	}
-	if node_artifact_uuid != package_io.NO_ARTIFACT_UUID:
-		files[VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER] = node_artifact_uuid
+	if node_keystore_files:
+		files[VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER] = node_keystore_files.files_artifact_uuid
 	cmd_str = " ".join(cmd)
 	return ServiceConfig(
 		image = image,
