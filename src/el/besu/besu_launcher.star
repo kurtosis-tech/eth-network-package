@@ -106,8 +106,8 @@ def launch(
 		WS_PORT_NUM,
 		ENGINE_HTTP_RPC_PORT_NUM,
 		jwt_secret,
+		service_name,
 		besu_metrics_info,
-		service_name
 	)
 
 
