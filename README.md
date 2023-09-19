@@ -115,7 +115,7 @@ these and other parameters are configurable through a json file Read more about 
 
       // Validator count can override the default number of validators per node
       // Defaults are set by num_validator_keys_per_node
-      "validator_count": "None",
+      "validator_count": null,
 
       // The number of times this participant should be repeated
       // defaults to 1(i.e no repetition). This is optional.
