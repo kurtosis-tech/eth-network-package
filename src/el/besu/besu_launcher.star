@@ -96,7 +96,7 @@ def launch(
 
 	jwt_secret = shared_utils.read_file_from_service(plan, service_name, jwt_secret_json_filepath_on_client)
 
-	metrics_url = "http://{0}:{1}".format(service.ip_address, METRICS_PORT_NUM)
+	metrics_url = "{0}:{1}".format(service.ip_address, METRICS_PORT_NUM)
 	besu_metrics_info = node_metrics.new_node_metrics_info(service_name, METRICS_PATH, metrics_url)
 
 	return el_client_context.new_el_client_context(
@@ -109,7 +109,7 @@ def launch(
 		ENGINE_HTTP_RPC_PORT_NUM,
 		jwt_secret,
 		service_name,
-		besu_metrics_info,
+		[besu_metrics_info],
 	)
 
 
