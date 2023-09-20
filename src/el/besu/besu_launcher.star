@@ -66,7 +66,8 @@ def launch(
 	el_max_cpu,
 	el_min_mem,
 	el_max_mem,
-	extra_params):
+	extra_params,
+	extra_env_vars):
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, BESU_LOG_LEVELS)
 
@@ -85,7 +86,8 @@ def launch(
 		el_max_cpu,
 		el_min_mem,
 		el_max_mem,
-		extra_params
+		extra_params,
+		extra_env_vars
 	)
 
 	service = plan.add_service(service_name, config)
@@ -121,7 +123,8 @@ def get_config(
 	el_max_cpu,
 	el_min_mem,
 	el_max_mem,
-	extra_params):
+	extra_params,
+	extra_env_vars):
 
 	genesis_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_DIRPATH_ON_CLIENT_CONTAINER, genesis_data.besu_genesis_json_relative_filepath)
 	jwt_secret_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_DIRPATH_ON_CLIENT_CONTAINER, genesis_data.jwt_secret_relative_filepath)
@@ -178,7 +181,8 @@ def get_config(
 		min_cpu = el_min_cpu,
 		max_cpu = el_max_cpu,
 		min_memory = el_min_mem,
-		max_memory = el_max_mem
+		max_memory = el_max_mem,
+		env_vars = extra_env_vars
 	), jwt_secret_json_filepath_on_client
 
 
