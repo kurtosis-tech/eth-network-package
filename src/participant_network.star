@@ -154,7 +154,8 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 			participant.el_max_cpu,
 			participant.el_min_mem,
 			participant.el_max_mem,
-			participant.el_extra_params
+			participant.el_extra_params,
+			participant.el_extra_env_vars
 		)
 
 		all_el_client_contexts.append(el_client_context)
