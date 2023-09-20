@@ -4,6 +4,7 @@ el_client_context = import_module("github.com/kurtosis-tech/eth-network-package/
 el_admin_node_info = import_module("github.com/kurtosis-tech/eth-network-package/src/el/el_admin_node_info.star")
 genesis_constants = import_module("github.com/kurtosis-tech/eth-network-package/src/prelaunch_data_generator/genesis_constants/genesis_constants.star")
 
+node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/node_metrics_info.star")
 package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
 
 
@@ -11,6 +12,7 @@ RPC_PORT_NUM		= 8545
 WS_PORT_NUM			= 8546
 DISCOVERY_PORT_NUM	= 30303
 ENGINE_RPC_PORT_NUM = 8551
+METRICS_PORT_NUM	= 9001
 
 # The min/max CPU/memory that the execution node can use
 EXECUTION_MIN_CPU = 100
@@ -25,6 +27,7 @@ TCP_DISCOVERY_PORT_ID = "tcp-discovery"
 UDP_DISCOVERY_PORT_ID = "udp-discovery"
 ENGINE_RPC_PORT_ID	= "engine-rpc"
 ENGINE_WS_PORT_ID	= "engineWs"
+METRICS_PORT_ID		= "metrics"
 
 # TODO(old) Scale this dynamically based on CPUs available and Geth nodes mining
 NUM_MINING_THREADS = 1
@@ -32,6 +35,8 @@ NUM_MINING_THREADS = 1
 GENESIS_DATA_MOUNT_DIRPATH = "/genesis"
 
 PREFUNDED_KEYS_MOUNT_DIRPATH = "/prefunded-keys"
+
+METRICS_PATH = "/debug/metrics/prometheus"
 
 # The dirpath of the execution data directory on the client container
 EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/execution-data"
@@ -47,7 +52,8 @@ USED_PORTS = {
 	WS_PORT_ID: shared_utils.new_port_spec(WS_PORT_NUM, shared_utils.TCP_PROTOCOL),
 	TCP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.TCP_PROTOCOL),
 	UDP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.UDP_PROTOCOL),
-	ENGINE_RPC_PORT_ID: shared_utils.new_port_spec(ENGINE_RPC_PORT_NUM, shared_utils.TCP_PROTOCOL)
+	ENGINE_RPC_PORT_ID: shared_utils.new_port_spec(ENGINE_RPC_PORT_NUM, shared_utils.TCP_PROTOCOL),
+	METRICS_PORT_ID: shared_utils.new_port_spec(METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL)
 }
 
 ENTRYPOINT_ARGS = ["sh", "-c"]
@@ -108,6 +114,9 @@ def launch(
 
 	jwt_secret = shared_utils.read_file_from_service(plan, service_name, jwt_secret_json_filepath_on_client)
 
+	metrics_url = "http://{0}:{1}".format(service.ip_address, METRICS_PORT_NUM)
+	geth_metrics_info = node_metrics.new_node_metrics_info(service_name, METRICS_PATH, metrics_url)
+
 	return el_client_context.new_el_client_context(
 		"geth",
 		enr,
@@ -117,7 +126,8 @@ def launch(
 		WS_PORT_NUM,
 		ENGINE_RPC_PORT_NUM,
 		jwt_secret,
-		service_name
+		service_name,
+		geth_metrics_info,
 	)
 
 def get_config(
@@ -196,7 +206,10 @@ def get_config(
 		"--authrpc.vhosts=*",
 		"--authrpc.jwtsecret={0}".format(jwt_secret_json_filepath_on_client),
 		"--syncmode=full",
-		"--rpc.allow-unprotected-txs"
+		"--rpc.allow-unprotected-txs",
+		"--metrics",
+		"--metrics.addr=0.0.0.0",
+		"--metrics.port={0}".format(METRICS_PORT_NUM),
 	]
 
 	if BUILDER_IMAGE_STR in image:

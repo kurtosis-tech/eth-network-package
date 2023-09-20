@@ -1,7 +1,7 @@
 shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/shared_utils/shared_utils.star")
 input_parser = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
 cl_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_client_context.star")
-cl_node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_metrics_info.star")
+node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/node_metrics_info.star")
 cl_node_ready_conditions = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_ready_conditions.star")
 
 package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
@@ -141,7 +141,7 @@ def launch(
 	teku_metrics_port = teku_service.ports[METRICS_PORT_ID]
 	teku_metrics_url = "{0}:{1}".format(teku_service.ip_address, teku_metrics_port.number)
 
-	teku_node_metrics_info = cl_node_metrics.new_cl_node_metrics_info(service_name, METRICS_PATH, teku_metrics_url)
+	teku_node_metrics_info = node_metrics.new_node_metrics_info(service_name, METRICS_PATH, teku_metrics_url)
 	nodes_metrics_info = [teku_node_metrics_info]
 
 	return cl_client_context.new_cl_client_context(
