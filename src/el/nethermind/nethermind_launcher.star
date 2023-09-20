@@ -108,7 +108,7 @@ def launch(
 		ENGINE_RPC_PORT_NUM,
 		jwt_secret,
 		service_name,
-		nethermind_metrics_info,
+		[nethermind_metrics_info],
 	)
 
 
