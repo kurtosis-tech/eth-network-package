@@ -119,7 +119,7 @@ def launch(
 		ENGINE_RPC_PORT_NUM,
 		jwt_secret,
 		service_name,
-		None,
+		[ethjs_metrics_info],
 	)
 
 def get_config(
