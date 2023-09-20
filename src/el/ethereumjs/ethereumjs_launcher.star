@@ -105,7 +105,7 @@ def launch(
 
 	jwt_secret = shared_utils.read_file_from_service(plan, service_name, jwt_secret_json_filepath_on_client)
 
-	# TODO: Passing empty string for metrics_url for now
+	# TODO: Passing empty string for metrics_url for now https://github.com/kurtosis-tech/eth-network-package/issues/127
 	# metrics_url = "http://{0}:{1}".format(service.ip_address, METRICS_PORT_NUM)
 	ethjs_metrics_info = node_metrics.new_node_metrics_info(service_name, METRICS_PATH, "")
 
