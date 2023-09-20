@@ -107,7 +107,7 @@ def launch(
 
 	# TODO: Passing empty string for metrics_url for now https://github.com/kurtosis-tech/eth-network-package/issues/127
 	# metrics_url = "http://{0}:{1}".format(service.ip_address, METRICS_PORT_NUM)
-	ethjs_metrics_info = node_metrics.new_node_metrics_info(service_name, METRICS_PATH, "")
+	ethjs_metrics_info = None
 
 	return el_client_context.new_el_client_context(
 		"ethereumjs",
@@ -119,7 +119,7 @@ def launch(
 		ENGINE_RPC_PORT_NUM,
 		jwt_secret,
 		service_name,
-		[ethjs_metrics_info],
+		None,
 	)
 
 def get_config(

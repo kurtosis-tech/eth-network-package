@@ -100,7 +100,7 @@ def launch(
 
 	jwt_secret = shared_utils.read_file_from_service(plan, service_name, jwt_secret_json_filepath_on_client)
 
-	metric_url = "http://{0}:{1}".format(service.ip_address, METRICS_PORT_NUM)
+	metric_url = "{0}:{1}".format(service.ip_address, METRICS_PORT_NUM)
 	reth_metrics_info = node_metrics.new_node_metrics_info(service_name, METRICS_PATH, metric_url)
 
 	return el_client_context.new_el_client_context(
