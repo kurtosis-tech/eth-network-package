@@ -3,6 +3,15 @@ version: 2.1
 orbs:
   kurtosis-docs-checker: kurtosis-tech/docs-checker@0.2.3
 
+# Install go version 1.19 to run our integration tests on the minimal version we support
+setup_kurtosis: &setup_kurtosis
+  - run: |
+      echo "deb [trusted=yes] https://apt.fury.io/kurtosis-tech/ /" | sudo tee /etc/apt/sources.list.d/kurtosis.list
+      sudo apt update
+      sudo apt install kurtosis-cli
+      kurtosis config init dont-send-metrics
+      kurtosis engine restart
+
 executors:
   ubuntu_vm:
     machine:
@@ -27,38 +36,24 @@ jobs:
   run_starlark:
     executor: ubuntu_vm
     steps:
-      # Set up Kurtosis
-      - run: |
-          echo "deb [trusted=yes] https://apt.fury.io/kurtosis-tech/ /" | sudo tee /etc/apt/sources.list.d/kurtosis.list
-          sudo apt update
-          sudo apt install kurtosis-cli
-
       - checkout
+      - <<: *setup_kurtosis
+      - run: kurtosis run ${PWD}
 
-      # We don't send metrics to avoid polluting our logs
-      - run: kurtosis config init dont-send-metrics
-
-      - run: kurtosis engine restart
-
+  run_starlark_arm64:
+    executor: ubuntu_vm
+    resource_class: arm.medium
+    steps:
+      - checkout
+      - <<: *setup_kurtosis
       - run: kurtosis run ${PWD}
 
   check_latest_version:
     executor: ubuntu_vm
     steps:
-      # Set up Kurtosis
-      - run: |
-          echo "deb [trusted=yes] https://apt.fury.io/kurtosis-tech/ /" | sudo tee /etc/apt/sources.list.d/kurtosis.list
-          sudo apt update
-          sudo apt install kurtosis-cli
-
       - checkout
-
-      # We don't send metrics to avoid polluting our logs
-      - run: kurtosis config init dont-send-metrics
-
-      - run: kurtosis engine restart
-
-      - run: kurtosis run --dry-run ${PWD}
+      - <<: *setup_kurtosis
+      - run: kurtosis run ${PWD} --dry-run
 
 workflows:
   check_latest_version:
@@ -80,3 +75,11 @@ workflows:
             branches:
               ignore:
                 - main
+      - run_starlark_arm64:
+          context:
+            # This pulls in KurtosisBot's Github token, so that we can read from our private repos
+            - github-user
+          filters:
+            branches:
+              ignore:
+                - main                
