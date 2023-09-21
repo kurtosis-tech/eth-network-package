@@ -40,6 +40,13 @@ jobs:
       - <<: *setup_kurtosis
       - run: kurtosis run ${PWD}
 
+  lint:
+    executor: ubuntu_vm
+    steps:
+      - checkout
+      - <<: *setup_kurtosis
+      - run: kurtosis lint ${PWD}
+
   run_starlark_arm64:
     executor: ubuntu_vm
     resource_class: arm.medium
@@ -83,3 +90,11 @@ workflows:
             branches:
               ignore:
                 - main                
+      - lint:
+          context:
+            # This pulls in KurtosisBot's Github token, so that we can read from our private repos
+            - github-user
+          filters:
+            branches:
+              ignore:
+                - main
