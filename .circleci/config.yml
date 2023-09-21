@@ -75,25 +75,16 @@ workflows:
     jobs:
       # -- PR check jobs ------------------------------------------
       - run_starlark:
-          context:
-            # This pulls in KurtosisBot's Github token, so that we can read from our private repos
-            - github-user
           filters:
             branches:
               ignore:
                 - main
       - run_starlark_arm64:
-          context:
-            # This pulls in KurtosisBot's Github token, so that we can read from our private repos
-            - github-user
           filters:
             branches:
               ignore:
                 - main                
       - lint:
-          context:
-            # This pulls in KurtosisBot's Github token, so that we can read from our private repos
-            - github-user
           filters:
             branches:
               ignore:
