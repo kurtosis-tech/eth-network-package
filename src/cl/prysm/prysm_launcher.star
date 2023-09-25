@@ -1,7 +1,7 @@
 shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/shared_utils/shared_utils.star")
 input_parser = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
 cl_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_client_context.star")
-cl_node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_metrics_info.star")
+node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/node_metrics_info.star")
 cl_node_ready_conditions = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_ready_conditions.star")
 package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
 
@@ -112,18 +112,12 @@ def launch(
 
 	beacon_node_service_name = "{0}".format(service_name)
 	validator_node_service_name = "{0}-{1}".format(service_name, VALIDATOR_SUFFIX_SERVICE_NAME)
-
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, PRYSM_LOG_LEVELS)
 
 	bn_min_cpu = int(bn_min_cpu) if int(bn_min_cpu) > 0 else BEACON_MIN_CPU
 	bn_max_cpu = int(bn_max_cpu) if int(bn_max_cpu) > 0 else BEACON_MAX_CPU
 	bn_min_mem = int(bn_min_mem) if int(bn_min_mem) > 0 else BEACON_MIN_MEMORY
 	bn_max_mem = int(bn_max_mem) if int(bn_max_mem) > 0 else BEACON_MAX_MEMORY
-
-	v_min_cpu = int(v_min_cpu) if int(v_min_cpu) > 0 else VALIDATOR_MIN_CPU
-	v_max_cpu = int(v_max_cpu) if int(v_max_cpu) > 0 else VALIDATOR_MAX_CPU
-	v_min_mem = int(v_min_mem) if int(v_min_mem) > 0 else VALIDATOR_MIN_MEMORY
-	v_max_mem = int(v_max_mem) if int(v_max_mem) > 0 else VALIDATOR_MAX_MEMORY
 
 	beacon_config = get_beacon_config(
 		launcher.genesis_data,
@@ -144,28 +138,34 @@ def launch(
 
 	beacon_http_port = beacon_service.ports[HTTP_PORT_ID]
 
-	# Launch validator node
 	beacon_http_endpoint = "{0}:{1}".format(beacon_service.ip_address, HTTP_PORT_NUM)
 	beacon_rpc_endpoint = "{0}:{1}".format(beacon_service.ip_address, RPC_PORT_NUM)
 
-	validator_config = get_validator_config(
-		launcher.genesis_data,
-		validator_image,
-		validator_node_service_name,
-		log_level,
-		beacon_rpc_endpoint,
-		beacon_http_endpoint,
-		node_keystore_files,
-		v_min_cpu,
-		v_max_cpu,
-		v_min_mem,
-		v_max_mem,
-		extra_validator_params,
-		launcher.prysm_password_relative_filepath,
-		launcher.prysm_password_artifact_uuid
-	)
+	# Launch validator node if we have a keystore file
+	validator_service = None
+	if node_keystore_files != None:
+		v_min_cpu = int(v_min_cpu) if int(v_min_cpu) > 0 else VALIDATOR_MIN_CPU
+		v_max_cpu = int(v_max_cpu) if int(v_max_cpu) > 0 else VALIDATOR_MAX_CPU
+		v_min_mem = int(v_min_mem) if int(v_min_mem) > 0 else VALIDATOR_MIN_MEMORY
+		v_max_mem = int(v_max_mem) if int(v_max_mem) > 0 else VALIDATOR_MAX_MEMORY
+		validator_config = get_validator_config(
+			launcher.genesis_data,
+			validator_image,
+			validator_node_service_name,
+			log_level,
+			beacon_rpc_endpoint,
+			beacon_http_endpoint,
+			node_keystore_files,
+			v_min_cpu,
+			v_max_cpu,
+			v_min_mem,
+			v_max_mem,
+			extra_validator_params,
+			launcher.prysm_password_relative_filepath,
+			launcher.prysm_password_artifact_uuid
+		)
 
-	validator_service = plan.add_service(validator_node_service_name, validator_config)
+		validator_service = plan.add_service(validator_node_service_name, validator_config)
 
 	# TODO(old) add validator availability using the validator API: https://ethereum.github.io/beacon-APIs/?urls.primaryName=v1#/ValidatorRequiredApi | from eth2-merge-kurtosis-module
 	beacon_node_identity_recipe = GetHttpRequestRecipe(
@@ -184,14 +184,14 @@ def launch(
 
 	beacon_metrics_port = beacon_service.ports[BEACON_MONITORING_PORT_ID]
 	beacon_metrics_url = "{0}:{1}".format(beacon_service.ip_address, beacon_metrics_port.number)
+	beacon_node_metrics_info = node_metrics.new_node_metrics_info(beacon_node_service_name, METRICS_PATH, beacon_metrics_url)
+	nodes_metrics_info = [beacon_node_metrics_info]
 
-	validator_metrics_port = validator_service.ports[VALIDATOR_MONITORING_PORT_ID]
-	validator_metrics_url = "{0}:{1}".format(validator_service.ip_address, validator_metrics_port.number)
-
-	beacon_node_metrics_info = cl_node_metrics.new_cl_node_metrics_info(beacon_node_service_name, METRICS_PATH, beacon_metrics_url)
-	validator_node_metrics_info = cl_node_metrics.new_cl_node_metrics_info(validator_node_service_name, METRICS_PATH, validator_metrics_url)
-	nodes_metrics_info = [beacon_node_metrics_info, validator_node_metrics_info]
-
+	if validator_service:
+		validator_metrics_port = validator_service.ports[VALIDATOR_MONITORING_PORT_ID]
+		validator_metrics_url = "{0}:{1}".format(validator_service.ip_address, validator_metrics_port.number)
+		validator_node_metrics_info = node_metrics.new_node_metrics_info(validator_node_service_name, METRICS_PATH, validator_metrics_url)
+		nodes_metrics_info.append(validator_node_metrics_info)
 
 	return cl_client_context.new_cl_client_context(
 		"prysm",
@@ -312,17 +312,18 @@ def get_validator_config(
 	):
 
 	consensus_data_dirpath = shared_utils.path_join(CONSENSUS_DATA_DIRPATH_ON_SERVICE_CONTAINER, service_name)
-	prysm_keystore_dirpath = shared_utils.path_join(VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.prysm_relative_dirpath)
-	prysm_password_filepath = shared_utils.path_join(PRYSM_PASSWORD_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, prysm_password_relative_filepath)
 	genesis_config_filepath = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, genesis_data.config_yml_rel_filepath)
+
+	validator_keys_dirpath = shared_utils.path_join(VALIDATOR_KEYS_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.prysm_relative_dirpath)
+	validator_secrets_dirpath = shared_utils.path_join(PRYSM_PASSWORD_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, prysm_password_relative_filepath)
 
 	cmd = [
 		"--accept-terms-of-use=true",#it's mandatory in order to run the node
 		"--chain-config-file=" + genesis_config_filepath,
 		"--beacon-rpc-gateway-provider=" + beacon_http_endpoint,
 		"--beacon-rpc-provider=" + beacon_rpc_endpoint,
-		"--wallet-dir=" + prysm_keystore_dirpath,
-		"--wallet-password-file=" + prysm_password_filepath,
+		"--wallet-dir=" + validator_keys_dirpath,
+		"--wallet-password-file=" + validator_secrets_dirpath,
 		"--datadir=" + consensus_data_dirpath,
 		"--monitoring-port={0}".format(VALIDATOR_MONITORING_PORT_NUM),
 		"--verbosity=" + log_level,
@@ -338,7 +339,6 @@ def get_validator_config(
 	if len(extra_params) > 0:
 		# we do the for loop as otherwise its a proto repeated array
 		cmd.extend([param for param in extra_params])
-
 
 	return ServiceConfig(
 		image = validator_image,

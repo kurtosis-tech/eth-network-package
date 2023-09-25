@@ -3,6 +3,7 @@ input_parser = import_module("github.com/kurtosis-tech/eth-network-package/packa
 el_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/el/el_client_context.star")
 el_admin_node_info = import_module("github.com/kurtosis-tech/eth-network-package/src/el/el_admin_node_info.star")
 
+node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/node_metrics_info.star")
 package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
 
 
@@ -11,7 +12,7 @@ WS_PORT_NUM			= 8546
 WS_PORT_ENGINE_NUM 	= 8547
 DISCOVERY_PORT_NUM	= 30303
 ENGINE_RPC_PORT_NUM = 8551
-#METRICS_PORT_NUM = 9001
+METRICS_PORT_NUM    = 9001
 
 # The min/max CPU/memory that the execution node can use
 EXECUTION_MIN_CPU = 100
@@ -26,11 +27,13 @@ TCP_DISCOVERY_PORT_ID = "tcp-discovery"
 UDP_DISCOVERY_PORT_ID = "udp-discovery"
 ENGINE_RPC_PORT_ID	= "engine-rpc"
 WS_PORT_ENGINE_ID	= "ws-engine"
-#METRICS_PORT_ID = "metrics"
+METRICS_PORT_ID     = "metrics"
 
 GENESIS_DATA_MOUNT_DIRPATH = "/genesis"
 
 PREFUNDED_KEYS_MOUNT_DIRPATH = "/prefunded-keys"
+
+METRICS_PATH = "/metrics"
 
 # The dirpath of the execution data directory on the client container
 EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/execution-data"
@@ -44,7 +47,7 @@ USED_PORTS = {
 	TCP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.TCP_PROTOCOL),
 	UDP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.UDP_PROTOCOL),
 	ENGINE_RPC_PORT_ID: shared_utils.new_port_spec(ENGINE_RPC_PORT_NUM, shared_utils.TCP_PROTOCOL),
-#    METRICS_PORT_ID: shared_utils.new_port_spec(METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL)
+    # METRICS_PORT_ID: shared_utils.new_port_spec(METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL)
 }
 
 ENTRYPOINT_ARGS = []
@@ -71,7 +74,8 @@ def launch(
 	el_max_cpu,
 	el_min_mem,
 	el_max_mem,
-	extra_params):
+	extra_params,
+	extra_env_vars):
 
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, VERBOSITY_LEVELS)
@@ -91,7 +95,8 @@ def launch(
 		el_max_cpu,
 		el_min_mem,
 		el_max_mem,
-		extra_params
+		extra_params,
+		extra_env_vars
 	)
 
 	service = plan.add_service(service_name, config)
@@ -99,6 +104,10 @@ def launch(
 	enode = el_admin_node_info.get_enode_for_node(plan, service_name, RPC_PORT_ID)
 
 	jwt_secret = shared_utils.read_file_from_service(plan, service_name, jwt_secret_json_filepath_on_client)
+
+	# TODO: Passing empty string for metrics_url for now https://github.com/kurtosis-tech/eth-network-package/issues/127
+	# metrics_url = "http://{0}:{1}".format(service.ip_address, METRICS_PORT_NUM)
+	ethjs_metrics_info = None
 
 	return el_client_context.new_el_client_context(
 		"ethereumjs",
@@ -110,6 +119,7 @@ def launch(
 		ENGINE_RPC_PORT_NUM,
 		jwt_secret,
 		service_name,
+		[ethjs_metrics_info],
 	)
 
 def get_config(
@@ -121,7 +131,8 @@ def get_config(
 	el_max_cpu,
 	el_min_mem,
 	el_max_mem,
-	extra_params):
+	extra_params,
+	extra_env_vars):
 
 	genesis_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH, genesis_data.geth_genesis_json_relative_filepath)
 	jwt_secret_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH, genesis_data.jwt_secret_relative_filepath)
@@ -169,7 +180,8 @@ def get_config(
 		min_cpu = el_min_cpu,
 		max_cpu = el_max_cpu,
 		min_memory = el_min_mem,
-		max_memory = el_max_mem
+		max_memory = el_max_mem,
+		env_vars = extra_env_vars
 	), jwt_secret_json_filepath_on_client
 
 

@@ -1,7 +1,7 @@
 shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/shared_utils/shared_utils.star")
 input_parser = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
 cl_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_client_context.star")
-cl_node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_metrics_info.star")
+node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/node_metrics_info.star")
 cl_node_ready_conditions = import_module("github.com/kurtosis-tech/eth-network-package/src/cl/cl_node_ready_conditions.star")
 
 package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
@@ -141,7 +141,7 @@ def launch(
 	teku_metrics_port = teku_service.ports[METRICS_PORT_ID]
 	teku_metrics_url = "{0}:{1}".format(teku_service.ip_address, teku_metrics_port.number)
 
-	teku_node_metrics_info = cl_node_metrics.new_cl_node_metrics_info(service_name, METRICS_PATH, teku_metrics_url)
+	teku_node_metrics_info = node_metrics.new_node_metrics_info(service_name, METRICS_PATH, teku_metrics_url)
 	nodes_metrics_info = [teku_node_metrics_info]
 
 	return cl_client_context.new_cl_client_context(
@@ -188,10 +188,14 @@ def get_config(
 	genesis_config_filepath = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, genesis_data.config_yml_rel_filepath)
 	genesis_ssz_filepath = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, genesis_data.genesis_ssz_rel_filepath)
 	jwt_secret_filepath = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER, genesis_data.jwt_secret_rel_filepath)
-	validator_keys_dirpath = shared_utils.path_join(VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.teku_keys_relative_dirpath)
-	validator_secrets_dirpath = shared_utils.path_join(VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.teku_secrets_relative_dirpath)
 
-	cmd = [
+	validator_keys_dirpath = ""
+	validator_secrets_dirpath = ""
+	if node_keystore_files:
+		validator_keys_dirpath = shared_utils.path_join(VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.teku_keys_relative_dirpath)
+		validator_secrets_dirpath = shared_utils.path_join(VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER, node_keystore_files.teku_secrets_relative_dirpath)
+
+	validator_copy = [
 		# Needed because the generated keys are owned by root and the Teku image runs as the 'teku' user
 		"cp",
 		"-R",
@@ -204,6 +208,15 @@ def get_config(
 		validator_secrets_dirpath,
 		DEST_VALIDATOR_SECRETS_DIRPATH_IN_SERVICE_CONTAINER,
 		"&&",
+	]
+	validator_flags = [
+		"--validator-keys={0}:{1}".format(
+			DEST_VALIDATOR_KEYS_DIRPATH_IN_SERVICE_CONTAINER,
+			DEST_VALIDATOR_SECRETS_DIRPATH_IN_SERVICE_CONTAINER,
+		),
+		"--validators-proposer-default-fee-recipient=" + package_io.VALIDATING_REWARDS_ACCOUNT,
+	]
+	beacon_start = [
 		TEKU_BINARY_FILEPATH_IN_IMAGE,
 		"--logging=" + log_level,
 		"--log-destination=CONSOLE",
@@ -223,13 +236,8 @@ def get_config(
 		"--rest-api-port={0}".format(HTTP_PORT_NUM),
 		"--rest-api-host-allowlist=*",
 		"--data-storage-non-canonical-blocks-enabled=true",
-		"--validator-keys={0}:{1}".format(
-			DEST_VALIDATOR_KEYS_DIRPATH_IN_SERVICE_CONTAINER,
-			DEST_VALIDATOR_SECRETS_DIRPATH_IN_SERVICE_CONTAINER,
-		),
 		"--ee-jwt-secret-file={0}".format(jwt_secret_filepath),
 		"--ee-endpoint=" + EXECUTION_ENGINE_ENDPOINT,
-		"--validators-proposer-default-fee-recipient=" + package_io.VALIDATING_REWARDS_ACCOUNT,
 		# vvvvvvvvvvvvvvvvvvv METRICS CONFIG vvvvvvvvvvvvvvvvvvvvv
 		"--metrics-enabled",
 		"--metrics-interface=0.0.0.0",
@@ -239,6 +247,15 @@ def get_config(
 		# ^^^^^^^^^^^^^^^^^^^ METRICS CONFIG ^^^^^^^^^^^^^^^^^^^^^
 	]
 
+	# Depending on whether we're using a node keystore, we'll need to add the validator flags
+	cmd = []
+	if node_keystore_files != None:
+		cmd.extend(validator_copy)
+		cmd.extend(beacon_start)
+		cmd.extend(validator_flags)
+	else:
+		cmd.extend(beacon_start)
+
 	if bootnode_contexts != None:
 		cmd.append("--p2p-discovery-bootnodes="+",".join([ctx.enr for ctx in bootnode_contexts[:package_io.MAX_ENR_ENTRIES]]))
 		cmd.append("--p2p-static-peers="+",".join([ctx.multiaddr for ctx in bootnode_contexts[:package_io.MAX_ENR_ENTRIES]]))
@@ -247,17 +264,18 @@ def get_config(
 		# we do the list comprehension as the default extra_params is a proto repeated string
 		cmd.extend([param for param in extra_params])
 
+	files = {
+			GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: genesis_data.files_artifact_uuid,
+	}
+	if node_keystore_files:
+		files[VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER] = node_keystore_files.files_artifact_uuid
 	cmd_str = " ".join(cmd)
-
 	return ServiceConfig(
 		image = image,
 		ports = USED_PORTS,
 		cmd = [cmd_str],
 		entrypoint = ENTRYPOINT_ARGS,
-		files = {
-			GENESIS_DATA_MOUNT_DIRPATH_ON_SERVICE_CONTAINER: genesis_data.files_artifact_uuid,
-			VALIDATOR_KEYS_DIRPATH_ON_SERVICE_CONTAINER: node_keystore_files.files_artifact_uuid,
-		},
+		files = files,
 		private_ip_address_placeholder = PRIVATE_IP_ADDRESS_PLACEHOLDER,
 		ready_conditions = cl_node_ready_conditions.get_ready_conditions(HTTP_PORT_ID),
 		min_cpu = bn_min_cpu,

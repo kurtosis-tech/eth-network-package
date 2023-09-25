@@ -2,6 +2,7 @@ shared_utils = import_module("github.com/kurtosis-tech/eth-network-package/share
 input_parser = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
 el_client_context = import_module("github.com/kurtosis-tech/eth-network-package/src/el/el_client_context.star")
 el_admin_node_info = import_module("github.com/kurtosis-tech/eth-network-package/src/el/el_admin_node_info.star")
+node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/node_metrics_info.star")
 package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
 
 # The dirpath of the execution data directory on the client container
@@ -10,10 +11,13 @@ KZG_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/opt/besu/genesis/output/trusted_setup.t
 
 GENESIS_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/opt/besu/genesis"
 
+METRICS_PATH = "/metrics"
+
 RPC_PORT_NUM = 8545
 WS_PORT_NUM = 8546
 DISCOVERY_PORT_NUM = 30303
 ENGINE_HTTP_RPC_PORT_NUM = 8551
+METRICS_PORT_NUM = 9001
 
 # The min/max CPU/memory that the execution node can use
 EXECUTION_MIN_CPU = 100
@@ -27,6 +31,7 @@ WS_PORT_ID = "ws"
 TCP_DISCOVERY_PORT_ID = "tcp-discovery"
 UDP_DISCOVERY_PORT_ID = "udp-discovery"
 ENGINE_HTTP_RPC_PORT_ID = "engine-rpc"
+METRICS_PORT_ID = "metrics"
 
 PRIVATE_IP_ADDRESS_PLACEHOLDER = "KURTOSIS_IP_ADDR_PLACEHOLDER"
 
@@ -36,6 +41,7 @@ USED_PORTS = {
 	TCP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.TCP_PROTOCOL),
 	UDP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.UDP_PROTOCOL),
 	ENGINE_HTTP_RPC_PORT_ID: shared_utils.new_port_spec(ENGINE_HTTP_RPC_PORT_NUM, shared_utils.TCP_PROTOCOL),
+	METRICS_PORT_ID: shared_utils.new_port_spec(METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL)
 }
 
 ENTRYPOINT_ARGS = ["sh", "-c"]
@@ -60,7 +66,8 @@ def launch(
 	el_max_cpu,
 	el_min_mem,
 	el_max_mem,
-	extra_params):
+	extra_params,
+	extra_env_vars):
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, BESU_LOG_LEVELS)
 
@@ -79,7 +86,8 @@ def launch(
 		el_max_cpu,
 		el_min_mem,
 		el_max_mem,
-		extra_params
+		extra_params,
+		extra_env_vars
 	)
 
 	service = plan.add_service(service_name, config)
@@ -87,6 +95,9 @@ def launch(
 	enode = el_admin_node_info.get_enode_for_node(plan, service_name, RPC_PORT_ID)
 
 	jwt_secret = shared_utils.read_file_from_service(plan, service_name, jwt_secret_json_filepath_on_client)
+
+	metrics_url = "{0}:{1}".format(service.ip_address, METRICS_PORT_NUM)
+	besu_metrics_info = node_metrics.new_node_metrics_info(service_name, METRICS_PATH, metrics_url)
 
 	return el_client_context.new_el_client_context(
 		"besu",
@@ -97,7 +108,8 @@ def launch(
 		WS_PORT_NUM,
 		ENGINE_HTTP_RPC_PORT_NUM,
 		jwt_secret,
-		service_name
+		service_name,
+		[besu_metrics_info],
 	)
 
 
@@ -111,7 +123,8 @@ def get_config(
 	el_max_cpu,
 	el_min_mem,
 	el_max_mem,
-	extra_params):
+	extra_params,
+	extra_env_vars):
 
 	genesis_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_DIRPATH_ON_CLIENT_CONTAINER, genesis_data.besu_genesis_json_relative_filepath)
 	jwt_secret_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_DIRPATH_ON_CLIENT_CONTAINER, genesis_data.jwt_secret_relative_filepath)
@@ -141,7 +154,10 @@ def get_config(
 		"--engine-rpc-port={0}".format(ENGINE_HTTP_RPC_PORT_NUM),
 		"--sync-mode=FULL",
 		"--data-storage-format=BONSAI",
-		"--kzg-trusted-setup=" + KZG_DATA_DIRPATH_ON_CLIENT_CONTAINER
+		"--kzg-trusted-setup=" + KZG_DATA_DIRPATH_ON_CLIENT_CONTAINER,
+		"--metrics-enabled=true",
+		"--metrics-host=0.0.0.0",
+		"--metrics-port={0}".format(METRICS_PORT_NUM),
 	]
 
 	if len(existing_el_clients) > 0:
@@ -165,7 +181,8 @@ def get_config(
 		min_cpu = el_min_cpu,
 		max_cpu = el_max_cpu,
 		min_memory = el_min_mem,
-		max_memory = el_max_mem
+		max_memory = el_max_mem,
+		env_vars = extra_env_vars
 	), jwt_secret_json_filepath_on_client
 
 

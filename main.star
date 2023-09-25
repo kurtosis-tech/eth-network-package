@@ -5,7 +5,7 @@ static_files = import_module("github.com/kurtosis-tech/eth-network-package/stati
 genesis_constants = import_module("github.com/kurtosis-tech/eth-network-package/src/prelaunch_data_generator/genesis_constants/genesis_constants.star")
 
 def run(plan, args = {}):
-	args_with_right_defaults = input_parser.parse_input(args)
+	args_with_right_defaults = input_parser.get_args_with_default_values(args)
 
 	num_participants = len(args_with_right_defaults.participants)
 	network_params = args_with_right_defaults.network_params

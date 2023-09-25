@@ -52,15 +52,13 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		cl_validator_data = cl_validator_keystores.generate_cl_validator_keystores(
 			plan,
 			network_params.preregistered_validator_keys_mnemonic,
-			participants,
-			network_params.num_validator_keys_per_node
+			participants
 		)
 	else:
 		cl_validator_data = cl_validator_keystores.generate_cl_valdiator_keystores_in_parallel(
 			plan,
 			network_params.preregistered_validator_keys_mnemonic,
-			participants,
-			network_params.num_validator_keys_per_node
+			participants
 		)
 
 	plan.print(json.indent(json.encode(cl_validator_data)))
@@ -78,7 +76,8 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		network_params.genesis_delay,
 		network_params.seconds_per_slot,
 		network_params.capella_fork_epoch,
-		network_params.deneb_fork_epoch
+		network_params.deneb_fork_epoch,
+		network_params.electra_fork_epoch
 	)
 
 	plan.print(json.indent(json.encode(el_genesis_data)))
@@ -93,7 +92,9 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 
 	genesis_generation_config_yml_template = read_file(static_files.CL_GENESIS_GENERATION_CONFIG_TEMPLATE_FILEPATH)
 	genesis_generation_mnemonics_yml_template = read_file(static_files.CL_GENESIS_GENERATION_MNEMONICS_TEMPLATE_FILEPATH)
-	total_number_of_validator_keys = network_params.num_validator_keys_per_node * num_participants
+	total_number_of_validator_keys = 0
+	for participant in participants:
+		total_number_of_validator_keys += participant.validator_count
 	cl_genesis_data = cl_genesis_data_generator.generate_cl_genesis_data(
 		plan,
 		genesis_generation_config_yml_template,
@@ -107,7 +108,8 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		total_number_of_validator_keys,
 		network_params.genesis_delay,
 		network_params.capella_fork_epoch,
-		network_params.deneb_fork_epoch
+		network_params.deneb_fork_epoch,
+		network_params.electra_fork_epoch
 	)
 
 	plan.print(json.indent(json.encode(cl_genesis_data)))
@@ -116,7 +118,7 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 	genesis_validators_root = cl_genesis_data.genesis_validators_root
 
 	el_launchers = {
-		package_io.EL_CLIENT_TYPE.geth : {"launcher": geth.new_geth_launcher(network_params.network_id, el_genesis_data, geth_prefunded_keys_artifact_name, genesis_constants.PRE_FUNDED_ACCOUNTS, genesis_validators_root), "launch_method": geth.launch},
+		package_io.EL_CLIENT_TYPE.geth : {"launcher": geth.new_geth_launcher(network_params.network_id, el_genesis_data, geth_prefunded_keys_artifact_name, genesis_constants.PRE_FUNDED_ACCOUNTS, genesis_validators_root, network_params.electra_fork_epoch), "launch_method": geth.launch},
 		package_io.EL_CLIENT_TYPE.besu : {"launcher": besu.new_besu_launcher(network_params.network_id, el_genesis_data), "launch_method": besu.launch},
 		package_io.EL_CLIENT_TYPE.erigon : {"launcher": erigon.new_erigon_launcher(network_params.network_id, el_genesis_data), "launch_method": erigon.launch},
 		package_io.EL_CLIENT_TYPE.nethermind : {"launcher": nethermind.new_nethermind_launcher(el_genesis_data), "launch_method": nethermind.launch},
@@ -152,7 +154,8 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 			participant.el_max_cpu,
 			participant.el_min_mem,
 			participant.el_max_mem,
-			participant.el_extra_params
+			participant.el_extra_params,
+			participant.el_extra_env_vars
 		)
 
 		all_el_client_contexts.append(el_client_context)
@@ -185,8 +188,9 @@ def launch_participant_network(plan, participants, network_params, global_log_le
 		index_str = zfill_custom(index+1, zfill_calculator(participants))
 
 		cl_service_name = "cl-{0}-{1}-{2}".format(index_str, cl_client_type, el_client_type)
-
-		new_cl_node_validator_keystores = preregistered_validator_keys_for_nodes[index]
+		new_cl_node_validator_keystores = None
+		if participant.validator_count != 0:
+			new_cl_node_validator_keystores = preregistered_validator_keys_for_nodes[index]
 
 		el_client_context = all_el_client_contexts[index]
 

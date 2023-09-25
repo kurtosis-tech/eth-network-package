@@ -4,6 +4,7 @@ el_client_context = import_module("github.com/kurtosis-tech/eth-network-package/
 el_admin_node_info = import_module("github.com/kurtosis-tech/eth-network-package/src/el/el_admin_node_info.star")
 genesis_constants = import_module("github.com/kurtosis-tech/eth-network-package/src/prelaunch_data_generator/genesis_constants/genesis_constants.star")
 
+node_metrics = import_module("github.com/kurtosis-tech/eth-network-package/src/node_metrics_info.star")
 package_io = import_module("github.com/kurtosis-tech/eth-network-package/package_io/constants.star")
 
 
@@ -11,6 +12,7 @@ RPC_PORT_NUM		= 8545
 WS_PORT_NUM			= 8546
 DISCOVERY_PORT_NUM	= 30303
 ENGINE_RPC_PORT_NUM = 8551
+METRICS_PORT_NUM	= 9001
 
 # The min/max CPU/memory that the execution node can use
 EXECUTION_MIN_CPU = 100
@@ -25,6 +27,7 @@ TCP_DISCOVERY_PORT_ID = "tcp-discovery"
 UDP_DISCOVERY_PORT_ID = "udp-discovery"
 ENGINE_RPC_PORT_ID	= "engine-rpc"
 ENGINE_WS_PORT_ID	= "engineWs"
+METRICS_PORT_ID		= "metrics"
 
 # TODO(old) Scale this dynamically based on CPUs available and Geth nodes mining
 NUM_MINING_THREADS = 1
@@ -32,6 +35,8 @@ NUM_MINING_THREADS = 1
 GENESIS_DATA_MOUNT_DIRPATH = "/genesis"
 
 PREFUNDED_KEYS_MOUNT_DIRPATH = "/prefunded-keys"
+
+METRICS_PATH = "/debug/metrics/prometheus"
 
 # The dirpath of the execution data directory on the client container
 EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER = "/execution-data"
@@ -47,7 +52,8 @@ USED_PORTS = {
 	WS_PORT_ID: shared_utils.new_port_spec(WS_PORT_NUM, shared_utils.TCP_PROTOCOL),
 	TCP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.TCP_PROTOCOL),
 	UDP_DISCOVERY_PORT_ID: shared_utils.new_port_spec(DISCOVERY_PORT_NUM, shared_utils.UDP_PROTOCOL),
-	ENGINE_RPC_PORT_ID: shared_utils.new_port_spec(ENGINE_RPC_PORT_NUM, shared_utils.TCP_PROTOCOL)
+	ENGINE_RPC_PORT_ID: shared_utils.new_port_spec(ENGINE_RPC_PORT_NUM, shared_utils.TCP_PROTOCOL),
+	METRICS_PORT_ID: shared_utils.new_port_spec(METRICS_PORT_NUM, shared_utils.TCP_PROTOCOL)
 }
 
 ENTRYPOINT_ARGS = ["sh", "-c"]
@@ -75,11 +81,10 @@ def launch(
 	el_max_cpu,
 	el_min_mem,
 	el_max_mem,
-	extra_params):
-
+	extra_params,
+	extra_env_vars):
 
 	log_level = input_parser.get_client_log_level_or_default(participant_log_level, global_log_level, VERBOSITY_LEVELS)
-
 	el_min_cpu = el_min_cpu if int(el_min_cpu) > 0 else EXECUTION_MIN_CPU
 	el_max_cpu = el_max_cpu if int(el_max_cpu) > 0 else EXECUTION_MAX_CPU
 	el_min_mem = el_min_mem if int(el_min_mem) > 0 else EXECUTION_MIN_MEMORY
@@ -98,7 +103,9 @@ def launch(
 		el_max_cpu,
 		el_min_mem,
 		el_max_mem,
-		extra_params
+		extra_params,
+		extra_env_vars,
+		launcher.electra_fork_epoch
 	)
 
 	service = plan.add_service(service_name, config)
@@ -106,6 +113,9 @@ def launch(
 	enode, enr = el_admin_node_info.get_enode_enr_for_node(plan, service_name, RPC_PORT_ID)
 
 	jwt_secret = shared_utils.read_file_from_service(plan, service_name, jwt_secret_json_filepath_on_client)
+
+	metrics_url = "{0}:{1}".format(service.ip_address, METRICS_PORT_NUM)
+	geth_metrics_info = node_metrics.new_node_metrics_info(service_name, METRICS_PATH, metrics_url)
 
 	return el_client_context.new_el_client_context(
 		"geth",
@@ -117,6 +127,7 @@ def launch(
 		ENGINE_RPC_PORT_NUM,
 		jwt_secret,
 		service_name,
+		[geth_metrics_info],
 	)
 
 def get_config(
@@ -132,7 +143,9 @@ def get_config(
 	el_max_cpu,
 	el_min_mem,
 	el_max_mem,
-	extra_params):
+	extra_params,
+	extra_env_vars,
+	electra_fork_epoch):
 
 	genesis_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH, genesis_data.geth_genesis_json_relative_filepath)
 	jwt_secret_json_filepath_on_client = shared_utils.path_join(GENESIS_DATA_MOUNT_DIRPATH, genesis_data.jwt_secret_relative_filepath)
@@ -145,19 +158,11 @@ def get_config(
 		if package_io.GENESIS_VALIDATORS_ROOT_PLACEHOLDER in extra_param:
 			extra_params[index] = extra_param.replace(package_io.GENESIS_VALIDATORS_ROOT_PLACEHOLDER, genesis_validators_root)
 
-	env_vars = {}
-
-	# the key here is the private key of the first genesis account
-	# note that the mev builder is the one that needs this and not other nodes
-	# TODO productize a way to send custom env variables
-	if BUILDER_IMAGE_STR in image:
-		env_vars = {
-			"BUILDER_TX_SIGNING_KEY": "0x" + genesis_constants.PRE_FUNDED_ACCOUNTS[0].private_key
-		}
 
 	accounts_to_unlock_str = ",".join(account_addresses_to_unlock)
 
-	init_datadir_cmd_str = "geth init --datadir={0} {1}".format(
+	init_datadir_cmd_str = "geth init {0} --datadir={1} {2}".format(
+		"--cache.preimages" if electra_fork_epoch != None else "",
 		EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER,
 		genesis_json_filepath_on_client,
 	)
@@ -201,7 +206,10 @@ def get_config(
 		"--authrpc.vhosts=*",
 		"--authrpc.jwtsecret={0}".format(jwt_secret_json_filepath_on_client),
 		"--syncmode=full",
-		"--rpc.allow-unprotected-txs"
+		"--rpc.allow-unprotected-txs",
+		"--metrics",
+		"--metrics.addr=0.0.0.0",
+		"--metrics.port={0}".format(METRICS_PORT_NUM),
 	]
 
 	if BUILDER_IMAGE_STR in image:
@@ -240,15 +248,16 @@ def get_config(
 		max_cpu = el_max_cpu,
 		min_memory = el_min_mem,
 		max_memory = el_max_mem,
-		env_vars = env_vars
+		env_vars = extra_env_vars
 	), jwt_secret_json_filepath_on_client
 
 
-def new_geth_launcher(network_id, el_genesis_data, prefunded_geth_keys_artifact_uuid, prefunded_account_info, genesis_validators_root = ""):
+def new_geth_launcher(network_id, el_genesis_data, prefunded_geth_keys_artifact_uuid, prefunded_account_info, genesis_validators_root = "", electra_fork_epoch = None):
 	return struct(
 		network_id = network_id,
 		el_genesis_data = el_genesis_data,
 		prefunded_account_info = prefunded_account_info,
 		prefunded_geth_keys_artifact_uuid = prefunded_geth_keys_artifact_uuid,
-		genesis_validators_root = genesis_validators_root
+		genesis_validators_root = genesis_validators_root,
+		electra_fork_epoch = electra_fork_epoch
 	)

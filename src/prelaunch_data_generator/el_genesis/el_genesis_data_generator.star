@@ -35,7 +35,8 @@ def generate_el_genesis_data(
 	genesis_delay,
 	seconds_per_slot,
 	capella_fork_epoch,
-	deneb_fork_epoch
+	deneb_fork_epoch,
+	electra_fork_epoch
 	):
 
 	template_data = genesis_generation_config_template_data(
@@ -45,7 +46,8 @@ def generate_el_genesis_data(
 		genesis_delay,
 		seconds_per_slot,
 		capella_fork_epoch,
-		deneb_fork_epoch
+		deneb_fork_epoch,
+		electra_fork_epoch
 	)
 
 	genesis_config_file_template_and_data = shared_utils.new_template_and_data(genesis_generation_config_template, template_data)
@@ -63,7 +65,8 @@ def generate_el_genesis_data(
 			CONFIG_DIRPATH_ON_GENERATOR: genesis_generation_config_artifact_name,
 		},
 		"el-genesis-data",
-		capella_fork_epoch
+		capella_fork_epoch,
+		electra_fork_epoch
 	)
 
 
@@ -88,7 +91,7 @@ def generate_el_genesis_data(
 
 
 	dir_creation_cmd_result = plan.exec(recipe = ExecRecipe(command=dir_creation_cmd), service_name=launcher_service_name)
-	plan.assert(dir_creation_cmd_result["code"], "==", SUCCESSFUL_EXEC_CMD_EXIT_CODE)
+	plan.verify(dir_creation_cmd_result["code"], "==", SUCCESSFUL_EXEC_CMD_EXIT_CODE)
 
 	genesis_config_filepath_on_generator = shared_utils.path_join(CONFIG_DIRPATH_ON_GENERATOR, GENESIS_CONFIG_FILENAME)
 	genesis_filename_to_relative_filepath_in_artifact = {}
@@ -104,7 +107,7 @@ def generate_el_genesis_data(
 		]
 
 		cmd_to_execute_result = plan.exec(recipe = ExecRecipe(command=cmd_to_execute), service_name=launcher_service_name)
-		plan.assert(cmd_to_execute_result["code"], "==", SUCCESSFUL_EXEC_CMD_EXIT_CODE)
+		plan.verify(cmd_to_execute_result["code"], "==", SUCCESSFUL_EXEC_CMD_EXIT_CODE)
 
 
 		genesis_filename_to_relative_filepath_in_artifact[output_filename] = shared_utils.path_join(
@@ -124,7 +127,7 @@ def generate_el_genesis_data(
 	]
 
 	jwt_secret_generation_cmd_result = plan.exec(recipe = ExecRecipe(command=jwt_secret_generation_cmd), service_name=launcher_service_name)
-	plan.assert(jwt_secret_generation_cmd_result["code"], "==", SUCCESSFUL_EXEC_CMD_EXIT_CODE)
+	plan.verify(jwt_secret_generation_cmd_result["code"], "==", SUCCESSFUL_EXEC_CMD_EXIT_CODE)
 
 	el_genesis_data_artifact_name = plan.store_service_files(launcher_service_name, OUTPUT_DIRPATH_ON_GENERATOR, name = "el-genesis-data")
 
@@ -148,7 +151,8 @@ def genesis_generation_config_template_data(
 	genesis_delay,
 	seconds_per_slot,
 	capella_fork_epoch,
-	deneb_fork_epoch):
+	deneb_fork_epoch,
+	electra_fork_epoch):
 	return {
 		"NetworkId": network_id,
 		"DepositContractAddress": deposit_contract_address,
@@ -156,5 +160,6 @@ def genesis_generation_config_template_data(
 		"GenesisDelay": genesis_delay,
 		"SecondsPerSlot": seconds_per_slot,
 		"CapellaForkEpoch": capella_fork_epoch,
-		"DenebForkEpoch": deneb_fork_epoch
+		"DenebForkEpoch": deneb_fork_epoch,
+		"ElectraForkEpoch": electra_fork_epoch,
 	}

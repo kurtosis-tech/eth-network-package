@@ -113,6 +113,10 @@ these and other parameters are configurable through a json file Read more about 
       "v_min_mem": 0,
       "v_max_mem": 0,
 
+      // Validator count can override the default number of validators per node
+      // Defaults are set by num_validator_keys_per_node
+      "validator_count": null,
+
       // The number of times this participant should be repeated
       // defaults to 1(i.e no repetition). This is optional.
       "count": 1
@@ -153,17 +157,18 @@ For example, this `eth-network-params.json` adds a second node, running a differ
 
 ```json
 {
-  "//note": "each participant struct in particpants corresponds to a node in the network",
+  "//note": "each participant struct in participants corresponds to a node in the network",
   "participants": [
     {
       "el_client_type": "geth",
       "el_client_image": "",
       "el_client_log_level": "",
+      "el_extra_params": [],
+      "el_extra_env_vars": {},
       "cl_client_type": "lighthouse",
       "cl_client_image": "",
       "cl_client_log_level": "",
       "beacon_extra_params": [],
-      "el_extra_params": [],
       "validator_extra_params": [],
       "builder_network_params": null,
       "count": 1
@@ -172,11 +177,12 @@ For example, this `eth-network-params.json` adds a second node, running a differ
       "el_client_type": "nethermind",
       "el_client_image": "",
       "el_client_log_level": "",
+      "el_extra_params": [],
+      "el_extra_env_vars": {},
       "cl_client_type": "teku",
       "cl_client_image": "",
       "cl_client_log_level": "",
       "beacon_extra_params": [],
-      "el_extra_params": [],
       "validator_extra_params": [],
       "builder_network_params": null,
       "count": 1
