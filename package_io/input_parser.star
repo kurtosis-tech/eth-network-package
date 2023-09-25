@@ -89,10 +89,7 @@ def parse_input(input_args):
 		elif attr == "participants":
 			participants = []
 			for participant in input_args["participants"]:
-				new_participant = default_participant()
-				for sub_attr, sub_value in participant.items():
-					# if the value is set in input we set it in participant
-					new_participant[sub_attr] = sub_value
+				new_participant = create_new_participant(participant)
 				for _ in range(0, new_participant["count"]):
 					participants.append(new_participant)
 			result["participants"] = participants
@@ -176,6 +173,14 @@ def parse_input(input_args):
 		fail("required_num_validators - {0} is greater than actual_num_validators - {1}".format(required_num_validators, actual_num_validators))
 
 	return result
+
+def create_new_participant(participant_from_args):
+	new_participant = default_participant()
+	for sub_attr, sub_value in participant_from_args.items():
+		# if the value is set in input we set it in participant
+		new_participant[sub_attr] = sub_value
+	
+	return new_participant
 
 def get_client_log_level_or_default(participant_log_level, global_log_level, client_log_levels):
 	log_level = participant_log_level
