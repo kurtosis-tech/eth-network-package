@@ -95,7 +95,7 @@ def parse_input(input_args):
 					new_participant[sub_attr] = sub_value
 				for _ in range(0, new_participant["count"]):
 					participant_copy = deep_copy_participant(new_participant)
-					participants.append(new_participant)
+					participants.append(participant_copy)
 			result["participants"] = participants
 
 	total_participant_count = 0
