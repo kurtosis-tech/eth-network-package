@@ -87,27 +87,27 @@ def get_args_with_default_values(args):
 
 
 def parse_input(input_args):
-	result = default_input_args()
-	for attr in input_args:
-		value = input_args[attr]
-		# if its insterted we use the value inserted
-		if attr not in ATTR_TO_BE_SKIPPED_AT_ROOT and attr in input_args:
-			result[attr] = value
-		elif attr == "network_params":
-			for sub_attr in input_args["network_params"]:
-				sub_value = input_args["network_params"][sub_attr]
-				result["network_params"][sub_attr] = sub_value
-		elif attr == "participants":
-			participants = []
-			for participant in input_args["participants"]:
-				new_participant = default_participant()
-				for sub_attr, sub_value in participant.items():
-					# if the value is set in input we set it in participant
-					new_participant[sub_attr] = sub_value
-				for _ in range(0, new_participant["count"]):
-					participant_copy = deep_copy_participant(new_participant)
-					participants.append(participant_copy)
-			result["participants"] = participants
+    result = default_input_args()
+    for attr in input_args:
+        value = input_args[attr]
+        # if its insterted we use the value inserted
+        if attr not in ATTR_TO_BE_SKIPPED_AT_ROOT and attr in input_args:
+            result[attr] = value
+        elif attr == "network_params":
+            for sub_attr in input_args["network_params"]:
+                sub_value = input_args["network_params"][sub_attr]
+                result["network_params"][sub_attr] = sub_value
+        elif attr == "participants":
+            participants = []
+            for participant in input_args["participants"]:
+                new_participant = default_participant()
+                for sub_attr, sub_value in participant.items():
+                    # if the value is set in input we set it in participant
+                    new_participant[sub_attr] = sub_value
+                for _ in range(0, new_participant["count"]):
+                    participant_copy = deep_copy_participant(new_participant)
+                    participants.append(participant_copy)
+            result["participants"] = participants
 
     total_participant_count = 0
     actual_num_validators = 0
@@ -215,6 +215,16 @@ def parse_input(input_args):
     return result
 
 
+def deep_copy_participant(participant):
+    part = {}
+    for k, v in participant.items():
+        if type(v) == type([]):
+            part[k] = list(v)
+        else:
+            part[k] = v
+    return part
+
+
 def get_client_log_level_or_default(
     participant_log_level, global_log_level, client_log_levels
 ):
@@ -228,16 +238,6 @@ def get_client_log_level_or_default(
                 )
             )
     return log_level
-
-
-def deep_copy_participant(participant):
-    part = {}
-    for k, v in participant.items():
-        if type(v) == type([]):
-            part[k] = list(v)
-        else:
-            part[k] = v
-    return part
 
 
 def default_input_args():
