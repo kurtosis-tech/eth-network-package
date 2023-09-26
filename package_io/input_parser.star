@@ -94,6 +94,7 @@ def parse_input(input_args):
 					# if the value is set in input we set it in participant
 					new_participant[sub_attr] = sub_value
 				for _ in range(0, new_participant["count"]):
+					participant_copy = deep_copy_participant(new_participant)
 					participants.append(new_participant)
 			result["participants"] = participants
 
@@ -176,6 +177,15 @@ def parse_input(input_args):
 		fail("required_num_validators - {0} is greater than actual_num_validators - {1}".format(required_num_validators, actual_num_validators))
 
 	return result
+
+def deep_copy_participant(participant):
+    part = {}
+    for k, v in participant.items():
+        if type(v) == type([]):
+            part[k] = list(v)
+        else:    
+            part[k] = v
+    return part
 
 def get_client_log_level_or_default(participant_log_level, global_log_level, client_log_levels):
 	log_level = participant_log_level
