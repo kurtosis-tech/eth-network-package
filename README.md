@@ -1,6 +1,6 @@
 # :warning: DEPRECATION NOTICE :warning:
 
-## This package has been deprecated. Please use the Ethereum Package [here](https://github.com/kurtosis-tech/eth2-package)
+## This package has been deprecated. Please use the Ethereum Package [here](https://github.com/kurtosis-tech/ethereum-package)
 
 As of Sept 2023, this Kurtosis package has been deprecated and is no longer maintained. Please use the latest Ethereum Package [here](https://github.com/kurtosis-tech/eth2-package).
 
