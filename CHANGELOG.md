@@ -1,5 +1,26 @@
 # Changelog
 
+## [2.1.0](https://github.com/kurtosis-tech/eth-network-package/compare/2.0.0...2.1.0) (2023-09-27)
+
+
+### Features
+
+* add and run linter ([#131](https://github.com/kurtosis-tech/eth-network-package/issues/131)) ([b7548c7](https://github.com/kurtosis-tech/eth-network-package/commit/b7548c7d1b503722f3c688c4f798e9d6a97b24cc))
+* add custom validator count per node ([#122](https://github.com/kurtosis-tech/eth-network-package/issues/122)) ([d843d7c](https://github.com/kurtosis-tech/eth-network-package/commit/d843d7c2441e7821630255da2d3767a584ad8f30))
+* add support for verkle ([#115](https://github.com/kurtosis-tech/eth-network-package/issues/115)) ([83ef0a2](https://github.com/kurtosis-tech/eth-network-package/commit/83ef0a24f4053f653573bce4fc3a1460644269d5))
+* added 'participant.el_extra_env_vars' config param ([#128](https://github.com/kurtosis-tech/eth-network-package/issues/128)) ([b6ed50f](https://github.com/kurtosis-tech/eth-network-package/commit/b6ed50f1e86405ff6613fdfcf1b3b3744f93cbd0)), closes [#126](https://github.com/kurtosis-tech/eth-network-package/issues/126)
+* adding metric_url for reth ([#124](https://github.com/kurtosis-tech/eth-network-package/issues/124)) ([566bcfc](https://github.com/kurtosis-tech/eth-network-package/commit/566bcfc56679c604c798d8ba8a96ec251d0dfbef))
+* Make 'args' optional ([#119](https://github.com/kurtosis-tech/eth-network-package/issues/119)) ([bee10ab](https://github.com/kurtosis-tech/eth-network-package/commit/bee10aba5069a067c7e4e18050b6793a1d259a4e))
+
+
+### Bug Fixes
+
+* actually pass the deep copied participant ([#134](https://github.com/kurtosis-tech/eth-network-package/issues/134)) ([1e1e9ce](https://github.com/kurtosis-tech/eth-network-package/commit/1e1e9cecd73d96934090483af034e2370dc25c92))
+* deep copy participant before adding it into the participants list ([#133](https://github.com/kurtosis-tech/eth-network-package/issues/133)) ([8380599](https://github.com/kurtosis-tech/eth-network-package/commit/83805991fc2a609f655de1422c1016c3b4e2f3a4))
+* pass in list for metrics for el clients ([#129](https://github.com/kurtosis-tech/eth-network-package/issues/129)) ([dead526](https://github.com/kurtosis-tech/eth-network-package/commit/dead526d3d88422f507d529276188c024683f110))
+* replace assert with assert ([#125](https://github.com/kurtosis-tech/eth-network-package/issues/125)) ([c9a736e](https://github.com/kurtosis-tech/eth-network-package/commit/c9a736e86f8cc21fa527095e7c787a3b8dd6bbf2))
+* Update eip 7514 config ([#132](https://github.com/kurtosis-tech/eth-network-package/issues/132)) ([0e94653](https://github.com/kurtosis-tech/eth-network-package/commit/0e94653076fc6a5364f5bc0ae64623e2f1e46fe4))
+
 ## [2.0.0](https://github.com/kurtosis-tech/eth-network-package/compare/1.0.0...2.0.0) (2023-09-06)
 
 
