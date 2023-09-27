@@ -2,7 +2,7 @@
 
 ## This package has been deprecated. Please use the Ethereum Package [here](https://github.com/kurtosis-tech/ethereum-package)
 
-As of Sept 2023, this Kurtosis package has been deprecated and is no longer maintained. Please use the latest Ethereum Package [here](https://github.com/kurtosis-tech/eth2-package).
+As of Sept 2023, this Kurtosis package has been deprecated and is no longer maintained. Please use the latest Ethereum Package [here](https://github.com/kurtosis-tech/ethereum-package).
 
 Package owners who rely on this `eth-network-package` are strongly advised to migrate to using the latest Ethereum Package [here](https://github.com/kurtosis-tech/eth2-package). Please reach out on the [Kurtosis Discord](https://discord.gg/jJFG7XBqcY) if you have questions. Thank you!
 
